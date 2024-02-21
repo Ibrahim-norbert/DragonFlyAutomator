@@ -248,7 +248,7 @@ class xyz_stage(fusion_api):
 
 		vectors = vectors.reshape(r_n*c_n,2)
 
-		well_names = sum([[r.upper() + " " + str(c+1) for c in range(c_n) ]  for r in "abcdefghijklmnopqrstuvwxyz"[:r_n]],[])
+		well_names = sum([[str(r) + " " + str(c+1) for c in range(c_n) ]  for r in range(r_n)],[])
 
 		all_well_dicts = {well_name: self.vector_2_state_dict(vector)  for well_name,vector in zip(well_names,vectors)}
 

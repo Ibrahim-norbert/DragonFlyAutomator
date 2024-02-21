@@ -13,18 +13,19 @@ class wellplate(xyz_stage):
         super().__init__(endpoint)
 
 
-    def visualise_wellplate(self, all_well_dicts):
-
-        import matplotlib.pyplot as plt
-
-        fig, ax = plt.subplots()
-
-
-        for name, coord in all_well_dicts.items():
-            plt.Circle(self.state_dict_2_vector(coord), transform = fig.transFigure, figure = fig)
-
-        plt.show()
-        fig.savefig('plotcircles.png')
+    # def visualise_wellplate(self, all_well_dicts):
+    #
+    #     import matplotlib.pyplot as plt
+    #
+    #     fig2 = plt.figure()
+    #     ax2 = fig2.add_axes([0.15, 0.1, 0.7, 0.5]) #[left, bottom, width, height]
+    #
+    #
+    #     for name, coord in all_well_dicts.items():
+    #         plt.Circle(self.state_dict_2_vector(coord))
+    #
+    #     plt.show()
+    #     fig.savefig('plotcircles.png')
 
     def execute_wellplate_coords(self, all_state_dicts):
 
@@ -60,4 +61,4 @@ if __name__ == '__main__':
 
         wellplate_ = wellplate(endpoint=args.endpoint)
 
-        wellplate_.visualise_wellplate(all_state_dicts)
+        #wellplate_.visualise_wellplate(all_state_dicts)
