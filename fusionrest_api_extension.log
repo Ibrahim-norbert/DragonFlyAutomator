@@ -1,0 +1,122 @@
+2024-02-16 16:57:18,636 - DEBUG - Starting new HTTP connection (1): localhost:15120
+2024-02-16 16:57:20,642 - ERROR - An unexpected output error occurred
+Traceback (most recent call last):
+  File "C:\Users\Ibrahim\AppData\Local\Programs\Python\Python310\lib\site-packages\urllib3\connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+  File "C:\Users\Ibrahim\AppData\Local\Programs\Python\Python310\lib\site-packages\urllib3\util\connection.py", line 85, in create_connection
+    raise err
+  File "C:\Users\Ibrahim\AppData\Local\Programs\Python\Python310\lib\site-packages\urllib3\util\connection.py", line 73, in create_connection
+    sock.connect(sa)
+ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt werden, da der Zielcomputer die Verbindung verweigerte
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Ibrahim\AppData\Local\Programs\Python\Python310\lib\site-packages\urllib3\connectionpool.py", line 793, in urlopen
+    response = self._make_request(
+  File "C:\Users\Ibrahim\AppData\Local\Programs\Python\Python310\lib\site-packages\urllib3\connectionpool.py", line 496, in _make_request
+    conn.request(
+  File "C:\Users\Ibrahim\AppData\Local\Programs\Python\Python310\lib\site-packages\urllib3\connection.py", line 400, in request
+    self.endheaders()
+  File "C:\Users\Ibrahim\AppData\Local\Programs\Python\Python310\lib\http\client.py", line 1277, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+  File "C:\Users\Ibrahim\AppData\Local\Programs\Python\Python310\lib\http\client.py", line 1037, in _send_output
+    self.send(msg)
+  File "C:\Users\Ibrahim\AppData\Local\Programs\Python\Python310\lib\http\client.py", line 975, in send
+    self.connect()
+  File "C:\Users\Ibrahim\AppData\Local\Programs\Python\Python310\lib\site-packages\urllib3\connection.py", line 238, in connect
+    self.sock = self._new_conn()
+  File "C:\Users\Ibrahim\AppData\Local\Programs\Python\Python310\lib\site-packages\urllib3\connection.py", line 213, in _new_conn
+    raise NewConnectionError(
+urllib3.exceptions.NewConnectionError: <urllib3.connection.HTTPConnection object at 0x00000233F7E5C1C0>: Failed to establish a new connection: [WinError 10061] Es konnte keine Verbindung hergestellt werden, da der Zielcomputer die Verbindung verweigerte
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Ibrahim\AppData\Local\Programs\Python\Python310\lib\site-packages\requests\adapters.py", line 486, in send
+    resp = conn.urlopen(
+  File "C:\Users\Ibrahim\AppData\Local\Programs\Python\Python310\lib\site-packages\urllib3\connectionpool.py", line 847, in urlopen
+    retries = retries.increment(
+  File "C:\Users\Ibrahim\AppData\Local\Programs\Python\Python310\lib\site-packages\urllib3\util\retry.py", line 515, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+urllib3.exceptions.MaxRetryError: HTTPConnectionPool(host='localhost', port=15120): Max retries exceeded with url: /v1/devices/xyz-stage (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x00000233F7E5C1C0>: Failed to establish a new connection: [WinError 10061] Es konnte keine Verbindung hergestellt werden, da der Zielcomputer die Verbindung verweigerte'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\ibrahim_programme\Dragonfly_package\script.py", line 21, in get_output
+    return fusionrest.__get(endpoint)
+  File "C:\ibrahim_programme\Dragonfly_package\fusionrest.py", line 53, in __get
+    response = requests.get(__make_address(endpoint))
+  File "C:\Users\Ibrahim\AppData\Local\Programs\Python\Python310\lib\site-packages\requests\api.py", line 73, in get
+    return request("get", url, params=params, **kwargs)
+  File "C:\Users\Ibrahim\AppData\Local\Programs\Python\Python310\lib\site-packages\requests\api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+  File "C:\Users\Ibrahim\AppData\Local\Programs\Python\Python310\lib\site-packages\requests\sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "C:\Users\Ibrahim\AppData\Local\Programs\Python\Python310\lib\site-packages\requests\sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "C:\Users\Ibrahim\AppData\Local\Programs\Python\Python310\lib\site-packages\requests\adapters.py", line 519, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPConnectionPool(host='localhost', port=15120): Max retries exceeded with url: /v1/devices/xyz-stage (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x00000233F7E5C1C0>: Failed to establish a new connection: [WinError 10061] Es konnte keine Verbindung hergestellt werden, da der Zielcomputer die Verbindung verweigerte'))
+2024-02-16 16:57:20,646 - DEBUG - Starting new HTTP connection (1): localhost:15120
+2024-02-16 16:57:22,650 - ERROR - An unexpected output error occurred
+Traceback (most recent call last):
+  File "C:\Users\Ibrahim\AppData\Local\Programs\Python\Python310\lib\site-packages\urllib3\connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+  File "C:\Users\Ibrahim\AppData\Local\Programs\Python\Python310\lib\site-packages\urllib3\util\connection.py", line 85, in create_connection
+    raise err
+  File "C:\Users\Ibrahim\AppData\Local\Programs\Python\Python310\lib\site-packages\urllib3\util\connection.py", line 73, in create_connection
+    sock.connect(sa)
+ConnectionRefusedError: [WinError 10061] Es konnte keine Verbindung hergestellt werden, da der Zielcomputer die Verbindung verweigerte
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Ibrahim\AppData\Local\Programs\Python\Python310\lib\site-packages\urllib3\connectionpool.py", line 793, in urlopen
+    response = self._make_request(
+  File "C:\Users\Ibrahim\AppData\Local\Programs\Python\Python310\lib\site-packages\urllib3\connectionpool.py", line 496, in _make_request
+    conn.request(
+  File "C:\Users\Ibrahim\AppData\Local\Programs\Python\Python310\lib\site-packages\urllib3\connection.py", line 400, in request
+    self.endheaders()
+  File "C:\Users\Ibrahim\AppData\Local\Programs\Python\Python310\lib\http\client.py", line 1277, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+  File "C:\Users\Ibrahim\AppData\Local\Programs\Python\Python310\lib\http\client.py", line 1037, in _send_output
+    self.send(msg)
+  File "C:\Users\Ibrahim\AppData\Local\Programs\Python\Python310\lib\http\client.py", line 975, in send
+    self.connect()
+  File "C:\Users\Ibrahim\AppData\Local\Programs\Python\Python310\lib\site-packages\urllib3\connection.py", line 238, in connect
+    self.sock = self._new_conn()
+  File "C:\Users\Ibrahim\AppData\Local\Programs\Python\Python310\lib\site-packages\urllib3\connection.py", line 213, in _new_conn
+    raise NewConnectionError(
+urllib3.exceptions.NewConnectionError: <urllib3.connection.HTTPConnection object at 0x00000233F7EC8970>: Failed to establish a new connection: [WinError 10061] Es konnte keine Verbindung hergestellt werden, da der Zielcomputer die Verbindung verweigerte
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Ibrahim\AppData\Local\Programs\Python\Python310\lib\site-packages\requests\adapters.py", line 486, in send
+    resp = conn.urlopen(
+  File "C:\Users\Ibrahim\AppData\Local\Programs\Python\Python310\lib\site-packages\urllib3\connectionpool.py", line 847, in urlopen
+    retries = retries.increment(
+  File "C:\Users\Ibrahim\AppData\Local\Programs\Python\Python310\lib\site-packages\urllib3\util\retry.py", line 515, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+urllib3.exceptions.MaxRetryError: HTTPConnectionPool(host='localhost', port=15120): Max retries exceeded with url: /v1/devices/xyz-stage (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x00000233F7EC8970>: Failed to establish a new connection: [WinError 10061] Es konnte keine Verbindung hergestellt werden, da der Zielcomputer die Verbindung verweigerte'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\ibrahim_programme\Dragonfly_package\script.py", line 21, in get_output
+    return fusionrest.__get(endpoint)
+  File "C:\ibrahim_programme\Dragonfly_package\fusionrest.py", line 53, in __get
+    response = requests.get(__make_address(endpoint))
+  File "C:\Users\Ibrahim\AppData\Local\Programs\Python\Python310\lib\site-packages\requests\api.py", line 73, in get
+    return request("get", url, params=params, **kwargs)
+  File "C:\Users\Ibrahim\AppData\Local\Programs\Python\Python310\lib\site-packages\requests\api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+  File "C:\Users\Ibrahim\AppData\Local\Programs\Python\Python310\lib\site-packages\requests\sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "C:\Users\Ibrahim\AppData\Local\Programs\Python\Python310\lib\site-packages\requests\sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "C:\Users\Ibrahim\AppData\Local\Programs\Python\Python310\lib\site-packages\requests\adapters.py", line 519, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPConnectionPool(host='localhost', port=15120): Max retries exceeded with url: /v1/devices/xyz-stage (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x00000233F7EC8970>: Failed to establish a new connection: [WinError 10061] Es konnte keine Verbindung hergestellt werden, da der Zielcomputer die Verbindung verweigerte'))
