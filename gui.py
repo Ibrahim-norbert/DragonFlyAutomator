@@ -1,7 +1,20 @@
-from PyQt6.QtWidgets import QApplication, QGridLayout, QPushButton, QWidget, QButtonGroup, QMainWindow
+import logging
+import os.path
+
+from PyQt6.QtGui import QIcon, QPainter, QPixmap, QColor, QFont
+from PyQt6.QtWidgets import QApplication, QGridLayout, QPushButton, QWidget, QButtonGroup, QMainWindow, QLineEdit, \
+    QVBoxLayout
+from PyQt6.QtCore import Qt
 import sys
 from wellplate import wellplate
 
+
+directory = os.path.dirname(os.getcwd())
+
+
+# Configure logging
+logging.basicConfig(filename=os.path.join(directory,'wellplate_estimation.log'),
+                    format='%(asctime)s - %(levelname)s - %(message)s')
 class WellAsButton(QPushButton):
     def __init__(self, text, parent, coordinates):
         super().__init__(text=text, parent=parent)
@@ -11,154 +24,166 @@ class WellAsButton(QPushButton):
         self.setStyleSheet("background-color: {}; color: #ffffff;".format(self.color))
         self.setCheckable(True)
 
+    def handleButtonClick(self):
+        if self.isChecked():
+            self.color = "#ff0000"
+        else:
+            self.color = "#00aa00"
+        self.setStyleSheet("background-color: {}; color: #ffffff;".format(self.color))
+        print(f"{self.text()} {'Selected' if self.isChecked() else 'Deselected'}")
 
-class CustomButtonGroup:
+    def mouseDoubleClickEvent(self, event):
+        self.toggle()  # Toggle the check state
+        self.handleButtonClick()
 
-    """
-    In PyQt, QButtonGroup is not directly subclassable because it is not meant to be a widget itself but rather a
-    container for managing groups of radio buttons or checkable buttons. However, you can create a class that
-    encapsulates a QButtonGroup and extends its functionality. This class can have additional methods
-    and properties to handle your specific use case
 
-    """
+class CustomButtonGroup(QWidget):
     def __init__(self, all_state_dicts):
-        self.button_group = QButtonGroup()
+        super().__init__()
 
-        self.selected_buttons = set()
+        layout = QGridLayout(self)
 
         for key, well_state_dict in all_state_dicts.items():
             r, c = int(key.split(" ")[0]), int(key.split(" ")[-1])
             label = "abcdefghijklmnopqrstuvwxyz".upper()[r] + key.split(" ")[-1]
             button = WellAsButton(text=label, parent=self, coordinates=(r, c))
-            self.addButton(button)
+            button.clicked.connect(button.handleButtonClick)
+            layout.addWidget(button, button.coordinates[0], button.coordinates[1])
+
+        self.setLayout(layout)
+
+
+class BackgroundMainWindow(QMainWindow):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.background_image = QPixmap(os.path.join(directory,"dragonfly.jpg"))
+        self.overlay_image = QPixmap(os.path.join(directory,"BioQuant_Logo_RGB_136.png"))
+        self.text = "AG Erfle & Starkuvienė"
+
+
+    def paintEvent(self, event):
+        painter = QPainter(self)
+
+        # Draw the background image
+        painter.drawPixmap(self.rect(), self.background_image)
+
+        # Draw the overlay image in the top-left corner
+        painter.drawPixmap(0, 0, self.overlay_image)
+
+        # Set the text color to white
+        painter.setPen(QColor("white"))
+
+        # Set font properties if needed
+        font = QFont()
+        font.setPointSize(25)
+        painter.setFont(font)
+
+        # Add text next to the small picture
+        painter.drawText(self.overlay_image.width(), 35, self.text)
 
 
 
-        self.connectButtons(self.handleButtonClick)
-
-    def addButton(self, button):
-        self.button_group.addButton(button)
-
-    def handleButtonClick(self, button):
-        if button.isChecked():
-            print(f"{button.text()} selected")
-        else:
-            print(f"{button.text()} deselected")
-
-    def connectButtons(self, callback):
-        self.button_group.buttonClicked.connect(callback)
-
-#TODO How can i make group button as its own widget ????
-class DragonflyAutomator(QMainWindow):
-    def __init__(self, all_state_dicts):
+class DragonflyAutomator(BackgroundMainWindow):
+    def __init__(self):
         super().__init__()
 
-        layout = QGridLayout(self)
-        layout.addWidget(button, button.coordinates[0], button.coordinates[1]) #TODO Solve this
-
-        CustomButtonGroup(parent=self, all_state_dicts=all_state_dicts)
-
-        #self.setCentralWidget(buttons)
-
         self.setWindowTitle("Dragonfly Automator")
-        self.setGeometry(100, 100, 400, 300)
+        self.setGeometry(100, 100, 800, 400)
 
-if __name__ == '__main__':
-    import argparse
+        central_widget = QWidget(self)  # Create a central widget
+        self.setCentralWidget(central_widget)  # Set the central widget for the QMainWindow
 
-    parser = argparse.ArgumentParser(description='train a phase registration model')
-    parser.add_argument("--columns", type=int, required=False, help="Enter x coordinates for xyz stage")
-    parser.add_argument("--rows", type=int, required=False, help="Enter y coordinates for xyz stage")
-    parser.add_argument("--analoguecontrol", type=bool, default=False, help="Enter boolean for analog control of xyz stage")
-    parser.add_argument("--update", type=bool, default=False, help="Enter boolean for analog control of xyz stage")
-    parser.add_argument("--endpoint",type=str, required=True, help="Enter API endpoint of xyz stage")
+        self.save_directory = QLineEdit(parent=central_widget)
+        self.save_directory.setPlaceholderText("Please enter the directory to save the images in")
+
+        self.username = QLineEdit(parent=central_widget)
+        self.username.setPlaceholderText("Please enter your name")
+
+        self.enter_button = QPushButton("Enter", parent=central_widget)
+        self.enter_button.clicked.connect(self.handleButtonClick)
+
+        layout = QVBoxLayout(central_widget)  # Pass the central widget to the layout
+
+        layout.addWidget(self.username)
+        layout.addWidget(self.save_directory)
+        layout.addWidget(self.enter_button)
+
+        # Set layout alignment to center
+        layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+    def handleButtonClick(self):
+
+        #raise NotImplementedError ("Still need to work on it")
+
+        path = self.save_directory.setText(self.save_directory.text())
+
+        if not os.path.exists(path) and os.path.isdir(os.path.dirname(path)):
+            os.makedirs(path)
+            # If the path is valid, set the text color to black
+            self.save_directory.setStyleSheet("color: black;")
+            logging.log(level=20, msg="Made new directory: " + path)
+        elif not os.path.isdir(os.path.dirname(path)):
+            # If the directory part of the path is not a valid directory, set the text color to red
+            self.save_directory.setText("This is not a path, please try again.")
+            self.save_directory.setStyleSheet("color: red;")
+            logging.log(level=20, msg="Invalid path: " + path)
+        else:
+            # If the path exists or the directory part is valid, set the text color to black
+            self.save_directory.setStyleSheet("color: black;")
 
 
-    args = parser.parse_args()
+        if os.path.exists(path):
+            self.username.setText(self.username.text())
+            #self.empirical_wellplate()
 
 
-    wellplate_ = wellplate(endpoint=args.endpoint)
 
-    print("Before update: " + str(wellplate_.__dict__))
+   # def changeframe_wellplate(self):
 
-    wellplate_.get_well_plate_req_coords()
+       # self.setCentralWidget(CustomButtonGroup(all_state_dicts))
 
-    columns,rows = args.columns, args.rows
+    def empirical_wellplate(self, endpoint, columns, rows):
 
-    if columns is not None and rows is not None:
+        central_widget = QWidget(self)  # Create a central widget
+        self.setCentralWidget(central_widget)  # Set the central widget for the QMainWindow
+
+
+        self.save_directory = QLineEdit(parent=central_widget)
+        self.save_directory.setPlaceholderText("Column number")
+
+        self.username = QLineEdit(parent=central_widget)
+        self.username.setPlaceholderText("Row number")
+
+        self.enter_button = QPushButton("Enter", parent=central_widget)
+        self.enter_button.clicked.connect(self.handleButtonClick)
+
+        layout = QVBoxLayout(central_widget)  # Pass the central widget to the layout
+
+        layout.addWidget(self.username)
+        layout.addWidget(self.save_directory)
+        layout.addWidget(self.enter_button)
+
+        # Set layout alignment to center
+        layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+
+        wellplate_ = wellplate(endpoint=endpoint)
 
         all_state_dicts = wellplate_.compute_wellplate_coords(columns, rows)
 
-        # 2. Create an instance of QApplication
-        app = QApplication(sys.argv)  # Handles command line arguments but as empty list is given no command line argument
-        # handling is instructed
 
-        window = DragonflyAutomator(all_state_dicts)
+        print("Before update: " + str(wellplate_.__dict__))
 
-        # window.setGeometry(50, 50, 280, 80)  # x,y positions and width,height of window
-        window.show()
-
-        sys.exit(app.exec())
+        wellplate_.get_well_plate_req_coords()
 
 
 
 
 
 
+if __name__ == '__main__':
 
-#
-# import sys
-#
-#
-# from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget
-#
-#
-# WINDOW_SIZE = 235
-#
-#
-# class PyCalcWindow(QMainWindow):
-#
-#     """PyCalc's main window (GUI or view)."""
-#
-#
-#     def __init__(self):
-#
-#         super().__init__()
-#
-#         self.setWindowTitle("PyCalc")
-#
-#         self.setFixedSize(WINDOW_SIZE, WINDOW_SIZE)
-#
-#         centralWidget = QWidget(self)
-#
-#         self.setCentralWidget(centralWidget)
-#
-#
-# def main():
-#
-#     """PyCalc's main function."""
-#
-#     pycalcApp = QApplication([])
-#
-#     pycalcWindow = PyCalcWindow()
-#
-#     pycalcWindow.show()
-#
-#     sys.exit(pycalcApp.exec())
-#
-#
-# if __name__ == "__main__":
-#
-#     main()
-
-
-#window.setGeometry(50, 50, 280, 80) #x,y positions and width,height of window
-#helloMsg = QLabel("<h1>Hello, World!</h1>", parent=window) #Widget or graphical component. It displays HTML formatted text, here the text is provided as a h1 header
-#helloMsg.move(60, 15) #Moves the text within the coordinates of the window
-
-# 4. Show your application's GUI
-#window.show() #Paints the widgets and is added to the application event queue.
-
-# 5. Run your application's event loop
-#sys.exit(app.exec())# The application event loop is started using .exec. This is wrapped into sys.exit() which enables
-# clean exit from python and release of memory resources when the application is terminated.
+    app = QApplication(sys.argv)
+    window = DragonflyAutomator()
+    window.show()
+    sys.exit(app.exec())
