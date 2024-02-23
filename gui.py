@@ -1,20 +1,18 @@
 import logging
 import os.path
+import sys
 
 from PyQt6.QtGui import QIcon, QPainter, QPixmap, QColor, QFont
-from PyQt6.QtWidgets import QApplication, QGridLayout, QPushButton, QWidget, QButtonGroup, QMainWindow, QLineEdit, \
-    QVBoxLayout
+from PyQt6.QtWidgets import QApplication, QGridLayout, QPushButton, QWidget, QMainWindow, QLineEdit, QVBoxLayout
 from PyQt6.QtCore import Qt
-import sys
-from wellplate import wellplate
-
 
 directory = os.path.dirname(os.getcwd())
 
-
 # Configure logging
-logging.basicConfig(filename=os.path.join(directory,'wellplate_estimation.log'),
+logging.basicConfig(filename=os.path.join(directory, 'wellplate_estimation.log'),
                     format='%(asctime)s - %(levelname)s - %(message)s')
+
+
 class WellAsButton(QPushButton):
     def __init__(self, text, parent, coordinates):
         super().__init__(text=text, parent=parent)
@@ -53,13 +51,47 @@ class CustomButtonGroup(QWidget):
         self.setLayout(layout)
 
 
+class wellplatedimensions(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        layout = QGridLayout(self)
+
+
+        self.save_directory = QLineEdit(parent=self)
+        self.save_directory.setPlaceholderText("Column number")
+
+        self.username = QLineEdit(parent=self)
+        self.username.setPlaceholderText("Row number")
+
+
+        #TODO give small display fields for the sample readings
+        #.........................
+
+
+        self.enter_button = QPushButton("Enter", parent=self)
+        self.enter_button.clicked.connect(self.handleButtonClick)
+
+        layout = QVBoxLayout(self)  # Pass the central widget to the layout
+
+        layout.addWidget(self.username)
+        layout.addWidget(self.save_directory)
+        layout.addWidget(self.enter_button)
+
+        # Set layout alignment to center
+        layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.setLayout(layout)
+
+
+
+
 class BackgroundMainWindow(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.background_image = QPixmap(os.path.join(directory,"dragonfly.jpg"))
-        self.overlay_image = QPixmap(os.path.join(directory,"BioQuant_Logo_RGB_136.png"))
+        self.background_image = QPixmap(os.path.join(directory, "dragonfly.jpg"))
+        self.overlay_image = QPixmap(os.path.join(directory, "BioQuant_Logo_RGB_136.png"))
         self.text = "AG Erfle & Starkuvienė"
-
 
     def paintEvent(self, event):
         painter = QPainter(self)
@@ -80,7 +112,6 @@ class BackgroundMainWindow(QMainWindow):
 
         # Add text next to the small picture
         painter.drawText(self.overlay_image.width(), 35, self.text)
-
 
 
 class DragonflyAutomator(BackgroundMainWindow):
@@ -111,78 +142,41 @@ class DragonflyAutomator(BackgroundMainWindow):
         # Set layout alignment to center
         layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
+        # Store the default stylesheet
+        self.default_stylesheet = self.save_directory.styleSheet()
+
+        self.save_directory.textChanged.connect(self.handlePathChanged)
+
     def handleButtonClick(self):
-
-        #raise NotImplementedError ("Still need to work on it")
-
-        path = self.save_directory.setText(self.save_directory.text())
+        path = self.save_directory.text()
 
         if not os.path.exists(path) and os.path.isdir(os.path.dirname(path)):
             os.makedirs(path)
-            # If the path is valid, set the text color to black
-            self.save_directory.setStyleSheet("color: black;")
+            # If the path is valid, set the text color to white
+            self.save_directory.setStyleSheet("color: white;")
             logging.log(level=20, msg="Made new directory: " + path)
+            # Reset the error_displayed flag
         elif not os.path.isdir(os.path.dirname(path)):
-            # If the directory part of the path is not a valid directory, set the text color to red
-            self.save_directory.setText("This is not a path, please try again.")
+            error_message = "Invalid path: Please enter a valid directory."
+            self.save_directory.setText(error_message)
             self.save_directory.setStyleSheet("color: red;")
-            logging.log(level=20, msg="Invalid path: " + path)
-        else:
-            # If the path exists or the directory part is valid, set the text color to black
-            self.save_directory.setStyleSheet("color: black;")
 
+        else:
+            # If the path exists or the directory part is valid, set the text color to white
+            self.save_directory.setStyleSheet("color: white;")
 
         if os.path.exists(path):
             self.username.setText(self.username.text())
-            #self.empirical_wellplate()
+            # self.empirical_wellplate()
 
-
-
-   # def changeframe_wellplate(self):
-
-       # self.setCentralWidget(CustomButtonGroup(all_state_dicts))
-
-    def empirical_wellplate(self, endpoint, columns, rows):
-
-        central_widget = QWidget(self)  # Create a central widget
-        self.setCentralWidget(central_widget)  # Set the central widget for the QMainWindow
-
-
-        self.save_directory = QLineEdit(parent=central_widget)
-        self.save_directory.setPlaceholderText("Column number")
-
-        self.username = QLineEdit(parent=central_widget)
-        self.username.setPlaceholderText("Row number")
-
-        self.enter_button = QPushButton("Enter", parent=central_widget)
-        self.enter_button.clicked.connect(self.handleButtonClick)
-
-        layout = QVBoxLayout(central_widget)  # Pass the central widget to the layout
-
-        layout.addWidget(self.username)
-        layout.addWidget(self.save_directory)
-        layout.addWidget(self.enter_button)
-
-        # Set layout alignment to center
-        layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-
-        wellplate_ = wellplate(endpoint=endpoint)
-
-        all_state_dicts = wellplate_.compute_wellplate_coords(columns, rows)
-
-
-        print("Before update: " + str(wellplate_.__dict__))
-
-        wellplate_.get_well_plate_req_coords()
-
-
+    def handlePathChanged(self):
+        # Reset the text color and placeholder text when the user starts typing
+        self.save_directory.setStyleSheet(self.default_stylesheet)
 
 
 
 
 if __name__ == '__main__':
-
     app = QApplication(sys.argv)
     window = DragonflyAutomator()
     window.show()

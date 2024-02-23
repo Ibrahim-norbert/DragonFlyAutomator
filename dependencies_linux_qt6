@@ -1,0 +1,4 @@
+Dependencies that must be downloaded before installing pyqt6 for linux: 
+
+
+python3 python3-pip build-essential libgl1-mesa-dev qtbase5-dev libxcb-cursor0
