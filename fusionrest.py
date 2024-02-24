@@ -1,7 +1,11 @@
 import requests
 import json
 import time
+import logging
+import os
 
+logging.basicConfig(filename=os.path.join(os.getcwd(),'dragonfly_automator.log'), level=logging.DEBUG,
+					format='%(asctime)s - %(levelname)s - %(message)s', filemode="w")
 host = "localhost"
 port = 15120
 

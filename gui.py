@@ -5,53 +5,15 @@ import sys
 
 from PyQt6.QtGui import QIcon, QPainter, QPixmap, QColor, QFont
 from PyQt6.QtWidgets import QApplication, QGridLayout, QPushButton, QWidget, QMainWindow, QLineEdit, QVBoxLayout, \
-    QLabel, QComboBox, QHBoxLayout, QStackedWidget
+    QLabel, QComboBox, QHBoxLayout, QStackedWidget, QSizePolicy
 from PyQt6.QtCore import Qt
 from wellplate import wellplate
 
 directory = os.path.dirname(os.getcwd())
 
 # Configure logging
-logging.basicConfig(filename=os.path.join(directory, 'wellplate_estimation.log'),
+logging.basicConfig(filename=os.path.join(directory, 'dragonfly_automator.log'), level=logging.DEBUG,
                     format='%(asctime)s - %(levelname)s - %(message)s')
-
-
-class WellAsButton(QPushButton):
-    def __init__(self, text, parent, coordinates):
-        super().__init__(text=text, parent=parent)
-
-        self.coordinates = coordinates
-        self.color = "#00aa00"
-        self.setStyleSheet("background-color: {}; color: #ffffff;".format(self.color))
-        self.setCheckable(True)
-
-    def handleButtonClick(self):
-        if self.isChecked():
-            self.color = "#ff0000"
-        else:
-            self.color = "#00aa00"
-        self.setStyleSheet("background-color: {}; color: #ffffff;".format(self.color))
-        print(f"{self.text()} {'Selected' if self.isChecked() else 'Deselected'}")
-
-    def mouseDoubleClickEvent(self, event):
-        self.toggle()  # Toggle the check state
-        self.handleButtonClick()
-
-
-class CustomButtonGroup(QWidget):
-    def __init__(self, all_state_dicts):
-        super().__init__()
-
-        layout = QGridLayout(self)
-
-        for key, well_state_dict in all_state_dicts.items():
-            r, c = int(key.split(" ")[0]), int(key.split(" ")[-1])
-            label = "abcdefghijklmnopqrstuvwxyz".upper()[r] + key.split(" ")[-1]
-            button = WellAsButton(text=label, parent=self, coordinates=(r, c))
-            button.clicked.connect(button.handleButtonClick)
-            layout.addWidget(button, button.coordinates[0], button.coordinates[1])
-
-        self.setLayout(layout)
 
 
 class BackgroundMainWindow(QMainWindow):
@@ -82,14 +44,96 @@ class BackgroundMainWindow(QMainWindow):
         painter.drawText(self.overlay_image.width(), 35, self.text)
 
 
-def create_colored_label(text, parent):
-    label = QLabel(text, parent=parent)
-    label.setStyleSheet("color: {};".format("white"))
-    return label
+class DragonflyAutomator(BackgroundMainWindow):
+    def __init__(self):
+        super().__init__()
+
+        self.setWindowTitle("Dragonfly Automator")
+        self.setGeometry(500, 300, 800, 400)
+
+        self.stacked_widget = QStackedWidget()
+        # Widget should be in the centre
+        self.setCentralWidget(self.stacked_widget)
+
+        #Frame one
+        self.stacked_widget.addWidget(UsernamePath(self.stacked_widget))
+
+        #Frame two
+        self.stacked_widget.addWidget(WellPlateDimensions(endpoint="v1/devices/xyz-stage", model="384",
+                                                          stacked_widget=self.stacked_widget))
+
+
+
+
+    # def add_switch_to_next_widget(self, widget):
+    #     .addWidget(widget)
+    #     self.stacked_widget.setCurrentWidget(widget)
+
+class UsernamePath(QWidget):
+    def __init__(self, stacked_widget):
+        super().__init__()
+
+
+        self.stacked_widget = stacked_widget
+
+        self.save_directory = QLineEdit(parent=self)
+        self.save_directory.setPlaceholderText("Please enter the directory to save the images in")
+
+        self.username = QLineEdit(parent=self)
+        self.username.setPlaceholderText("Please enter your name")
+
+        self.enter_button = QPushButton("Enter", parent=self)
+        self.enter_button.clicked.connect(self.handleEnterPressed)
+
+        # Store the default stylesheet
+        self.default_stylesheet = self.save_directory.styleSheet()
+
+        self.save_directory.textChanged.connect(self.handlePathChanged)
+        # self.save_directory.returnPressed.connect(self.handleEnterPressed)
+        # self.username.returnPressed.connect(self.handleEnterPressed)
+
+        # Layout of widget
+        layout = QVBoxLayout(self)  # Pass the central widget to the layout
+        layout.addWidget(self.username)
+        layout.addWidget(self.save_directory)
+        layout.addWidget(self.enter_button)
+        layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.setLayout(layout)
+
+    def handleEnterPressed(self):
+        # This method will be called when the user presses Enter in the line edit widgets
+
+        # Check if both username and path are not empty
+        if self.username.text() and self.save_directory.text():
+            # Perform the necessary checks and switch to WellPlateDimensions
+            path = self.save_directory.text()
+
+            if not os.path.exists(path) and os.path.isdir(os.path.dirname(path)):
+                os.makedirs(path)
+                # If the path is valid, set the text color to white
+                self.save_directory.setStyleSheet("color: white;")
+                logging.log(level=10, msg="Made new directory: " + path)
+            elif not os.path.isdir(os.path.dirname(path)):
+                error_message = "Invalid path: Please enter a valid directory."
+                logging.log(level=10, msg=error_message + ": " + path)
+                self.save_directory.setText(error_message)
+                self.save_directory.setStyleSheet("color: red;")
+            else:
+                # If the path exists or the directory part is valid, set the text color to white
+                self.save_directory.setStyleSheet("color: white;")
+
+            if os.path.exists(path):
+                self.username.setText(self.username.text())
+                logging.log(level=10, msg="Username: " + self.username.text())
+                self.stacked_widget.setCurrentIndex(1)
+
+    def handlePathChanged(self):
+        # Reset the text color and placeholder text when the user starts typing
+        self.save_directory.setStyleSheet(self.default_stylesheet)
 
 
 class WellPlateDimensions(QWidget):
-    def __init__(self, stacked_widget, endpoint, model):
+    def __init__(self, endpoint, model, stacked_widget):
         super().__init__()
 
         self.stacked_widget = stacked_widget
@@ -138,27 +182,27 @@ class WellPlateDimensions(QWidget):
         main_layout.addLayout(layout4)
         main_layout.addWidget(self.enter_button)
         main_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
         self.setLayout(main_layout)
-
-        self.stacked_widget.addWidget(self)
 
         options = [self.dropdown.itemText(index) for index in range(self.dropdown.count())]
         self.well_plate = wellplate(endpoint=endpoint, well1=options[0], well2=options[1], well3=options[2],
                                     model=model)
 
+
+
     def read_well_coordinate(self):
 
         try:
-            self.well_plate.well_plate_req_coords[self.dropdown.currentText()] = self.well_plate.get_state()
+            self.well_plate.well_plate_req_coords[self.dropdown.currentText()] = self.well_plate.get_state(
+                test_key=self.dropdown.currentText())
             vector = self.well_plate.state_dict_2_vector(
                 self.well_plate.well_plate_req_coords[self.dropdown.currentText()])
             self.placeholder_coordinates.setText(str(vector))
-            logging.log(level=20, msg="Well: " + self.dropdown.currentText() + " - " + str(vector))
+            logging.log(level=10, msg="Well: " + self.dropdown.currentText() + " - " + str(vector))
 
             if None not in self.well_plate.well_plate_req_coords.values():
                 final = self.well_plate.well_plate_req_coords.items()
-                logging.log(level=20, msg="Final coordinates: " + str(final))
+                logging.log(level=10, msg="Final coordinates: " + str(final))
 
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
@@ -167,92 +211,72 @@ class WellPlateDimensions(QWidget):
     def enter_button_click(self):
 
         if None not in self.well_plate.well_plate_req_coords.values():
-            self.well_plate.compute_template_coords(self.column_n, self.row_n)
+            diction = self.well_plate.compute_template_coords(int(self.column_n.text()), int(self.row_n.text()))
+
+            # Frame three
+            self.stacked_widget.addWidget(CustomButtonGroup(diction))
+            self.stacked_widget.setCurrentIndex(2)
 
 
-class UsernamePath(QWidget):
-    def __init__(self, stacked_widget):
+class WellAsButton(QPushButton):
+    def __init__(self, text, parent, coordinates):
+        super().__init__(text=text, parent=parent)
+
+        self.coordinates = coordinates
+        self.color = "#00aa00"
+        self.setStyleSheet("background-color: {}; color: #ffffff;".format(self.color))
+        self.setCheckable(True)
+
+    def handleButtonClick(self):
+        if self.isChecked():
+            self.color = "#ff0000"
+        else:
+            self.color = "#00aa00"
+        self.setStyleSheet("background-color: {}; color: #ffffff;".format(self.color))
+
+        print(f"{self.text()} {'Selected' if self.isChecked() else 'Deselected'}")
+
+    def mouseDoubleClickEvent(self, event):
+        self.toggle()  # Toggle the check state
+        self.handleButtonClick()
+
+
+class CustomButtonGroup(QWidget):
+    def __init__(self, all_state_dicts):
         super().__init__()
 
-        self.stacked_widget = stacked_widget
+        layout = QGridLayout()
+        for key, well_state_dict in all_state_dicts.items():
+            r, c = int(key.split(" ")[0]), int(key.split(" ")[-1])
+            label = "abcdefghijklmnopqrstuvwxyz".upper()[r] + key.split(" ")[-1]
+            button = WellAsButton(text=label, parent=self, coordinates=(r, c))
+            button.clicked.connect(button.handleButtonClick)
+            layout.addWidget(button, button.coordinates[0], button.coordinates[1])
+            button.setFixedSize(25, 15)
 
-        self.save_directory = QLineEdit(parent=self)
-        self.save_directory.setPlaceholderText("Please enter the directory to save the images in")
-
-        self.username = QLineEdit(parent=self)
-        self.username.setPlaceholderText("Please enter your name")
-
+        main_layout = QVBoxLayout(self)
+        main_layout.addLayout(layout)
         self.enter_button = QPushButton("Enter", parent=self)
         self.enter_button.clicked.connect(self.handleEnterPressed)
+        main_layout.addWidget(self.enter_button)
+        # Set stretch factors for rows and columns
+        # layout.setColumnStretch(0, 0.6)  # Adjust the stretch factor for columns as needed
+        # layout.setRowStretch(0, 1)  # Adjust the stretch factor for rows as needed
+        #
+        # container_layout = QVBoxLayout(self)
+        # container_layout.addLayout(layout)
 
-        # Store the default stylesheet
-        self.default_stylesheet = self.save_directory.styleSheet()
-
-        self.save_directory.textChanged.connect(self.handlePathChanged)
-        self.save_directory.returnPressed.connect(self.handleEnterPressed)
-        self.username.returnPressed.connect(self.handleEnterPressed)
-
-        # Layout of widget
-        layout = QVBoxLayout(self)  # Pass the central widget to the layout
-        layout.addWidget(self.username)
-        layout.addWidget(self.save_directory)
-        layout.addWidget(self.enter_button)
-        layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.setLayout(layout)
-
-        self.stacked_widget.addWidget(self)
+        self.setLayout(main_layout)
 
     def handleEnterPressed(self):
-        # This method will be called when the user presses Enter in the line edit widgets
-
-        # Check if both username and path are not empty
-        if self.username.text() and self.save_directory.text():
-            # Perform the necessary checks and switch to WellPlateDimensions
-            path = self.save_directory.text()
-
-            if not os.path.exists(path) and os.path.isdir(os.path.dirname(path)):
-                os.makedirs(path)
-                # If the path is valid, set the text color to white
-                self.save_directory.setStyleSheet("color: white;")
-                logging.log(level=20, msg="Made new directory: " + path)
-            elif not os.path.isdir(os.path.dirname(path)):
-                error_message = "Invalid path: Please enter a valid directory."
-                logging.log(level=20, msg=error_message + ": " + path)
-                self.save_directory.setText(error_message)
-                self.save_directory.setStyleSheet("color: red;")
-            else:
-                # If the path exists or the directory part is valid, set the text color to white
-                self.save_directory.setStyleSheet("color: white;")
-
-            if os.path.exists(path):
-                self.username.setText(self.username.text())
-                logging.log(level=20, msg="Username: " + self.username.text())
-                self.stacked_widget.setCurrentIndex(1)
-
-    def handlePathChanged(self):
-        # Reset the text color and placeholder text when the user starts typing
-        self.save_directory.setStyleSheet(self.default_stylesheet)
+        #Enter update of positions and image acuiqsiation for each well
+        pass
 
 
-class DragonflyAutomator(BackgroundMainWindow):
-    def __init__(self):
-        super().__init__()
-
-        self.setWindowTitle("Dragonfly Automator")
-        self.setGeometry(500, 300, 800, 400)
-
-        self.stacked_widget = QStackedWidget()
-        # Widget should be in the centre
-        self.setCentralWidget(self.stacked_widget)
-
-        self.frame_1 = UsernamePath(self.stacked_widget)
-
-        self.model = None
-        #files = glob.glob("*.pkl")
-        #if files is None:
-         #   self.model = None
-
-        self.frame_2 = WellPlateDimensions(self.stacked_widget, endpoint="v1/devices/xyz-stage", model=self.model)
+def create_colored_label(text, parent):
+    label = QLabel(text, parent=parent)
+    label.setStyleSheet("color: {};".format("white"))
+    return label
 
 
 if __name__ == '__main__':

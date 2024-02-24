@@ -4,214 +4,193 @@ import os
 import fusionrest
 
 # Configure logging
-logging.basicConfig(filename=os.path.join(os.getcwd(),'endpoints.log'), level=20,
-					format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(filename=os.path.join(os.getcwd(), 'dragonfly_automator.log'), level=logging.DEBUG,
+                    format='%(asctime)s - %(levelname)s - %(message)s')
+
 
 def get_address(endpoint):
-	try:
-		return fusionrest.__make_address(endpoint)
-	except Exception as e:
-		print(f"An unexpected address error occurred: {e}")
-		logging.exception("An unexpected address error occurred", exc_info=True)
+    try:
+        return fusionrest.__make_address(endpoint)
+    except Exception as e:
+        print(f"An unexpected address error occurred: {e}")
+        logging.exception("An unexpected address error occurred", exc_info=True)
 
 
 def get_output(endpoint):
-	try:
-		return fusionrest.__get(endpoint)
-	except Exception as e:
-		print(f"An unexpected output error occurred: {e}")
-		logging.exception("An unexpected output error occurred", exc_info=True)
+    try:
+        return fusionrest.__get(endpoint)
+    except Exception as e:
+        print(f"An unexpected output error occurred: {e}")
+        logging.exception("An unexpected output error occurred", exc_info=True)
 
 
-def update(endpoint,obj):
-	try:
-		fusionrest.__put(endpoint, obj)
-	except Exception as e:
-		print(f"An unexpected update error occurred: {e}")
-		logging.exception("An unexpected update error occurred", exc_info=True)
-
-
+def update(endpoint, obj):
+    try:
+        fusionrest.__put(endpoint, obj)
+    except Exception as e:
+        print(f"An unexpected update error occurred: {e}")
+        logging.exception("An unexpected update error occurred", exc_info=True)
 
 
 class fusion_api:
-	def __init__(self):
-		self.endpoint = "/v1"
-		#self.current_output = get_output(self.endpoint)
-		self.endpoint = "/v1"
-		self.selected_path_option = "/v1"
-		self.path_options = "/v1"
-		self.address = None
-		self.selected_key = None
-		self.current_output = None
+    def __init__(self):
+        self.endpoint = "/v1"
+        # self.current_output = get_output(self.endpoint)
+        self.endpoint = "/v1"
+        self.selected_path_option = "/v1"
+        self.path_options = "/v1"
+        self.address = None
+        self.selected_key = None
+        self.current_output = None
 
-	def get_current_address(self):
-		self.address = get_address(self.endpoint)
-		return self.address
+    def get_current_address(self):
+        self.address = get_address(self.endpoint)
+        return self.address
 
-	def get_current_output(self):
+    def get_current_output(self):
 
-		self.current_output = get_output(self.endpoint)
+        self.current_output = get_output(self.endpoint)
 
-		return self.current_output
+        return self.current_output
 
-	def get_path_options(self):
-		"""
-		If current path is not a dictionary or list, then we have reached the end path
-		"""
-		if isinstance(self.current_output, dict):
-			out = list(self.current_output.keys())
-			self.path_options = out
-			print(out)
-			return out
-		elif isinstance(self.current_output, list):
-			out = self.current_output
-			self.path_options = out
-			print(out)
-			return out
-		else:
-			print("Current output is neither dictionary no list, it is " + str(self.current_output))
+    def get_path_options(self):
+        """
+        If current path is not a dictionary or list, then we have reached the end path
+        """
+        if isinstance(self.current_output, dict):
+            out = list(self.current_output.keys())
+            self.path_options = out
+            print(out)
+            return out
+        elif isinstance(self.current_output, list):
+            out = self.current_output
+            self.path_options = out
+            print(out)
+            return out
+        else:
+            print("Current output is neither dictionary no list, it is " + str(self.current_output))
 
+    def go_to_next_path_output(self, path_option):
 
+        out = self.get_path_options()
 
-	def go_to_next_path_output(self, path_option):
+        assert out is not None, "No further path outputs"
 
-		out = self.get_path_options()
+        if not isinstance(path_option, str):
+            path_option = str(path_option)
 
-		assert out is not None, "No further path outputs"
+        assert path_option in out, "Please give correct spelling. "
 
-		if not isinstance(path_option, str):
-			path_option = str(path_option)
+        self.selected_path_option = path_option  # update
 
-		assert path_option in out, "Please give correct spelling. "
+        self.endpoint += "/{}".format(self.selected_path_option)
 
-		self.selected_path_option = path_option  # update
+        self.current_output = self.get_current_output()
 
-		self.endpoint += "/{}".format(self.selected_path_option)
+        self.address = self.get_current_address()
 
-		self.current_output = self.get_current_output()
+        self.path_options = out
 
-		self.address = self.get_current_address()
+        return self.current_output
 
-		self.path_options = out
+    def get_value(self, key):
 
-		return self.current_output
-
-
-	def get_value(self, key):
-
-		"""Key are the keys of a dictionary or elements of a list"""
-		assert isinstance(self.current_output, dict), ("Value cannot be retrieved."
-													   " Current output is not a dictionary. Current output is " + str(self.current_output))
-		self.selected_key = key
-		return self.current_output[self.selected_key]
+        """Key are the keys of a dictionary or elements of a list"""
+        assert isinstance(self.current_output, dict), ("Value cannot be retrieved."
+                                                       " Current output is not a dictionary. Current output is " + str(
+            self.current_output))
+        self.selected_key = key
+        return self.current_output[self.selected_key]
 
 
 class xyz_stage(fusion_api):
+    """From what I have seen, the xyz_stage path outputs a list."""
 
-	"""From what I have seen, the xyz_stage path outputs a list."""
+    def __init__(self, endpoint):
+        super().__init__()  # inherits
 
-	def __init__(self, endpoint):
-		super().__init__() #inherits
+        self.endpoint = self.endpoint + "/{}/{}".format("devices", "xyz-stage")
 
+        # self.current_output = get_output(self.endpoint)
 
-		self.endpoint = self.endpoint + "/{}/{}".format("devices","xyz-stage")
+        # Opening JSON file
+        f = open(r"C:\ibrahim_programme\Dragonfly_package\384_wellplate_automation\endpoint_outputs\xyz-stage.json")
 
+        self.current_output = json.load(f)
 
+        self.path_options = [x["Name"] for x in self.current_output]
 
-		#self.current_output = get_output(self.endpoint)
+        self.x_dict = self.current_output[0]
+        self.y_dict = self.current_output[1]
+        self.autoregulation_dict = self.current_output[2]
+        self.coords_features = list(self.current_output[0].keys())
+        self.value_key = self.coords_features[-3]
+        self.min_key = self.coords_features[-2]
+        self.max_key = self.coords_features[-1]
 
-		# Opening JSON file
-		f = open(r"C:\ibrahim_programme\Dragonfly_package\384_wellplate_automation\endpoint_outputs\xyz-stage.json")
+        self.xmin, self.xmax = float(self.x_dict[self.min_key].replace(",", ".")), float(
+            self.x_dict[self.max_key].replace(",", "."))
+        self.ymin, self.ymax = float(self.y_dict[self.min_key].replace(",", ".")), float(
+            self.y_dict[self.max_key].replace(",", "."))
 
-		self.current_output = json.load(f)
+        self.selected_path_option = endpoint.split("/")[-1]
+        self.selected_key = None
 
-		self.path_options = [x["Name"] for x in self.current_output]
+    def get_state(self, test_key=None):
+        # return {x: get_output(endpoint=self.endpoint + "/{}".format(x)) for x in
+        #         self.path_options}
 
-		self.x_dict = self.current_output[0]
-		self.y_dict = self.current_output[1]
-		self.autoregulation_dict = self.current_output[2]
-		self.coords_features = list(self.current_output[0].keys())
-		self.value_key = self.coords_features[-3]
-		self.min_key = self.coords_features[-2]
-		self.max_key = self.coords_features[-1]
+        #[[-48, 33.1], [-48, -38.9], [60, 33.1], [60, -38.9], [-48, 33.1]]
 
+        # Opening JSON file
+        file = r"C:\ibrahim_programme\Dragonfly_package\384_wellplate_automation\endpoint_outputs\{}xposition.json".format(test_key.replace(" well", "_"))
+        f = open(file)
+        x_ = json.load(f)
+        # Opening JSON file
+        file = r"C:\ibrahim_programme\Dragonfly_package\384_wellplate_automation\endpoint_outputs\{}yposition.json".format(test_key.replace(" well", "_"))
+        f = open(file)
+        y = json.load(f)
+        return {x: [x_,y, None][id] for id, x in enumerate(self.path_options)}
 
-		self.xmin, self.xmax =  float(self.x_dict[self.min_key].replace(",", ".")), float(self.x_dict[self.max_key].replace(",", "."))
-		self.ymin, self.ymax = float(self.y_dict[self.min_key].replace(",", ".")), float(self.y_dict[self.max_key].replace(",", "."))
+    def enter_coords(self, x, y, state_dict):
 
-		self.selected_path_option = endpoint.split("/")[-1]
-		self.selected_key = None
+        if x <= self.xmax and x >= self.xmin and y <= self.ymax and y >= self.ymin:
+            state_dict[self.path_options[0]][self.value_key] = float(x)
+            state_dict[self.path_options[1]][self.value_key] = float(y)
+            return state_dict
 
-	def get_state(self):
-		return {x: get_output(endpoint=self.endpoint + "/{}".format(x)) for x in
-				self.path_options}
+    def update_state(self, state_dict, analoguecontrol_bool=False):
 
-	def enter_coords(self,x,y, state_dict):
+        if state_dict is not None:
+            state_dict[self.path_options[-1]][self.value_key] = analoguecontrol_bool
 
+            update(self.endpoint + "/{}".format(self.path_options[0]), state_dict[self.path_options[0]])
+            update(self.endpoint + "/{}".format(self.path_options[1]), state_dict[self.path_options[1]])
+            update(self.endpoint + "/{}".format(self.path_options[2]), state_dict[self.path_options[2]])
 
-		if x <= self.xmax and x >= self.xmin and y <= self.ymax and y >= self.ymin:
-			state_dict[self.path_options[0]][self.value_key] = float(x)
-			state_dict[self.path_options[1]][self.value_key] = float(y)
-			return state_dict
-
-	def update_state(self, state_dict, analoguecontrol_bool=False):
-
-		if state_dict is not None:
-			state_dict[self.path_options[-1]][self.value_key] = analoguecontrol_bool
-
-			update(self.endpoint + "/{}".format(self.path_options[0]), state_dict[self.path_options[0]])
-			update(self.endpoint + "/{}".format(self.path_options[1]), state_dict[self.path_options[1]])
-			update(self.endpoint + "/{}".format(self.path_options[2]), state_dict[self.path_options[2]])
-
-			return state_dict
-
-
-
-
-
-
+            return state_dict
 
 
 if __name__ == '__main__':
-	import argparse
+    import argparse
 
-	parser = argparse.ArgumentParser(description='train a phase registration model')
-	parser.add_argument("--x", type=int, required=False, help="Enter x coordinates for xyz stage")
-	parser.add_argument("--y", type=int, required=False, help="Enter y coordinates for xyz stage")
-	parser.add_argument("--analoguecontrol", type=bool, default=False, help="Enter boolean for analog control of xyz stage")
-	parser.add_argument("--update", type=bool, default=False, help="Enter boolean for analog control of xyz stage")
-	parser.add_argument("--endpoint",type=str, required=True, help="Enter API endpoint of xyz stage")
+    parser = argparse.ArgumentParser(description='train a phase registration model')
+    parser.add_argument("--x", type=int, required=False, help="Enter x coordinates for xyz stage")
+    parser.add_argument("--y", type=int, required=False, help="Enter y coordinates for xyz stage")
+    parser.add_argument("--analoguecontrol", type=bool, default=False,
+                        help="Enter boolean for analog control of xyz stage")
+    parser.add_argument("--update", type=bool, default=False, help="Enter boolean for analog control of xyz stage")
+    parser.add_argument("--endpoint", type=str, required=True, help="Enter API endpoint of xyz stage")
 
+    args = parser.parse_args()
 
-	args = parser.parse_args()
+    instance_xyz_Stage = xyz_stage(args.endpoint)
 
+    print("Before update: " + str(instance_xyz_Stage.__dict__))
 
-	instance_xyz_Stage = xyz_stage(args.endpoint)
+    x, y = args.x, args.y
 
-	print("Before update: " + str(instance_xyz_Stage.__dict__))
-
-	x,y = args.x,args.y
-
-	if x is not None and y is not None:
-		state_dict = instance_xyz_Stage.enter_coords(x, y, instance_xyz_Stage.get_state())
-		if args.update is True:
-			instance_xyz_Stage.update_state(state_dict=state_dict,	analoguecontrol_bool=args.analoguecontrol)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    if x is not None and y is not None:
+        state_dict = instance_xyz_Stage.enter_coords(x, y, instance_xyz_Stage.get_state())
+        if args.update is True:
+            instance_xyz_Stage.update_state(state_dict=state_dict, analoguecontrol_bool=args.analoguecontrol)

@@ -4,7 +4,11 @@ print("initialising")
 
 import fusionrest
 from time import sleep
+import os
+import logging
 
+logging.basicConfig(filename=os.path.join(os.getcwd(), 'dragonfly_automator.log'), level=logging.DEBUG,
+                    format='%(asctime)s - %(levelname)s - %(message)s')
 def wait_for_input_trigger():
 	# insert your code here
 	print("(pretending to wait for input trigger)")
