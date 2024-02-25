@@ -9,18 +9,16 @@ from PyQt6.QtWidgets import QApplication, QGridLayout, QPushButton, QWidget, QMa
 from PyQt6.QtCore import Qt
 from wellplate import wellplate
 
-directory = os.path.dirname(os.getcwd())
-
 # Configure logging
-logging.basicConfig(filename=os.path.join(directory, 'dragonfly_automator.log'), level=logging.DEBUG,
+logging.basicConfig(filename=os.path.join(os.getcwd(), 'dragonfly_automator.log'), level=logging.DEBUG,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
-
+logging.log(level=10,msg="Directory: {}".format(os.getcwd()))
 class BackgroundMainWindow(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.background_image = QPixmap(os.path.join(directory, "dragonfly.jpg"))
-        self.overlay_image = QPixmap(os.path.join(directory, "BioQuant_Logo_RGB_136.png"))
+        self.background_image = QPixmap(os.path.join(os.getcwd(), "dragonfly.jpg"))
+        self.overlay_image = QPixmap(os.path.join(os.getcwd(), "BioQuant_Logo_RGB_136.png"))
         self.text = "AG Erfle & Starkuvienė"
 
     def paintEvent(self, event):
@@ -214,18 +212,19 @@ class WellPlateDimensions(QWidget):
             diction = self.well_plate.compute_template_coords(int(self.column_n.text()), int(self.row_n.text()))
 
             # Frame three
-            self.stacked_widget.addWidget(CustomButtonGroup(diction))
+            self.stacked_widget.addWidget(CustomButtonGroup(diction, self.well_plate))
             self.stacked_widget.setCurrentIndex(2)
 
 
 class WellAsButton(QPushButton):
-    def __init__(self, text, parent, coordinates):
+    def __init__(self, text, parent, coordinates, well_coordinate):
         super().__init__(text=text, parent=parent)
 
         self.coordinates = coordinates
         self.color = "#00aa00"
         self.setStyleSheet("background-color: {}; color: #ffffff;".format(self.color))
         self.setCheckable(True)
+        self.well_state_dict = well_coordinate
 
     def handleButtonClick(self):
         if self.isChecked():
@@ -242,15 +241,20 @@ class WellAsButton(QPushButton):
 
 
 class CustomButtonGroup(QWidget):
-    def __init__(self, all_state_dicts):
+    def __init__(self, all_state_dicts, well_plate):
         super().__init__()
 
+        self.well_plate = well_plate
+
         layout = QGridLayout()
+
+        self.buttons = []
         for key, well_state_dict in all_state_dicts.items():
             r, c = int(key.split(" ")[0]), int(key.split(" ")[-1])
             label = "abcdefghijklmnopqrstuvwxyz".upper()[r] + key.split(" ")[-1]
-            button = WellAsButton(text=label, parent=self, coordinates=(r, c))
+            button = WellAsButton(text=label, parent=self, coordinates=(r, c), well_coordinate=well_state_dict)
             button.clicked.connect(button.handleButtonClick)
+            self.buttons.append(button)
             layout.addWidget(button, button.coordinates[0], button.coordinates[1])
             button.setFixedSize(25, 15)
 
@@ -269,8 +273,11 @@ class CustomButtonGroup(QWidget):
         self.setLayout(main_layout)
 
     def handleEnterPressed(self):
-        #Enter update of positions and image acuiqsiation for each well
-        pass
+        checked_buttons = [button.well_state_dict for button in self.buttons if button.isChecked()]
+
+        logging.log(level=10,msg="Wells that have been selected: {}".format(checked_buttons))
+
+        self.well_plate.execute_template_coords(checked_buttons)
 
 
 def create_colored_label(text, parent):

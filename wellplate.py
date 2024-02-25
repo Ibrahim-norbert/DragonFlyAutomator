@@ -1,5 +1,4 @@
 import pickle
-
 from script import xyz_stage
 import logging
 import numpy as np
@@ -32,55 +31,10 @@ class wellplate(xyz_stage):
     def execute_template_coords(self, all_state_dicts):
 
         for state_dict in all_state_dicts:
+            #Move stage to well
             self.update_state(state_dict, analoguecontrol_bool=False)
+            #Take multiple pictures in well
 
-    # def get_well_plate_req_coords(self):
-    #
-    #     exit_ = False
-    #     vectors = [[-48, 33.1], [-48, -38.9], [60, 33.1], [60, -38.9], [-48, 33.1]]
-    #
-    #     while exit_ == False:
-    #         count = 0
-    #         for key in self.well_plate_req_coords.keys():
-    #
-    #             # print("Is this well " + key + " yes or no (or type exit for shutdown)?")
-    #             # answer = str(input()).lower()
-    #             # logging.log(level=20, msg="Well plate set coordinate answer: " + answer)
-    #             answer = "yes"
-    #             if answer == "yes":
-    #
-    #                 self.well_plate_req_coords[key] = self.vector_2_state_dict(vectors[count])  # self.get_state()
-    #                 count += 1
-    #                 # self.well_plate_req_coords[key] = self.get_state()
-    #                 logging.log(level=20, msg="Well: " + key + " - " + str(self.well_plate_req_coords[key]))
-    #             # well_plate_req_coords[key] = np.array([state_dict[self.path_options[0]][self.value_key], state_dict[self.path_options[1]][self.value_key]])
-    #
-    #             # self.well_plate_req_coords[key] = ("fay",
-    #             #							  "beby")
-    #             elif answer == "exit":
-    #                 exit_ = True
-    #                 break
-    #             else:
-    #                 print(" ")
-    #                 print(" ")
-    #                 print("Please set all well coordinates again")
-    #                 print(" ")
-    #                 print(" ")
-    #                 sleep(1)
-    #                 break
-    #
-    #             sleep(1)
-    #
-    #         if exit_ is False:
-    #             print("Are the coordinates given below correct, yes or no ?")
-    #             print(self.well_plate_req_coords)
-    #             answer = str(input()).lower()
-    #             logging.log(level=20, msg="Confirm all selected coordinates answer: " + answer)
-    #             logging.log(level=20, msg="Final coordinates: " + str(self.well_plate_req_coords))
-    #             if answer == "yes":
-    #                 exit_ = True
-    #             else:
-    #                 print("Please set all well coordinates again")
 
     def state_dict_2_vector(self, state_dict):
         logging.log(level=10, msg='Value key: {}, Path options: {},'
@@ -100,9 +54,8 @@ class wellplate(xyz_stage):
                                  self.state_dict_2_vector(self.well_plate_req_coords["Top left well"]),
                                  self.state_dict_2_vector(self.well_plate_req_coords["Bottom left well"])]
 
-            #Add bottom left well
+            # Add bottom left well
             specified_vectors.append(np.array([specified_vectors[-3][0], specified_vectors[-1][1]]))
-
 
             logging.log(level=20, msg="Well plate dimension: state dict as vectors {}".format(specified_vectors))
 
@@ -110,7 +63,6 @@ class wellplate(xyz_stage):
             bottomleft = specified_vectors[-2].astype(float)
             topright = specified_vectors[-4].astype(float)
             bottomright = specified_vectors[-1].astype(float)
-
 
             length = np.linalg.norm(topleft - topright)
             height = np.linalg.norm(topleft - bottomleft)
@@ -143,7 +95,6 @@ class wellplate(xyz_stage):
             self.xspacing = x_spacing
             self.yspacing = y_spacing
 
-
             if self.model is not None:
                 with open(self.model + ".pkl", 'wb') as outp:
                     pickle.dump(self, outp, pickle.HIGHEST_PROTOCOL)
@@ -154,8 +105,6 @@ class wellplate(xyz_stage):
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
             logging.exception("State dict might be None", exc_info=True)
-
-
 
 
 if __name__ == '__main__':

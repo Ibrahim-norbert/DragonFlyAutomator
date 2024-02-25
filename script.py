@@ -114,7 +114,8 @@ class xyz_stage(fusion_api):
         # self.current_output = get_output(self.endpoint)
 
         # Opening JSON file
-        f = open(r"C:\ibrahim_programme\Dragonfly_package\384_wellplate_automation\endpoint_outputs\xyz-stage.json")
+
+        f = open(os.path.join(os.getcwd(),r"endpoint_outputs","xyz-stage.json"))
 
         self.current_output = json.load(f)
 
@@ -143,11 +144,11 @@ class xyz_stage(fusion_api):
         #[[-48, 33.1], [-48, -38.9], [60, 33.1], [60, -38.9], [-48, 33.1]]
 
         # Opening JSON file
-        file = r"C:\ibrahim_programme\Dragonfly_package\384_wellplate_automation\endpoint_outputs\{}xposition.json".format(test_key.replace(" well", "_"))
+        file = os.path.join(os.getcwd(), r"endpoint_outputs", "{}xposition.json".format(test_key.replace(" well", "_")))
         f = open(file)
         x_ = json.load(f)
         # Opening JSON file
-        file = r"C:\ibrahim_programme\Dragonfly_package\384_wellplate_automation\endpoint_outputs\{}yposition.json".format(test_key.replace(" well", "_"))
+        file = os.path.join(os.getcwd(), r"endpoint_outputs", "{}yposition.json".format(test_key.replace(" well", "_")))
         f = open(file)
         y = json.load(f)
         return {x: [x_,y, None][id] for id, x in enumerate(self.path_options)}
