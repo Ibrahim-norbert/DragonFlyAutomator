@@ -6,8 +6,8 @@ import os
 from script import fusion_api
 import json
 
-logging.basicConfig(filename=os.path.join(os.getcwd(), 'dragonfly_automator.log'), level=logging.DEBUG,
-                    format='%(asctime)s - %(levelname)s - %(message)s')
+#logging.basicConfig(filename=os.path.join(os.getcwd(), 'dragonfly_automator.log'), level=logging.DEBUG,
+ #                   format='%(asctime)s - %(levelname)s - %(message)s')
 
 
 class EMCCD2(fusion_api):

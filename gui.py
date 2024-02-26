@@ -8,12 +8,15 @@ from PyQt6.QtWidgets import QApplication, QGridLayout, QPushButton, QWidget, QMa
     QLabel, QComboBox, QHBoxLayout, QStackedWidget, QSizePolicy
 from PyQt6.QtCore import Qt
 
-from wellplate import wellplate
+from wellplate import WellPlate
 
-logging.basicConfig(filename=os.path.join(os.getcwd(), 'dragonfly_automator.log'), level=logging.DEBUG,
-                    format='%(asctime)s - %(levelname)s - %(message)s')
-
-logging.log(level=10, msg="Directory: {}".format(os.getcwd()))
+# Configure logging
+# logging.basicConfig(filename=os.path.join(os.getcwd(), 'dragonfly_automator.log'), level=logging.DEBUG,
+#                   format='%(asctime)s - %(levelname)s - %(message)s')
+# Example: Log a message from another module
+logger = logging.getLogger(__name__)
+logger.info("This log message is from another module.")
+logging.debug("Directory: {}".format(os.getcwd()))
 
 
 class BackgroundMainWindow(QMainWindow):
@@ -133,6 +136,9 @@ class WellPlateDimensions(QWidget):
     def __init__(self, endpoint, model, stacked_widget):
         super().__init__()
 
+        self.well_plate = WellPlate(endpoint=endpoint,
+                                    model=model)
+
         self.stacked_widget = stacked_widget
 
         self.column_n = QLineEdit(parent=self)
@@ -152,9 +158,9 @@ class WellPlateDimensions(QWidget):
         self.read_button = QPushButton("Read", self)
         self.read_button.clicked.connect(self.read_well_coordinate)
         self.dropdown = QComboBox(self)
-        self.dropdown.addItem("Top left well")
-        self.dropdown.addItem("Bottom left well")
-        self.dropdown.addItem("Top right well")
+        options = list(self.well_plate.well_plate_req_coords.keys())
+        for x in options:
+            self.dropdown.addItem(x)
 
         layout3 = QHBoxLayout()
         layout3.addWidget(self.read_button)
@@ -181,10 +187,6 @@ class WellPlateDimensions(QWidget):
         main_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setLayout(main_layout)
 
-        options = [self.dropdown.itemText(index) for index in range(self.dropdown.count())]
-        self.well_plate = wellplate(endpoint=endpoint, well1=options[0], well2=options[1], well3=options[2],
-                                    model=model)
-
     def read_well_coordinate(self):
 
         try:
@@ -206,7 +208,9 @@ class WellPlateDimensions(QWidget):
     def enter_button_click(self):
 
         if None not in self.well_plate.well_plate_req_coords.values():
-            diction = self.well_plate.compute_template_coords(int(self.column_n.text()), int(self.row_n.text()))
+            #diction = self.well_plate.compute_template_coords(int(self.column_n.text()), int(self.row_n.text()))
+            diction = self.well_plate.compute_coords_with_linearcorrection(int(self.column_n.text()),
+                                                                           int(self.row_n.text()))
 
             # Frame three
             self.stacked_widget.addWidget(CustomButtonGroup(diction, self.well_plate, self.stacked_widget))
@@ -277,7 +281,7 @@ class CustomButtonGroup(QWidget):
         logging.log(level=10, msg="Wells that have been selected: {}".format(checked_buttons))
 
         # This executes the xzystage movement
-        self.well_plate.execute_template_coords(checked_buttons)
+        # self.well_plate.execute_template_coords(checked_buttons)
 
         self.stacked_widget.addWidget(SaveWindow())
         self.stacked_widget.setCurrentIndex(3)

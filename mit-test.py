@@ -7,12 +7,17 @@ from time import sleep
 import os
 import logging
 
+<<<<<<< Updated upstream
 
 
 
 
 logging.basicConfig(filename=os.path.join(os.getcwd(), 'dragonfly_automator.log'), level=logging.DEBUG,
                     format='%(asctime)s - %(levelname)s - %(message)s')
+=======
+#logging.basicConfig(filename=os.path.join(os.getcwd(), 'dragonfly_automator.log'), level=logging.DEBUG,
+ #                   format='%(asctime)s - %(levelname)s - %(message)s')
+>>>>>>> Stashed changes
 def wait_for_input_trigger():
 	# insert your code here
 	print("(pretending to wait for input trigger)")
