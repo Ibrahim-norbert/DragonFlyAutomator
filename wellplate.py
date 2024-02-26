@@ -1,5 +1,5 @@
 import pickle
-from script import xyz_stage
+from xyz_stage import xyz_stage
 import logging
 import numpy as np
 import os
@@ -57,6 +57,9 @@ class WellPlate(xyz_stage):
                         r_n, c_n, length, height, x_spacing, y_spacing):
 
         logging.log(level=20, msg="All well plate coordinates: {}".format(all_well_dicts))
+        logging.log(level=20, msg="Well plate dimension: length - {}, height - {}".format(length, height))
+        logging.log(level=20, msg="Computed well spacing: x:spacing = {} and y_spacing = {}".format(
+            x_spacing, y_spacing))
 
         self.wellplate_matrix = (r_n, c_n)
         self.all_well_dicts = all_well_dicts
@@ -124,19 +127,19 @@ class WellPlate(xyz_stage):
             # cor is the correction matrix to account for misalignment of the plate vs. translation directions in x,y,z
             cor = np.array(([corx[0], cory[0], 0],
                             [corx[1], cory[1], 0],
-                            [0, 0, 0]))
+                            [0,0,0]))
 
             logging.log(level=20, msg="The correction matrix: {}".format(cor))
 
-            blpred = np.dot(cor, np.array(((c_n - 1), (r_n - 1))))  # predicted position of bl based on tl and br
+            blpred = np.dot(cor, np.array(((c_n - 1), (r_n - 1), 0)))  # predicted position of bl based on tl and br
             logging.log(level=20, msg="The bottom left well coordinate prediction: {}".format(blpred))
 
-            fixit = (bl - blpred) / float((c_n - 1) * (r_n - 1))  # this is the correction based on bl
+            fixit = (np.append(bl, 0) - blpred) / float((c_n - 1) * (r_n - 1))  # this is the correction based on bl
             logging.log(level=20, msg="The non linear prediction: {}".format(fixit))
             # x = numbers i.e. columns
             # y = letters i.e. rows
             vectors = sum(
-                [[np.dot(cor, np.array(np.array((c, r)))) + fixit * (c * r) for c in range(c_n)] for r in range(r_n)], [])
+                [[(np.dot(cor, np.array(np.array((c, r, 0)))) + fixit * (c * r)) + np.append(topright,0) for c in range(c_n)] for r in range(r_n)], [])
 
             logging.log(level=20, msg="The resulting vectors: {}".format(vectors))
 

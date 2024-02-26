@@ -11,9 +11,7 @@ from PyQt6.QtCore import Qt
 from wellplate import WellPlate
 
 # Configure logging
-# logging.basicConfig(filename=os.path.join(os.getcwd(), 'dragonfly_automator.log'), level=logging.DEBUG,
-#                   format='%(asctime)s - %(levelname)s - %(message)s')
-# Example: Log a message from another module
+
 logger = logging.getLogger(__name__)
 logger.info("This log message is from another module.")
 logging.debug("Directory: {}".format(os.getcwd()))
@@ -208,7 +206,7 @@ class WellPlateDimensions(QWidget):
     def enter_button_click(self):
 
         if None not in self.well_plate.well_plate_req_coords.values():
-            #diction = self.well_plate.compute_template_coords(int(self.column_n.text()), int(self.row_n.text()))
+            #diction = self.well_plate.compute_inspect_coords(int(self.column_n.text()), int(self.row_n.text()))
             diction = self.well_plate.compute_coords_with_linearcorrection(int(self.column_n.text()),
                                                                            int(self.row_n.text()))
 

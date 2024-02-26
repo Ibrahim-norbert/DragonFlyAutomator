@@ -1,9 +1,9 @@
 import pickle
-from script import xyz_stage
+from xyz_stage import xyz_stage
 import logging
 import numpy as np
 import os
-from script import fusion_api
+from xyz_stage import fusion_api
 import json
 
 #logging.basicConfig(filename=os.path.join(os.getcwd(), 'dragonfly_automator.log'), level=logging.DEBUG,
