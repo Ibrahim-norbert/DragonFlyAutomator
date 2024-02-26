@@ -117,35 +117,40 @@ class WellPlate(xyz_stage):
 
         logging.log(level=20, msg="Well plate coordinate frame after normalisation: {}".format((tr,tl,bl,br)))
 
-        corx = tl / float(c_n - 1)
-        cory = br / float(r_n - 1)
+        try:
+            corx = tl / float(c_n - 1)
+            cory = br / float(r_n - 1)
 
-        # cor is the correction matrix to account for misalignment of the plate vs. translation directions in x,y,z
-        cor = np.array(([corx[0], cory[0], 0],
-                        [corx[1], cory[1], 0]))
+            # cor is the correction matrix to account for misalignment of the plate vs. translation directions in x,y,z
+            cor = np.array(([corx[0], cory[0], 0],
+                            [corx[1], cory[1], 0],
+                            [0, 0, 0]))
 
-        logging.log(level=20, msg="The correction matrix: {}".format(cor))
+            logging.log(level=20, msg="The correction matrix: {}".format(cor))
 
-        blpred = np.dot(cor, np.array(((c_n - 1), (r_n - 1))))  # predicted position of bl based on tl and br
-        logging.log(level=20, msg="The bottom left well coordinate prediction: {}".format(blpred))
+            blpred = np.dot(cor, np.array(((c_n - 1), (r_n - 1))))  # predicted position of bl based on tl and br
+            logging.log(level=20, msg="The bottom left well coordinate prediction: {}".format(blpred))
 
-        fixit = (bl - blpred) / float((c_n - 1) * (r_n - 1))  # this is the correction based on bl
-        logging.log(level=20, msg="The non linear prediction: {}".format(fixit))
-        # x = numbers i.e. columns
-        # y = letters i.e. rows
-        vectors = sum(
-            [[np.dot(cor, np.array(np.array((c, r)))) + fixit * (c * r) for c in range(c_n)] for r in range(r_n)], [])
+            fixit = (bl - blpred) / float((c_n - 1) * (r_n - 1))  # this is the correction based on bl
+            logging.log(level=20, msg="The non linear prediction: {}".format(fixit))
+            # x = numbers i.e. columns
+            # y = letters i.e. rows
+            vectors = sum(
+                [[np.dot(cor, np.array(np.array((c, r)))) + fixit * (c * r) for c in range(c_n)] for r in range(r_n)], [])
 
-        logging.log(level=20, msg="The resulting vectors: {}".format(vectors))
+            logging.log(level=20, msg="The resulting vectors: {}".format(vectors))
 
-        well_names = sum([[str(r) + " " + str(c + 1) for c in range(c_n)] for r in range(r_n)], [])
+            well_names = sum([[str(r) + " " + str(c + 1) for c in range(c_n)] for r in range(r_n)], [])
 
-        all_well_dicts = {well_name: self.vector_2_state_dict(vector) for well_name, vector in zip(well_names,
-                                                                                                   vectors)}
-        x_spacing = np.abs(vectors[int(c_n / 2)][0] - vectors[int(c_n / 2) + 1][0])
-        y_spacing = np.abs(vectors[c_n * int(r_n / 2)][1] - vectors[c_n * int(r_n / 2) + 1][1])
+            all_well_dicts = {well_name: self.vector_2_state_dict(vector) for well_name, vector in zip(well_names,
+                                                                                                       vectors)}
+            x_spacing = np.abs(vectors[int(c_n / 2)][0] - vectors[int(c_n / 2) + 1][0])
+            y_spacing = np.abs(vectors[c_n * int(r_n / 2)][1] - vectors[c_n * int(r_n / 2) + 1][1])
 
-        return self.save_parameters(all_well_dicts, r_n, c_n, length, height, x_spacing, y_spacing)
+            return self.save_parameters(all_well_dicts, r_n, c_n, length, height, x_spacing, y_spacing)
+        except Exception as e:
+            print(f"An unexpected output error occurred: {e}")
+            logging.exception("An unexpected output error occurred", exc_info=True)
 
     def compute_inspect_coords(self, c_n, r_n):
 
