@@ -1,19 +1,21 @@
 import glob
-import logging
 import os.path
 import sys
-
+import logging
+import fusionrest
 from PyQt6.QtGui import QIcon, QPainter, QPixmap, QColor, QFont
 from PyQt6.QtWidgets import QApplication, QGridLayout, QPushButton, QWidget, QMainWindow, QLineEdit, QVBoxLayout, \
     QLabel, QComboBox, QHBoxLayout, QStackedWidget, QSizePolicy
 from PyQt6.QtCore import Qt
+
 from wellplate import wellplate
 
-# Configure logging
 logging.basicConfig(filename=os.path.join(os.getcwd(), 'dragonfly_automator.log'), level=logging.DEBUG,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
-logging.log(level=10,msg="Directory: {}".format(os.getcwd()))
+logging.log(level=10, msg="Directory: {}".format(os.getcwd()))
+
+
 class BackgroundMainWindow(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -53,24 +55,21 @@ class DragonflyAutomator(BackgroundMainWindow):
         # Widget should be in the centre
         self.setCentralWidget(self.stacked_widget)
 
-        #Frame one
+        # Frame one
         self.stacked_widget.addWidget(UsernamePath(self.stacked_widget))
 
-        #Frame two
+        # Frame two
         self.stacked_widget.addWidget(WellPlateDimensions(endpoint="v1/devices/xyz-stage", model="384",
                                                           stacked_widget=self.stacked_widget))
-
-
-
 
     # def add_switch_to_next_widget(self, widget):
     #     .addWidget(widget)
     #     self.stacked_widget.setCurrentWidget(widget)
 
+
 class UsernamePath(QWidget):
     def __init__(self, stacked_widget):
         super().__init__()
-
 
         self.stacked_widget = stacked_widget
 
@@ -186,8 +185,6 @@ class WellPlateDimensions(QWidget):
         self.well_plate = wellplate(endpoint=endpoint, well1=options[0], well2=options[1], well3=options[2],
                                     model=model)
 
-
-
     def read_well_coordinate(self):
 
         try:
@@ -212,7 +209,7 @@ class WellPlateDimensions(QWidget):
             diction = self.well_plate.compute_template_coords(int(self.column_n.text()), int(self.row_n.text()))
 
             # Frame three
-            self.stacked_widget.addWidget(CustomButtonGroup(diction, self.well_plate))
+            self.stacked_widget.addWidget(CustomButtonGroup(diction, self.well_plate, self.stacked_widget))
             self.stacked_widget.setCurrentIndex(2)
 
 
@@ -241,7 +238,7 @@ class WellAsButton(QPushButton):
 
 
 class CustomButtonGroup(QWidget):
-    def __init__(self, all_state_dicts, well_plate):
+    def __init__(self, all_state_dicts, well_plate, stacked_widget):
         super().__init__()
 
         self.well_plate = well_plate
@@ -272,12 +269,45 @@ class CustomButtonGroup(QWidget):
 
         self.setLayout(main_layout)
 
+        self.stacked_widget = stacked_widget
+
     def handleEnterPressed(self):
         checked_buttons = [button.well_state_dict for button in self.buttons if button.isChecked()]
 
-        logging.log(level=10,msg="Wells that have been selected: {}".format(checked_buttons))
+        logging.log(level=10, msg="Wells that have been selected: {}".format(checked_buttons))
 
+        # This executes the xzystage movement
         self.well_plate.execute_template_coords(checked_buttons)
+
+        self.stacked_widget.addWidget(SaveWindow())
+        self.stacked_widget.setCurrentIndex(3)
+
+
+class SaveWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        # self.model = model
+
+        # self.yes_widget = QPushButton("Yes", self)
+        # self.no_widget = QPushButton("No", self)
+
+        # yes_no_widget = QHBoxLayout()
+        # yes_no_widget.addWidget(self.yes_widget)
+        # yes_no_widget.addWidget(self.no_widget)
+
+        layout = QHBoxLayout()
+        layout.addWidget(create_colored_label("No further steps, please close the app", self))
+
+        self.setLayout(layout)
+
+    # yes_no_widget.addWidget(message)
+
+    # self.setLayout(yes_no_widget)
+
+    # def savemodel(self):
+
+    #  if self.yes_widget.isChecked():
 
 
 def create_colored_label(text, parent):

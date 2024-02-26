@@ -31,10 +31,13 @@ class wellplate(xyz_stage):
     def execute_template_coords(self, all_state_dicts):
 
         for state_dict in all_state_dicts:
-            #Move stage to well
+            # Move stage to well
             self.update_state(state_dict, analoguecontrol_bool=False)
-            #Take multiple pictures in well
 
+            # Perform image acquisition of different Z positions
+            #self.run_protocol()
+
+            sleep(3)
 
     def state_dict_2_vector(self, state_dict):
         logging.log(level=10, msg='Value key: {}, Path options: {},'
@@ -43,7 +46,8 @@ class wellplate(xyz_stage):
             [state_dict[self.path_options[0]][self.value_key], state_dict[self.path_options[1]][self.value_key]])
 
     def vector_2_state_dict(self, vector):
-        return {self.path_options[0]: {self.value_key: vector[0]}, self.path_options[1]: {self.value_key: vector[1]}}
+        return {self.path_options[0]: {self.value_key: vector[0]}, self.path_options[1]: {self.value_key: vector[1]},
+                self.path_options[-1]: {self.value_key: False}}
 
     def compute_template_coords(self, c_n, r_n):
 
