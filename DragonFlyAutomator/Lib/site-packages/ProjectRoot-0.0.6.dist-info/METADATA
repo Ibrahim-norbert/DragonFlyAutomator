@@ -1,0 +1,17 @@
+Metadata-Version: 2.1
+Name: ProjectRoot
+Version: 0.0.6
+Summary: Sets your working dir to your project root. Add a .root_dir file to your desired directory. The script fill look it up and sets it's parent dir as your working dir.
+Home-page: UNKNOWN
+Author: Dennis Maier
+Author-email: dennis@dennis-maier.de
+License: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Description-Content-Type: text/markdown
+
+UNKNOWN
+
+
