@@ -16,15 +16,13 @@ class SelectWellPlateDimensions(QWidget):
 
         self.stacked_widget = stacked_widget
 
-        self.model = glob.glob(os.path.join(os.getcwd(), "models", "*"))  # Saved as paths to save memory
-
         self.dropdown = QComboBox(self)
-        for ID, well_num in df[df["filename"].isin(self.model)][["Manufacturer ID", "Total well number"]]:
+        for ID, well_num in df[["Manufacturer ID", "Total well number"]]:
             self.dropdown.addItem(ID + " " + well_num)
 
         layout1 = QVBoxLayout()
         self.selectwell_button = QPushButton("Select Well Plate", self)
-        self.selectwell_button.clicked.connect(self.selectwell)
+        self.selectwell_button.clicked.connect(self.selectwellplate)
         self.addwell_button = QPushButton("Add new Well Plate", self)
         self.addwell_button.clicked.connect(self.addwell)
         layout1.addWidget(self.selectwell_button)
@@ -34,21 +32,25 @@ class SelectWellPlateDimensions(QWidget):
         main_layout.addWidget(self.dropdown)
         main_layout.addLayout(layout1)
 
-
-    def selectwell(self):
-
-
-    def 
+        self.well_plate = WellPlate()
 
 
-class WellPlateDimensions(QWidget):
-    def __init__(self, endpoint, model, stacked_widget):
+    def selectwellplate(self):
+        ID, wellnum = self.dropdown.currentText().split(" ")
+        self.model_params = df[((df["Manufacturer ID"]==ID) & (df["Total well number"]==wellnum))]
+        #Intersection between:
+        # self.well_plate = self.well_plate & self.model_params
+
+
+    def addwell(self):
+        self.stacked_widget(WellPlateDimensions())
+        self.stacked_widget.setCurrentIndex(2)
+
+
+
+class WellPlateDimensions(SelectWellPlateDimensions):
+    def __init__(self):
         super().__init__()
-
-        self.well_plate = WellPlate(endpoint=endpoint,
-                                    model=model)
-
-        self.stacked_widget = stacked_widget
 
         self.column_n = QLineEdit(parent=self)
         self.column_n.setPlaceholderText("Column number")
@@ -123,7 +125,7 @@ class WellPlateDimensions(QWidget):
 
             # Frame three
             self.stacked_widget.addWidget(CustomButtonGroup(diction, self.well_plate, self.stacked_widget))
-            self.stacked_widget.setCurrentIndex(2)
+            self.stacked_widget.setCurrentIndex(3)
 
 
 class WellAsButton(QPushButton):
@@ -193,7 +195,7 @@ class CustomButtonGroup(QWidget):
         # self.well_plate.execute_template_coords(checked_buttons)
 
         self.stacked_widget.addWidget(SaveWindow())
-        self.stacked_widget.setCurrentIndex(3)
+        self.stacked_widget.setCurrentIndex(4)
 
 
 class SaveWindow(QWidget):
@@ -208,6 +210,8 @@ class SaveWindow(QWidget):
         # yes_no_widget = QHBoxLayout()
         # yes_no_widget.addWidget(self.yes_widget)
         # yes_no_widget.addWidget(self.no_widget)
+
+
 
         layout = QHBoxLayout()
         layout.addWidget(create_colored_label("No further steps, please close the app", self))

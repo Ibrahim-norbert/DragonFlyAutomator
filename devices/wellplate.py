@@ -33,16 +33,35 @@ class WellPlate(xyz_stage):
     #
     #     fig.savefig(os.path.join(os.getcwd(), 'well_plate_visualisation.png'))
 
+    def define_coordinate_frame_visualisation(self, all_state_dicts):
+        fig, ax = plt.subplots(dpi=300)
+        corners = [self.state_dict_2_vector(all_state_dicts[x]) for x in [0,
+        self.c_n-1, (self.r_n-1)+(self.c_n-1), (self.r_n-1)+(2*(self.c_n-1)) ]] #Top left, Top right, Bottom left
+
+        tl, tr, bl, br = corners
+        #center = self.state_dict_2_vector(all_state_dicts[((self.c_n/2)-1)+((self.r_n/2)-1)])
+
+        # Set the x-axis and y-axis limits for the first subplot
+        ax.set_xlim(tl[0], tr[0])
+        ax.set_ylim(tl[1], bl[1])
+
+        #Set axes labels
+
+
+        return ax
+
+
     def execute_template_coords(self, all_state_dicts):
 
+        ax = self.define_coordinate_frame_visualisation(all_state_dicts)
         for state_dict in all_state_dicts:
             # Move stage to well
             self.update_state(state_dict, analoguecontrol_bool=False)
-
+            ax.scatter(*list(self.state_dict_2_vector(state_dict)))
             # Perform image acquisition of different Z positions
             # self.run_protocol()
 
-            sleep(3)
+            sleep(5)
 
     def state_dict_2_vector(self, state_dict):
         logging.log(level=10, msg='Value key: {}, Path options: {},'

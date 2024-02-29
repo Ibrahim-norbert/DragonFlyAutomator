@@ -1,6 +1,7 @@
 import logging
 import numpy as np
 from matplotlib import pyplot as plt
+import cv2 as cv
 
 logger = logging.getLogger(__name__)
 logger.info("This log message is from another module.")
@@ -96,74 +97,3 @@ def homography_matrix_estimation(method, vectors, well_names):
 
     return H
 
-
-def homography_matrix_estimation_cv():
-    ##Use this to associate a homography matrix to a wellplate
-
-    import cv2 as cv
-    #
-    #  #
-    #   # #[z_gt * np.array([x, y, z]), [0, 0, 0], -x_gt * np.array([x, y, z])]]
-    #   # ax = np.array([[0, 0, 0], -z*np.array([x_gt, y_gt, z_gt]), y*np.array([x_gt, y_gt, z_gt])])
-    #   # ax3 = np.array([-y*np.array([x_gt, y_gt, z_gt]), x*np.array([x_gt, y_gt, z_gt]), [0, 0, 0]])
-    #   #
-    #   # h3 = Matrix(ax3).nullspace()
-    #   #
-    #   # if len(h3) > 1:
-    #   #     h3 = np.array(h3[0])
-    #   #
-    #   # h1 = Matrix(ax).nullspace()
-    #   # if len(h1) > 1:
-    #   #     h1 = np.array(h1[0])
-    #   #pts_src =
-    #   # Convert points to homogeneous coordinates
-    #
-    #   test = np.array([[6, 15]])
-    #   pts_src_homogeneous = np.hstack((test, np.ones((test.shape[0], 1))))
-    #
-    #   # Apply perspective transformation
-    #   pts_dst_homogeneous = np.dot(pts_src_homogeneous, H.T)
-    #
-    #   # Convert back to inhomogeneous coordinates
-    #   pts_dst = pts_dst_homogeneous[:, :2] / pts_dst_homogeneous[:, 2:]
-
-    well_coords1, xyz_stage_coords1 = [16, 1], [-46.9, -35.939]  # Bottom left
-    well_coords2, xyz_stage_coords2 = [1, 1], [-47.7, 33.1]  # Top left
-    well_coords3, xyz_stage_coords3 = [1, 24], [59.4, 33.8]  # Top right
-    well_coords4, xyz_stage_coords4 = [16, 24], [59.4, -35.939]  # Bottom right
-
-    well_coords, xyz_stage_coords = (np.array([well_coords1, well_coords2, well_coords3, well_coords4]),
-                                     np.array([xyz_stage_coords1, xyz_stage_coords2, xyz_stage_coords3, xyz_stage_coords4]))
-
-
-
-    # Unseen coordinate
-    unseen_coord = np.array([10.0, 10.0, 1.0])
-
-
-
-    print("Homography Matrix:")
-    print(h)
-    print("\nTransformed Coordinate:")
-    print(transformed_coord)
-
-
-
-
-import time
-from memory_profiler import profile
-
-
-# Your function to be tested
-@profile
-def your_function():
-    # Your function code here
-    result = 0
-    for i in range(100):
-        homography_matrix_estimation_cv()
-        result += i
-    return result
-
-
-if __name__ == '__main__':
-    your_function()
