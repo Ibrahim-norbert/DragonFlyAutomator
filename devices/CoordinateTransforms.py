@@ -1,6 +1,5 @@
 import logging
 import numpy as np
-from matplotlib import pyplot as plt
 import cv2 as cv
 
 logger = logging.getLogger(__name__)
@@ -25,12 +24,14 @@ def linearspacing(topright, topleft, bottomright, bottomleft, c_n, r_n):
 
     vectors = vectors.reshape(r_n * c_n, 2)
 
+    vectors = [x.tolist() for x in vectors]
+
     well_names = sum([[str(r) + " " + str(c + 1) for c in range(c_n)] for r in range(r_n)], [])
 
     return vectors, well_names, length, height, x_spacing, y_spacing
 
 
-def linearcorrectionmatrix(topright, topleft, bottomright, bottomleft, c_n, r_n):
+def  linearcorrectionmatrix(topright, topleft, bottomright, bottomleft, c_n, r_n):
     """correction matrix obtained from:
         https://scripts.iucr.org/cgi-bin/paper?S2053230X18016515"""
 
@@ -72,11 +73,15 @@ def homography_matrix_estimation(method, vectors, well_names):
     ##Use this to associate a homography matrix to a wellplate
 
     # Define source and destination coordinates
+    well_names = [[int(x.split(" ")[0]),int(x.split(" ")[1])] for x in well_names]
+
     pts_src = np.array(well_names, dtype=np.float32)
     pts_dst = np.array(vectors, dtype=np.float32)
     
     if method == "non-linear":
+
         H = cv.findHomography(pts_src, pts_dst)[0]
+
     else:
         # Construct matrix A
         A = []

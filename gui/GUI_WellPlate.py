@@ -1,24 +1,28 @@
-import os.path
-import sys
-import logging
-from PyQt6.QtGui import QPainter, QPixmap, QColor, QFont
-from PyQt6.QtWidgets import QApplication, QGridLayout, QPushButton, QWidget, QMainWindow, QLineEdit, QVBoxLayout, \
-    QLabel, QComboBox, QHBoxLayout, QStackedWidget
-from PyQt6.QtCore import Qt
-from devices.wellplate import WellPlate
-from helperfunctions import create_colored_label
 import glob
+import logging
+import os
+from PyQt6.QtWidgets import QGridLayout, QPushButton, QWidget, QLineEdit, QVBoxLayout, QComboBox, QHBoxLayout
+from PyQt6.QtCore import Qt
+from helperfunctions import create_colored_label
+from devices.wellplate import WellPlate
+from devices.helperfunctions import CoordinateFrameVisualisation, RealTimePlot
+
+wellplate_paths = [os.path.basename(x) for x in glob.glob(os.path.join(os.getcwd(), "models", "*WellPlate*"))]
+
+logger = logging.getLogger(__name__)
+logger.info("This log message is from another module.")
+logging.debug("Directory: {}".format(os.getcwd()))
 
 
 class SelectWellPlateDimensions(QWidget):
-    def __init__(self, endpoint, model, stacked_widget):
+    def __init__(self, stacked_widget):
         super().__init__()
 
         self.stacked_widget = stacked_widget
 
         self.dropdown = QComboBox(self)
-        for ID, well_num in df[["Manufacturer ID", "Total well number"]]:
-            self.dropdown.addItem(ID + " " + well_num)
+        for path in wellplate_paths:
+            self.dropdown.addItem(path)
 
         layout1 = QVBoxLayout()
         self.selectwell_button = QPushButton("Select Well Plate", self)
@@ -34,23 +38,30 @@ class SelectWellPlateDimensions(QWidget):
 
         self.well_plate = WellPlate()
 
-
     def selectwellplate(self):
-        ID, wellnum = self.dropdown.currentText().split(" ")
-        self.model_params = df[((df["Manufacturer ID"]==ID) & (df["Total well number"]==wellnum))]
-        #Intersection between:
-        # self.well_plate = self.well_plate & self.model_params
-
+        try:
+            path = self.dropdown.currentText()
+            self.well_plate.load_attributes(path)
+            self.stacked_widget.addWidget(CustomButtonGroup(self.well_plate, self.stacked_widget))
+            self.stacked_widget.setCurrentIndex(2)
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
+            logging.exception("What happened here: ", exc_info=True)
 
     def addwell(self):
-        self.stacked_widget(WellPlateDimensions())
-        self.stacked_widget.setCurrentIndex(2)
+        try:
+            self.stacked_widget.addWidget(WellPlateDimensions(self.stacked_widget, self.well_plate))
+            self.stacked_widget.setCurrentIndex(2)
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
+            logging.exception("What happened here: ", exc_info=True)
 
 
-
-class WellPlateDimensions(SelectWellPlateDimensions):
-    def __init__(self):
+class WellPlateDimensions(QWidget):
+    def __init__(self, stacked_widget, wellplate):
         super().__init__()
+        self.well_plate = wellplate
+        self.stacked_widget = stacked_widget
 
         self.column_n = QLineEdit(parent=self)
         self.column_n.setPlaceholderText("Column number")
@@ -101,13 +112,12 @@ class WellPlateDimensions(SelectWellPlateDimensions):
     def read_well_coordinate(self):
 
         try:
-            self.well_plate.well_plate_req_coords[self.dropdown.currentText()] = self.well_plate.get_state(
-                test_key=self.dropdown.currentText())
+            self.well_plate.well_plate_req_coords[self.dropdown.currentText()] = self.well_plate.get_state(test_key=self.dropdown.currentText())
+            #self.well_plate.well_plate_req_coords[self.dropdown.currentText()] = self.well_plate.get_state()
             vector = self.well_plate.state_dict_2_vector(
                 self.well_plate.well_plate_req_coords[self.dropdown.currentText()])
             self.placeholder_coordinates.setText(str(vector))
             logging.log(level=10, msg="Well: " + self.dropdown.currentText() + " - " + str(vector))
-
             if None not in self.well_plate.well_plate_req_coords.values():
                 final = self.well_plate.well_plate_req_coords.items()
                 logging.log(level=10, msg="Final coordinates: " + str(final))
@@ -118,14 +128,16 @@ class WellPlateDimensions(SelectWellPlateDimensions):
 
     def enter_button_click(self):
 
-        if None not in self.well_plate.well_plate_req_coords.values():
-            diction = self.well_plate.compute_inspect_coords(int(self.column_n.text()), int(self.row_n.text()))
-            # diction = self.well_plate.compute_coords_with_linearcorrection(int(self.column_n.text()),
-            #                                                              int(self.row_n.text()))
+        try:
+            if None not in self.well_plate.well_plate_req_coords.values():
+                self.well_plate.predict_well_coords(int(self.column_n.text()), int(self.row_n.text()))
 
-            # Frame three
-            self.stacked_widget.addWidget(CustomButtonGroup(diction, self.well_plate, self.stacked_widget))
-            self.stacked_widget.setCurrentIndex(3)
+                # Frame three
+                self.stacked_widget.addWidget(CustomButtonGroup(self.well_plate, self.stacked_widget))
+                self.stacked_widget.setCurrentIndex(3)
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
+            logging.exception("What happened here ", exc_info=True)
 
 
 class WellAsButton(QPushButton):
@@ -153,7 +165,7 @@ class WellAsButton(QPushButton):
 
 
 class CustomButtonGroup(QWidget):
-    def __init__(self, all_state_dicts, well_plate, stacked_widget):
+    def __init__(self, well_plate, stacked_widget):
         super().__init__()
 
         self.well_plate = well_plate
@@ -161,7 +173,7 @@ class CustomButtonGroup(QWidget):
         layout = QGridLayout()
 
         self.buttons = []
-        for key, well_state_dict in all_state_dicts.items():
+        for key, well_state_dict in self.well_plate.all_well_dicts.items():
             r, c = int(key.split(" ")[0]), int(key.split(" ")[-1])
             label = "abcdefghijklmnopqrstuvwxyz".upper()[r] + key.split(" ")[-1]
             button = WellAsButton(text=label, parent=self, coordinates=(r, c), well_coordinate=well_state_dict)
@@ -191,11 +203,17 @@ class CustomButtonGroup(QWidget):
 
         logging.log(level=10, msg="Wells that have been selected: {}".format(checked_buttons))
 
+        self.visualiser = RealTimePlot()
+
+        self.stacked_widget.addWidget(self.visualiser)
+        self.stacked_widget.setCurrentIndex(4)
+
+
         # This executes the xzystage movement
-        # self.well_plate.execute_template_coords(checked_buttons)
+        self.well_plate.execute_template_coords(checked_buttons, self.visualiser)
 
         self.stacked_widget.addWidget(SaveWindow())
-        self.stacked_widget.setCurrentIndex(4)
+        self.stacked_widget.setCurrentIndex(5)
 
 
 class SaveWindow(QWidget):
@@ -211,10 +229,8 @@ class SaveWindow(QWidget):
         # yes_no_widget.addWidget(self.yes_widget)
         # yes_no_widget.addWidget(self.no_widget)
 
-
-
         layout = QHBoxLayout()
-        layout.addWidget(create_colored_label("No further steps, please close the app", self))
+        layout.addWidget(create_colored_label("Would you like to save this new coordinate transformation ?", self))
 
         self.setLayout(layout)
 

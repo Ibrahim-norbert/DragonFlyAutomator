@@ -1,16 +1,16 @@
 import pickle
-from xyz_stage import xyz_stage
+from xyzstage import XYZStage
 import logging
 import numpy as np
 import os
-from xyz_stage import fusion_api
+from xyzstage import FusionApi
 import json
 
 #logging.basicConfig(filename=os.path.join(os.getcwd(), 'dragonfly_automator.log'), level=logging.DEBUG,
  #                   format='%(asctime)s - %(levelname)s - %(message)s')
 
 
-class EMCCD2(fusion_api):
+class EMCCD2(FusionApi):
     def __init__(self):
         super().__init__()  # inherits
 

@@ -2,11 +2,10 @@ import os.path
 import sys
 import logging
 from PyQt6.QtGui import QPainter, QPixmap, QColor, QFont
-from PyQt6.QtWidgets import QApplication, QGridLayout, QPushButton, QWidget, QMainWindow, QLineEdit, QVBoxLayout, \
-    QLabel, QComboBox, QHBoxLayout, QStackedWidget
+from PyQt6.QtWidgets import QApplication, QPushButton, QWidget, QMainWindow, QLineEdit, QVBoxLayout, QStackedWidget
 from PyQt6.QtCore import Qt
 
-from GUI_WellPlate import WellPlateDimensions
+from GUI_WellPlate import SelectWellPlateDimensions
 
 # Configure logging
 
@@ -18,8 +17,8 @@ logging.debug("Directory: {}".format(os.getcwd()))
 class BackgroundMainWindow(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.background_image = QPixmap(os.path.join(os.getcwd(), "../images/dragonfly.jpg"))
-        self.overlay_image = QPixmap(os.path.join(os.getcwd(), "../images/BioQuant_Logo_RGB_136.png"))
+        self.background_image = QPixmap(os.path.join(os.getcwd(), "images", "dragonfly.jpg"))
+        self.overlay_image = QPixmap(os.path.join(os.getcwd(), "images", "BioQuant_Logo_RGB_136.png"))
         self.text = "AG Erfle & Starkuvienė"
 
     def paintEvent(self, event):
@@ -56,10 +55,6 @@ class DragonflyAutomator(BackgroundMainWindow):
 
         # Frame one
         self.stacked_widget.addWidget(UsernamePath(self.stacked_widget))
-
-        # Frame two
-        self.stacked_widget.addWidget(WellPlateDimensions(endpoint="v1/devices/xyz-stage", model="384",
-                                                          stacked_widget=self.stacked_widget))
 
     # def add_switch_to_next_widget(self, widget):
     #     .addWidget(widget)
@@ -121,6 +116,8 @@ class UsernamePath(QWidget):
             if os.path.exists(path):
                 self.username.setText(self.username.text())
                 logging.log(level=10, msg="Username: " + self.username.text())
+                # Frame two
+                self.stacked_widget.addWidget(SelectWellPlateDimensions(self.stacked_widget))
                 self.stacked_widget.setCurrentIndex(1)
 
     def handlePathChanged(self):
