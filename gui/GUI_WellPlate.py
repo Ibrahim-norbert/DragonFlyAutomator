@@ -5,7 +5,7 @@ from PyQt6.QtWidgets import QGridLayout, QPushButton, QWidget, QLineEdit, QVBoxL
 from PyQt6.QtCore import Qt
 from helperfunctions import create_colored_label
 from devices.wellplate import WellPlate
-from devices.helperfunctions import CoordinateFrameVisualisation, RealTimePlot
+from devices.helperfunctions import RealTimePlot
 
 wellplate_paths = [os.path.basename(x) for x in glob.glob(os.path.join(os.getcwd(), "models", "*WellPlate*"))]
 
