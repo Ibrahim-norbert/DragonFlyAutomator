@@ -112,8 +112,9 @@ class WellPlateDimensions(QWidget):
     def read_well_coordinate(self):
 
         try:
-            self.well_plate.well_plate_req_coords[self.dropdown.currentText()] = self.well_plate.get_state(test_key=self.dropdown.currentText())
-            #self.well_plate.well_plate_req_coords[self.dropdown.currentText()] = self.well_plate.get_state()
+            self.well_plate.well_plate_req_coords[self.dropdown.currentText()] = self.well_plate.get_state(
+                test_key=self.dropdown.currentText())
+            # self.well_plate.well_plate_req_coords[self.dropdown.currentText()] = self.well_plate.get_state()
             vector = self.well_plate.state_dict_2_vector(
                 self.well_plate.well_plate_req_coords[self.dropdown.currentText()])
             self.placeholder_coordinates.setText(str(vector))
@@ -133,6 +134,8 @@ class WellPlateDimensions(QWidget):
                 self.well_plate.predict_well_coords(int(self.column_n.text()), int(self.row_n.text()))
 
                 # Frame three
+
+                # self.setCentralWidget(self.visualiser)
                 self.stacked_widget.addWidget(CustomButtonGroup(self.well_plate, self.stacked_widget))
                 self.stacked_widget.setCurrentIndex(3)
         except Exception as e:
@@ -168,6 +171,7 @@ class CustomButtonGroup(QWidget):
     def __init__(self, well_plate, stacked_widget):
         super().__init__()
 
+
         self.well_plate = well_plate
 
         layout = QGridLayout()
@@ -199,21 +203,23 @@ class CustomButtonGroup(QWidget):
         self.stacked_widget = stacked_widget
 
     def handleEnterPressed(self):
-        checked_buttons = [button.well_state_dict for button in self.buttons if button.isChecked()]
 
-        logging.log(level=10, msg="Wells that have been selected: {}".format(checked_buttons))
+        try:
+            checked_buttons = [button.well_state_dict for button in self.buttons if button.isChecked()]
 
-        self.visualiser = RealTimePlot()
+            logging.log(level=10, msg="Wells that have been selected: {}".format(checked_buttons))
+            visualiser = RealTimePlot()
+            self.stacked_widget.addWidget(visualiser)
+            self.stacked_widget.setCurrentIndex(4)
 
-        self.stacked_widget.addWidget(self.visualiser)
-        self.stacked_widget.setCurrentIndex(4)
+            # This executes the xzystage movement
+            self.well_plate.execute_template_coords(checked_buttons, visualiser)
 
-
-        # This executes the xzystage movement
-        self.well_plate.execute_template_coords(checked_buttons, self.visualiser)
-
-        self.stacked_widget.addWidget(SaveWindow())
-        self.stacked_widget.setCurrentIndex(5)
+            self.stacked_widget.addWidget(SaveWindow())
+            self.stacked_widget.setCurrentIndex(5)
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
+            logging.exception("What happened here ", exc_info=True)
 
 
 class SaveWindow(QWidget):
