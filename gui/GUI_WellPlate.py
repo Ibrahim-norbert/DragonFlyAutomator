@@ -3,9 +3,11 @@ import logging
 import os
 import sys
 
+import numpy as np
 from PyQt6.QtWidgets import QGridLayout, QPushButton, QWidget, QLineEdit, QVBoxLayout, QComboBox, QHBoxLayout, \
     QApplication, QStackedWidget
 from PyQt6.QtCore import Qt, QTimer
+from matplotlib import pyplot as plt
 
 from gui.helperfunctions import create_colored_label
 from visualisation import MplCanvas, Visualiser
@@ -211,11 +213,28 @@ class CustomButtonGroup(QWidget):
 
             # TODO See if there is a cleaner method for this
             ## TODO Maybe add the self.wellplate into the consturctor and the timer too ? and make it a child ?
-            self.visualiser = Visualiser(MplCanvas())
-            self.stacked_widget.addWidget(self.visualiser)
-            self.stacked_widget.setCurrentWidget(self.visualiser)
+            #self.visualiser = Visualiser(MplCanvas())
+            #self.stacked_widget.addWidget(self.visualiser)
+            #self.stacked_widget.setCurrentWidget(self.visualiser)
+            fig,axes = plt.subplots()
+            axes.set_xlim(self.well_plate.corners_coords[0][0], self.well_plate.corners_coords[1][0])
+            axes.set_ylim(self.well_plate.corners_coords[0][1], self.well_plate.corners_coords[2][1])
 
+            x_values = list(range(1, 25))
+            y_values = [x for x in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[:self.well_plate.r_n]]
 
+            # Set y-axis ticks from P to A
+            axes.set_yticks(np.linspace(self.well_plate.corners_coords[0][1], self.well_plate.corners_coords[2][1], len(y_values)))
+            axes.set_yticklabels(reversed(y_values))
+
+            axes.set_title('Real-Time {} well plate positioning'.format(self.well_plate.c_n * self.well_plate.r_n))
+
+            #TODO Instead of execute tempalte, try it with just sleep
+            for state_dict,x in self.checked_buttons:
+                vector = self.well_plate.state_dict_2_vector(state_dict)
+                axes.scatter(vector[0], vector[1])
+                plt.show()
+                #self.well_plate.execute_template_coords(state_dict)
 
 
             # TODO Add next button so i can proceed to the save window
