@@ -113,20 +113,16 @@ class WellPlate(XYZStage):
                                                                                                    vectors)}
         return all_well_dicts
 
-    def execute_template_coords(self, all_state_dicts, visualiser):
+    def execute_template_coords(self, state_dict):
 
         # Configure drawer
 
         try:
-            drawer = visualiser.define_coordinate_frame_visualisation(self.corners_coords, self.c_n, self.r_n)
-
-            for state_dict in all_state_dicts:
-                # Move stage to well
-                # self.update_state(state_dict, analoguecontrol_bool=False)
-                drawer.drawcoordinate(self.state_dict_2_vector(state_dict))
-                # Perform image acquisition of different Z positions
-                # self.run_protocol()
-                sleep(5)
+            # Move stage to well
+            # self.update_state(state_dict, analoguecontrol_bool=False)
+            # Perform image acquisition of different Z positions
+            # self.run_protocol()
+            sleep(3)
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
             logging.exception("What happened here ", exc_info=True)

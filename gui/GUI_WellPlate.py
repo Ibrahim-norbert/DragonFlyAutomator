@@ -1,11 +1,15 @@
 import glob
 import logging
 import os
-from PyQt6.QtWidgets import QGridLayout, QPushButton, QWidget, QLineEdit, QVBoxLayout, QComboBox, QHBoxLayout
-from PyQt6.QtCore import Qt
-from helperfunctions import create_colored_label
+import sys
+
+from PyQt6.QtWidgets import QGridLayout, QPushButton, QWidget, QLineEdit, QVBoxLayout, QComboBox, QHBoxLayout, \
+    QApplication, QStackedWidget
+from PyQt6.QtCore import Qt, QTimer
+
+from gui.helperfunctions import create_colored_label
+from visualisation import MplCanvas, Visualiser
 from devices.wellplate import WellPlate
-from devices.helperfunctions import RealTimePlot
 
 wellplate_paths = [os.path.basename(x) for x in glob.glob(os.path.join(os.getcwd(), "models", "*WellPlate*"))]
 
@@ -14,6 +18,8 @@ logger.info("This log message is from another module.")
 logging.debug("Directory: {}".format(os.getcwd()))
 
 
+# TODO Make this script cohesive
+# TODO Find out what dynamical means in method context
 class SelectWellPlateDimensions(QWidget):
     def __init__(self, stacked_widget):
         super().__init__()
@@ -171,7 +177,6 @@ class CustomButtonGroup(QWidget):
     def __init__(self, well_plate, stacked_widget):
         super().__init__()
 
-
         self.well_plate = well_plate
 
         layout = QGridLayout()
@@ -191,59 +196,102 @@ class CustomButtonGroup(QWidget):
         self.enter_button = QPushButton("Enter", parent=self)
         self.enter_button.clicked.connect(self.handleEnterPressed)
         main_layout.addWidget(self.enter_button)
-        # Set stretch factors for rows and columns
-        # layout.setColumnStretch(0, 0.6)  # Adjust the stretch factor for columns as needed
-        # layout.setRowStretch(0, 1)  # Adjust the stretch factor for rows as needed
-        #
-        # container_layout = QVBoxLayout(self)
-        # container_layout.addLayout(layout)
 
         self.setLayout(main_layout)
 
         self.stacked_widget = stacked_widget
 
+
     def handleEnterPressed(self):
 
         try:
-            checked_buttons = [button.well_state_dict for button in self.buttons if button.isChecked()]
+            self.checked_buttons = [(button.well_state_dict, button.coordinates) for button in self.buttons if button.isChecked()]
 
-            logging.log(level=10, msg="Wells that have been selected: {}".format(checked_buttons))
-            visualiser = RealTimePlot()
-            self.stacked_widget.addWidget(visualiser)
-            self.stacked_widget.setCurrentIndex(4)
+            logging.log(level=10, msg="Wells that have been selected: {}".format(self.checked_buttons))
 
-            # This executes the xzystage movement
-            self.well_plate.execute_template_coords(checked_buttons, visualiser)
+            # TODO See if there is a cleaner method for this
+            ## TODO Maybe add the self.wellplate into the consturctor and the timer too ? and make it a child ?
+            self.visualiser = Visualiser(MplCanvas())
+            self.stacked_widget.addWidget(self.visualiser)
+            self.stacked_widget.setCurrentWidget(self.visualiser)
 
-            self.stacked_widget.addWidget(SaveWindow())
-            self.stacked_widget.setCurrentIndex(5)
+
+
+
+            # TODO Add next button so i can proceed to the save window
+            # self.stacked_widget.addWidget(SaveWindow(self.well_plate, stacked_widget=self.stacked_widget))
+            # self.stacked_widget.setCurrentWidget(self.stacked_widget.currentWidget())
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
             logging.exception("What happened here ", exc_info=True)
 
 
 class SaveWindow(QWidget):
-    def __init__(self):
+    def __init__(self, wellplate, stacked_widget):
         super().__init__()
 
-        # self.model = model
-
-        # self.yes_widget = QPushButton("Yes", self)
-        # self.no_widget = QPushButton("No", self)
-
-        # yes_no_widget = QHBoxLayout()
-        # yes_no_widget.addWidget(self.yes_widget)
-        # yes_no_widget.addWidget(self.no_widget)
+        self.wellplate = wellplate
 
         layout = QHBoxLayout()
         layout.addWidget(create_colored_label("Would you like to save this new coordinate transformation ?", self))
-
+        self.yes_button = QPushButton("Yes", parent=self)
+        self.yes_button.clicked.connect(self.save)
+        layout.addWidget(self.yes_button)
+        self.no_button = QPushButton("No", parent=self)
+        self.no_button.clicked.connect(self.save)
+        layout.addWidget(self.no_button)
         self.setLayout(layout)
 
-    # yes_no_widget.addWidget(message)
+        self.stacked_widget = stacked_widget
 
-    # self.setLayout(yes_no_widget)
+    def save(self):
+        if self.yes_button.isChecked():
 
-    # def savemodel(self):
+            layout = QHBoxLayout()
+            self.manufacturer = QLineEdit(parent=self)
+            self.manufacturer.setPlaceholderText("Manufacturer name")
+            layout.addWidget(self.manufacturer)
+            self.partnumber = QLineEdit(parent=self)
+            self.partnumber.setPlaceholderText("Part number")
+            layout.addWidget(self.partnumber)
+            self.confirm_button = QPushButton("Confirm", parent=self)
+            self.confirm_button.clicked.connect(self.confirm)
+            layout.addWidget(self.confirm_button)
 
-    #  if self.yes_widget.isChecked():
+            main_layout = QVBoxLayout()
+            main_layout.addLayout(self.layout())
+            main_layout.addLayout(layout)
+
+            self.setLayout(main_layout)
+
+        elif self.no_button.isChecked():
+            # Create a button
+            button = QPushButton('Exit', self)
+            # Connect the button to the quit method
+            button.clicked.connect(self.close)
+
+            self.stacked_widget.addWidget(button)
+            self.stacked_widget.setCurrentWidget(button)
+
+    def confirm(self):
+        self.wellplate.save_attributes2json(self.manufacturer.text(), self.partnumber.text())
+
+# if __name__ == '__main__':
+#     app = QApplication(sys.argv)
+#     window = Visualiser(MplCanvas())
+#     # Update the canvas with new data
+#     wellplate2 = WellPlate()
+#     wellplate2.load_attributes(name="384_falcon_wellplate.json")
+#
+#     def update_canvas():
+#         if wellplate2.all_well_dicts:
+#             key, value = next(iter(wellplate2.all_well_dicts.items()))
+#             window.canvas.CoordinateFrameVisualisation(wellplate2.corners_coords,
+#                                                        wellplate2.r_n, wellplate2.c_n,
+#                                                        wellplate2.state_dict_2_vector(value))
+#             wellplate2.all_well_dicts.pop(key)  # Remove the processed entry
+#             QTimer.singleShot(5000, update_canvas)
+#
+#     update_canvas()
+#     window.show()
+#     sys.exit(app.exec())
