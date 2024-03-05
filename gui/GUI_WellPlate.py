@@ -204,7 +204,6 @@ class CustomButtonGroup(QWidget):
         self.stacked_widget = stacked_widget
 
     def handleEnterPressed(self):
-
         try:
             self.checked_buttons = [(button.well_state_dict, button.coordinates) for button in self.buttons if
                                     button.isChecked()]
@@ -213,16 +212,10 @@ class CustomButtonGroup(QWidget):
 
             # TODO See if there is a cleaner method for this
             ## TODO Maybe add the self.wellplate into the consturctor and the timer too ? and make it a child ?
-            self.visualiser = Visualiser(CoordinatePlot(well_plate=self.well_plate,
-                                                        checked_buttons=self.checked_buttons))
-            self.stacked_widget.addWidget(self.visualiser)
-            self.stacked_widget.setCurrentWidget(self.visualiser)
-
-            # self.well_plate.execute_template_coords(state_dict)
-
-            # TODO Add next button so i can proceed to the save window
-            # self.stacked_widget.addWidget(SaveWindow(self.well_plate, stacked_widget=self.stacked_widget))
-            # self.stacked_widget.setCurrentWidget(self.stacked_widget.currentWidget())
+            Visualiser(CoordinatePlot(well_plate=self.well_plate,
+                                                        checked_buttons=self.checked_buttons),
+                                         stacked_widget=self.stacked_widget,
+                                         next_widget=SaveWindow(self.well_plate, stacked_widget=self.stacked_widget))
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
             logging.exception("What happened here ", exc_info=True)

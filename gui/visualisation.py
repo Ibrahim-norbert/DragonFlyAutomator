@@ -31,56 +31,80 @@ class CoordinatePlot(MplCanvas):
 
         self.well_plate = well_plate
         self.checked_buttons = checked_buttons
-        self.timer = QTimer(self)
-        self.timer.timeout.connect(self.update_canvas)
-        self.timer.start(10)
+
+    def drawcoordinate(self, vector):
+        try:
+            self.axes.cla()  # Clear the canvas.
+            self.axes.set_xlim(self.well_plate.corners_coords[0][0], self.well_plate.corners_coords[1][0])
+            self.axes.set_ylim(self.well_plate.corners_coords[0][1], self.well_plate.corners_coords[2][1])
+
+            x_values = list(range(1, 25))
+            y_values = [x for x in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[:self.well_plate.r_n]]
+
+            # Set y-axis ticks from P to A
+            self.axes.set_yticks(
+                np.linspace(self.well_plate.corners_coords[0][1], self.well_plate.corners_coords[2][1],
+                            len(y_values)))
+            self.axes.set_yticklabels(reversed(y_values))
+
+            self.axes.set_title(
+                'Real-Time {} well plate positioning'.format(self.well_plate.c_n * self.well_plate.r_n))
+            self.x += [vector[0]]
+            self.y += [vector[1]]
+            self.axes.scatter(self.x, self.y, c="r")
+            self.draw()
+
+            logger.log(level=10,
+                       msg="Wells that have been selected: {} adn their coordinates {}".format(self.coords,
+
+                                                                                               self.state_dict))
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
+            logging.exception("What happened here ", exc_info=True)
 
     def update_canvas(self):
-        #TODO quit Qtimer from repeating itself when the checkedbuttons is empty
-        #See if you can find the coordinate mapping problem
+        # TODO quit Qtimer from repeating itself when the checkedbuttons is empty
+        # See if you can find the coordinate mapping problem
         if self.checked_buttons:
             outs = next(iter(self.checked_buttons))
             self.state_dict, self.coords = outs
             vector = self.well_plate.state_dict_2_vector(self.state_dict)
+            self.drawcoordinate(vector)
             self.checked_buttons.remove(outs)  # Remove the processed entry
-            try:
-                self.axes.cla()  # Clear the canvas.
-                self.axes.set_xlim(self.well_plate.corners_coords[0][0], self.well_plate.corners_coords[1][0])
-                self.axes.set_ylim(self.well_plate.corners_coords[0][1], self.well_plate.corners_coords[2][1])
-
-                x_values = list(range(1, 25))
-                y_values = [x for x in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[:self.well_plate.r_n]]
-
-                # Set y-axis ticks from P to A
-                self.axes.set_yticks(
-                    np.linspace(self.well_plate.corners_coords[0][1], self.well_plate.corners_coords[2][1],
-                                len(y_values)))
-                self.axes.set_yticklabels(reversed(y_values))
-
-                self.axes.set_title(
-                    'Real-Time {} well plate positioning'.format(self.well_plate.c_n * self.well_plate.r_n))
-                self.x += [vector[0]]
-                self.y += [vector[1]]
-                self.axes.scatter(self.x, self.y, c="r")
-                self.draw()
-
-                logger.log(level=10,
-                           msg="Wells that have been selected: {} adn their coordinates {}".format(self.coords,
-
-                                                                                                   self.state_dict))
-            except Exception as e:
-                print(f"An unexpected error occurred: {e}")
-                logging.exception("What happened here ", exc_info=True)
+            return True
+        else:
+            return False
 
 
 class Visualiser(QWidget):
-    def __init__(self, canvas):
+    def __init__(self, canvas, stacked_widget=None, next_widget=None):
         super().__init__()
 
         self.canvas = canvas
         layout = QVBoxLayout()
         layout.addWidget(self.canvas)
         self.setLayout(layout)
+        self.stacked_widget = stacked_widget
+        self.stacked_widget.addWidget(self)
+        self.stacked_widget.setCurrentWidget(self)
+
+        self.next_widget = next_widget
+        self.stacked_widget.addWidget(self.next_widget)
+
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.Update())
+        self.timer.start(10)
+
+    def Update(self):
+        out = self.canvas.update_canvas()
+        if out is False:
+            self.stopUpdates()
+    def stopUpdates(self):
+        # Stop the timer and update the label
+        self.timer.stop()
+        logger.log(level=10, msg="Switch to new widget")
+        self.stacked_widget.setCurrentWidget(self.next_widget)
+
 
 
 if __name__ == '__main__':
