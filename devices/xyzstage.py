@@ -2,12 +2,13 @@ import json
 import logging
 import os
 import numpy as np
-import fusionrest
+from RestAPI import fusionrest
 
 logger = logging.getLogger(__name__)
 logger.info("This log message is from {}.".format(__name__))
 
-#TODO need to remove the testers
+
+# TODO need to remove the testers
 
 def get_address(endpoint):
     try:
@@ -125,18 +126,18 @@ class FusionApi:
 class XYZStage(FusionApi):
     """From what I have seen, the XYZStage path outputs a list."""
 
-    def __init__(self, endpoint="v1"):
+    def __init__(self, endpoint="v1", test=True):
         super().__init__()  # inherits
 
         self.endpoint = self.endpoint + "/{}/{}".format("devices", "xyz-stage")
 
-        self.current_output = get_output(self.endpoint)
+        if test is False:
+            self.current_output = get_output(self.endpoint)
+        else:
+            f = open(os.path.join(os.getcwd(), "endpoint_outputs", os.path.basename(self.endpoint) + ".json"))
+            self.current_output = json.load(f)
 
-        # Opening JSON file
-
-        #f = open(os.path.join(os.getcwd(), r"endpoint_outputs", "xyz-stage.json"))
-
-        #self.current_output = json.load(f)
+        self.test = test
 
         self.path_options = [x["Name"] for x in self.current_output]
 
@@ -156,21 +157,16 @@ class XYZStage(FusionApi):
         self.selected_path_option = endpoint.split("/")[-1]
         self.selected_key = None
 
-    def get_state(self, test_key=None):
-        return {x: get_output(endpoint=self.endpoint + "/{}".format(x)) for x in
-                 self.path_options}
+    def get_state(self, test_key):
 
-        # [[-48, 33.1], [-48, -38.9], [60, 33.1], [60, -38.9], [-48, 33.1]]
-
-        # Opening JSON file
-        file = os.path.join(os.getcwd(), r"endpoint_outputs", "{}xposition.json".format(test_key.replace(" well", "_")))
-        f = open(file)
-        x_ = json.load(f)
-        # Opening JSON file
-        #file = os.path.join(os.getcwd(), r"endpoint_outputs", "{}yposition.json".format(test_key.replace(" well", "_")))
-        #f = open(file)
-       # y = json.load(f)
-      #  return {x: [x_, y, None][id] for id, x in enumerate(self.path_options)}
+        if self.test is False:
+            return {x: get_output(endpoint=self.endpoint + "/{}".format(x)) for x in
+                    self.path_options}
+        else:
+            f = open(os.path.join(os.getcwd(), r"endpoint_outputs",
+                                  "{}xposition.json".format(test_key.replace(" well", "_"))))
+            x_ = json.load(f)
+            return {x: [x_, y, None][id] for id, x in enumerate(self.path_options)}
 
     def enter_coords(self, x, y, state_dict):
 

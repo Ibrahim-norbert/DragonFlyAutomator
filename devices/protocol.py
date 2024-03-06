@@ -6,30 +6,60 @@ import numpy as np
 import os
 import json
 from time import sleep
+from RestAPI import fusionrest
+
 logger = logging.getLogger(__name__)
 logger.info("This log message is from {}.py".format(__name__))
 
 
 class Protocol(FusionApi):
-    def __init__(self):
+    def __init__(self, test=True):
         super().__init__()  # inherits
         self.endpoint = self.endpoint + "/{}".format("protocol")
-        self.current_output = self.get_state()
+
+        if test is False:
+            self.current_output = self.get_state()
+            self.protocol_name = fusionrest.get_protocol_name()
+        else:
+            f = open(os.path.join(os.getcwd(), "endpoint_outputs", os.path.basename(self.endpoint) + "_current.json"))
+            self.current_output = json.load(f)
+        self.test = test
         self.microscope = Microscope()
 
     def get_state(self):
-        return {"current": get_output(endpoint=self.endpoint + "/{}".format("current"))}
+        return fusionrest.get_state()
 
     def run_protocol(self):
-        update(self.endpoint + "/{}".format("state"), {"State": "Running"})
-        logger.log(level=10, msg="Running protocol: {}".format(self.current_output.values()))
+        if self.test is False:
+            fusionrest.run_protocol_completely(protocol_name=self.protocol_name)
+            logger.log(level=10, msg="Running protocol: {}".format(self.current_output.values()))
+        else:
+            logger.log(level=10, msg="Running protocol: {}".format(self.current_output.values()))
 
     def change_image_name(self, image_name):
-	
-        img_name_dict = get_output(self.endpoint + "/{}".format("filename"))
-        print(img_name_dict )
-        #img_name_dict["ImageName"] = image_name
-        #update(self.endpoint + "/{}".format("filename"), img_name_dict)
+        if self.test is False:
+            img_name_dict = get_output(os.path.dirname(self.endpoint) + "/{}".format("datasets"))
+            img_path = img_name_dict["Path"]
+
+            logger.log(level=20, msg="Current image path: {}".format(img_path))
+            if ".ims" not in image_name:
+                image_name = image_name + ".ims"
+
+            img_name_dict["Path"] = os.path.join(os.path.split(img_path)[0], image_name)
+            logger.log(level=20, msg="New image path: {}".format(img_name_dict["Path"]))
+            update(self.endpoint + "/{}".format("filename"), img_name_dict)
+        else:
+            f = open(os.path.join(os.getcwd(), "endpoint_outputs", "dataset.json"))
+            img_name_dict = json.load(f)
+
+            img_path = img_name_dict["Path"]
+
+            logger.log(level=20, msg="Current image path: {}".format(img_path))
+            if ".ims" not in image_name:
+                image_name = image_name + ".ims"
+
+            img_name_dict["Path"] = os.path.join(os.path.split(img_path)[0], image_name)
+            logger.log(level=20, msg="New image path: {}".format(img_name_dict["Path"]))
 
     def z_stack(self, wellcoord="0 0"):
         # Set image name
@@ -39,13 +69,17 @@ class Protocol(FusionApi):
         logger.log(level=10,
                    msg="Height travelled in total {} mm. Please determine from current position that this is safe".format(
                        height))
-        for i in range(n_aqcuisitions):
-            _, z = self.microscope.get_current_z()
-            #self.change_image_name(image_name="Image{}_well{}_zheigth{}".format(i + 1, wellcoord, z))
-            self.run_protocol()
-            sleep(3)
+        if self.test is False:
+            for i in range(n_aqcuisitions):
+                _, z = self.microscope.get_current_z()
+                self.change_image_name(image_name="Image{}_well{}_zheigth{}".format(i + 1, wellcoord, z))
+                self.run_protocol()
+        else:
+            for i in range(n_aqcuisitions):
+                _, z = self.microscope.get_current_z()
+                self.change_image_name(image_name="Image{}_well{}_zheigth{}".format(i + 1, wellcoord, z))
+                self.run_protocol()
 
-    # def image_autofocus(self, wellcoord):
 
 
 if __name__ == '__main__':
@@ -68,12 +102,9 @@ if __name__ == '__main__':
         protocol.run_protocol()
         logger.log(level=10, msg="New state: {}".format(protocol.get_state()))
 
-
     print("Test Z stacking ? ")
     answer = input()
 
     if answer.upper() == "YES":
         logger.log(level=10, msg="Z stacking is on")
         protocol.z_stack()
-
-

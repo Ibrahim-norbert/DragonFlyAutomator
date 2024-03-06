@@ -24,6 +24,7 @@ class WellPlate(XYZStage):
         self.r_n = None
         self.homography_matrix_algorithm = None
         self.coordinate_frame_algorithm = None
+        self.currentwellposition = None
 
 
 
@@ -116,7 +117,7 @@ class WellPlate(XYZStage):
                                                                                                    vectors)}
         return all_well_dicts
 
-    def move3coord(self, state_dict):
+    def move2coord(self, state_dict):
 
         # Configure drawer
 

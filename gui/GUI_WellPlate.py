@@ -5,7 +5,7 @@ import sys
 from time import sleep
 import numpy as np
 from PyQt6.QtWidgets import QGridLayout, QPushButton, QWidget, QLineEdit, QVBoxLayout, QComboBox, QHBoxLayout, \
-    QApplication, QStackedWidget
+    QApplication
 from PyQt6.QtCore import Qt, QTimer
 from matplotlib import pyplot as plt
 from devices.micrscope import Microscope
@@ -213,12 +213,16 @@ class CustomButtonGroup(QWidget):
 
             
             #Automatic updater -> threading ?
-            self.stacked_widget.switch2WPrtplotter(self.checked_buttons) #-> Underneath for loop or in parallel to it ??
+            self.stacked_widget.switch2WPrtplotter() #-> Underneath for loop or in parallel to it ??
 
             #And with for loop -> multithreading?
             for out in self.checked_buttons:
                 state_dict, coords = out
+                self.well_plate.currentwellposition = out
                 self.well_plate.move2coord(state_dict) #3 second delay
+
+                #Move well plate
+                sleep(3)
                 
             
 
@@ -254,10 +258,10 @@ class CustomButtonGroup(QWidget):
 
 
 class SaveWindow(QWidget):
-    def __init__(self, wellplate, stacked_widget):
+    def __init__(self, stacked_widget):
         super().__init__()
 
-        self.wellplate = wellplate
+        self.wellplate = WellPlate()
 
         layout = QHBoxLayout()
         layout.addWidget(create_colored_label("Would you like to save this new coordinate transformation ?", self))
