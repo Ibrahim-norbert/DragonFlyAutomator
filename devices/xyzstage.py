@@ -2,7 +2,7 @@ import json
 import logging
 import os
 import numpy as np
-from RestAPI import fusionrest
+import fusionrest
 
 logger = logging.getLogger(__name__)
 logger.info("This log message is from {}.".format(__name__))
@@ -130,13 +130,13 @@ class XYZStage(FusionApi):
 
         self.endpoint = self.endpoint + "/{}/{}".format("devices", "xyz-stage")
 
-        # self.current_output = get_output(self.endpoint)
+        self.current_output = get_output(self.endpoint)
 
         # Opening JSON file
 
-        f = open(os.path.join(os.getcwd(), r"endpoint_outputs", "xyz-stage.json"))
+        #f = open(os.path.join(os.getcwd(), r"endpoint_outputs", "xyz-stage.json"))
 
-        self.current_output = json.load(f)
+        #self.current_output = json.load(f)
 
         self.path_options = [x["Name"] for x in self.current_output]
 
@@ -157,8 +157,8 @@ class XYZStage(FusionApi):
         self.selected_key = None
 
     def get_state(self, test_key=None):
-        # return {x: get_output(endpoint=self.endpoint + "/{}".format(x)) for x in
-        #         self.path_options}
+        return {x: get_output(endpoint=self.endpoint + "/{}".format(x)) for x in
+                 self.path_options}
 
         # [[-48, 33.1], [-48, -38.9], [60, 33.1], [60, -38.9], [-48, 33.1]]
 
@@ -167,10 +167,10 @@ class XYZStage(FusionApi):
         f = open(file)
         x_ = json.load(f)
         # Opening JSON file
-        file = os.path.join(os.getcwd(), r"endpoint_outputs", "{}yposition.json".format(test_key.replace(" well", "_")))
-        f = open(file)
-        y = json.load(f)
-        return {x: [x_, y, None][id] for id, x in enumerate(self.path_options)}
+        #file = os.path.join(os.getcwd(), r"endpoint_outputs", "{}yposition.json".format(test_key.replace(" well", "_")))
+        #f = open(file)
+       # y = json.load(f)
+      #  return {x: [x_, y, None][id] for id, x in enumerate(self.path_options)}
 
     def enter_coords(self, x, y, state_dict):
 

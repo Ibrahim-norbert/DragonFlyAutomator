@@ -8,10 +8,12 @@ from PyQt6.QtWidgets import QGridLayout, QPushButton, QWidget, QLineEdit, QVBoxL
     QApplication, QStackedWidget
 from PyQt6.QtCore import Qt, QTimer
 from matplotlib import pyplot as plt
+
 from devices.micrscope import Microscope
+from gui.helperfunctions import create_colored_label
+from visualisation import MplCanvas, CoordinatePlot
 from devices.protocol import Protocol
 from devices.wellplate import WellPlate
-from gui.helperfunctions import create_colored_label
 
 wellplate_paths = [os.path.basename(x) for x in glob.glob(os.path.join(os.getcwd(), "models", "*WellPlate*"))]
 
@@ -50,24 +52,25 @@ class SelectWellPlateDimensions(QWidget):
         try:
             path = self.dropdown.currentText()
             self.well_plate.load_attributes(path)
-            self.stacked_widget.switch2WPbuttongrid()
-            
+            self.stacked_widget.addWidget(CustomButtonGroup(self.well_plate, self.stacked_widget))
+            self.stacked_widget.setCurrentIndex(2)
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
             logging.exception("What happened here: ", exc_info=True)
 
     def addwell(self):
         try:
-            self.stacked_widget.switch2WPnew()
+            self.stacked_widget.addWidget(WellPlateDimensions(self.stacked_widget, self.well_plate))
+            self.stacked_widget.setCurrentIndex(2)
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
             logging.exception("What happened here: ", exc_info=True)
 
 
 class WellPlateDimensions(QWidget):
-    def __init__(self, stacked_widget):
+    def __init__(self, stacked_widget, wellplate):
         super().__init__()
-        self.well_plate = WellPlate()
+        self.well_plate = wellplate
         self.stacked_widget = stacked_widget
 
         self.column_n = QLineEdit(parent=self)
@@ -138,13 +141,13 @@ class WellPlateDimensions(QWidget):
 
         try:
             if None not in self.well_plate.well_plate_req_coords.values():
-                
-                #Compute the wellplate grid
                 self.well_plate.predict_well_coords(int(self.column_n.text()), int(self.row_n.text()))
-                
-                # Switch to frame three
-                self.stacked_widget.switch2WPbuttongrid()
-                
+
+                # Frame three
+
+                # self.setCentralWidget(self.visualiser)
+                self.stacked_widget.addWidget(CustomButtonGroup(self.well_plate, self.stacked_widget))
+                self.stacked_widget.setCurrentIndex(3)
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
             logging.exception("What happened here ", exc_info=True)
@@ -175,11 +178,11 @@ class WellAsButton(QPushButton):
 
 
 class CustomButtonGroup(QWidget):
-    def __init__(self, stacked_widget):
+    def __init__(self, well_plate, stacked_widget):
         super().__init__()
 
         #self.protocol = Protocol()
-        self.well_plate = WellPlate()
+        self.well_plate = well_plate
 
         layout = QGridLayout()
 
@@ -211,25 +214,12 @@ class CustomButtonGroup(QWidget):
 
             logging.log(level=10, msg="Wells that have been selected: {}".format(self.checked_buttons))
 
-            
-            #Automatic updater -> threading ?
-            self.stacked_widget.switch2WPrtplotter(self.checked_buttons) #-> Underneath for loop or in parallel to it ??
-
-            #And with for loop -> multithreading?
-            for out in self.checked_buttons:
-                state_dict, coords = out
-                self.well_plate.move2coord(state_dict) #3 second delay
-                
-            
-
-
-
-        
             # for button in self.checked_buttons:
             # self.well_plate.execute_template_coords(button[0].values())
             # logging.log(level=10, msg="Well coordinates: {}".format(button[1]))
             # self.protocol.z_stack(button[1])
-            
+            self.stacked_widget.addWidget(SaveWindow(self.well_plate, stacked_widget=self.stacked_widget))
+            self.stacked_widget.setCurrentIndex(4)
 
 
             # Perform image acquisition of different Z positions

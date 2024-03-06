@@ -43,7 +43,7 @@ class CoordinatePlot(MplCanvas):
 
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_figure)
-        self.timer.start(1000)  # update every second
+        self.timer.start(100)  # update every second
 
     def drawcoordinate(self, vector):
         try:
@@ -67,8 +67,8 @@ class CoordinatePlot(MplCanvas):
             self.axes.scatter(self.x, self.y, c="r")
             self.draw()
 
-            logger.log(level=20,
-                       msg="Wells that have been selected: {} and their coordinates {}".format(self.coords,
+            logger.log(level=10,
+                       msg="Wells that have been selected: {} adn their coordinates {}".format(self.coords,
 
                                                                                                self.state_dict))
         except Exception as e:
@@ -81,14 +81,17 @@ class CoordinatePlot(MplCanvas):
 
         #Check if CoordinatePlot is current widget and then proceed with plotting
         #Im doing this as I do not want Qtimer after init to switch to the exit window after startup because wellplate has no checkedbuttons attribute
-        if self.well_plate.checked_buttons is not None:
-            state_dict, coords = self.well_plate.currentButton
-            vector = self.well_plate.state_dict_2_vector(state_dict)
+        if self.well_plate.checked_buttons:
+            outs = next(iter(self.well_plate.checked_buttons))
+            self.state_dict, self.coords = outs
+            vector = self.well_plate.state_dict_2_vector(self.state_dict)
             self.drawcoordinate(vector)
             self.well_plate.checked_buttons.remove(outs)  # Remove the processed entry
         else:
-            self.stacked_widget.switch2WPsavewindow()
-            logger.log(level=10, msg="Switch to save window")
+            self.hide()
+            self.another_widget = AnotherWidget(self.parent())
+            self.parent().layout().addWidget(self.another_widget)
+            logger.log(level=10, msg="Switch to new widget")
 
 
 

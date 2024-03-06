@@ -25,4 +25,5 @@ class EMCCD2(FusionApi):
         logging.log(level=10, msg="The next path destinations of ixon-emccd-2: {}".format(self.path_options))
 
 
-EMCCD2()
+
+

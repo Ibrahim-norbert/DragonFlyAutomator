@@ -25,6 +25,8 @@ class WellPlate(XYZStage):
         self.homography_matrix_algorithm = None
         self.coordinate_frame_algorithm = None
 
+
+
     def state_dict_2_vector(self, state_dict):
         logging.log(level=10, msg='Value key: {}, Path options: {},'
                                   'State dictionary: {}'.format(self.value_key, self.path_options, state_dict))
@@ -42,14 +44,15 @@ class WellPlate(XYZStage):
                                  self.state_dict_2_vector(self.well_plate_req_coords["Top left well"]),
                                  self.state_dict_2_vector(self.well_plate_req_coords["Bottom left well"])]
 
+            #Top right, Bottom left = Bottom right
             specified_vectors = specified_vectors + [np.array([specified_vectors[-3][0], specified_vectors[-1][1]])]
 
             # Add bottom left well
 
-            topleft = specified_vectors[-3].astype(float)
-            bottomleft = specified_vectors[-2].astype(float)
-            topright = specified_vectors[-4].astype(float)
-            bottomright = specified_vectors[-1].astype(float)
+            topleft = specified_vectors[1].astype(float)
+            bottomleft = specified_vectors[2].astype(float)
+            topright = specified_vectors[0].astype(float)
+            bottomright = specified_vectors[3].astype(float)
 
             logging.log(level=20, msg="Well plate dimension: state dict as vectors {}".format(specified_vectors))
 
@@ -113,15 +116,13 @@ class WellPlate(XYZStage):
                                                                                                    vectors)}
         return all_well_dicts
 
-    def execute_template_coords(self, state_dict):
+    def move3coord(self, state_dict):
 
         # Configure drawer
 
         try:
             # Move stage to well
             # self.update_state(state_dict, analoguecontrol_bool=False)
-            # Perform image acquisition of different Z positions
-            # self.run_protocol()
             sleep(3)
         except Exception as e:
             print(f"An unexpected error occurred: {e}")

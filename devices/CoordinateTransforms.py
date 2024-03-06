@@ -11,8 +11,8 @@ def linearspacing(topright, topleft, bottomright, bottomleft, c_n, r_n):
     height = np.linalg.norm(topleft - bottomleft)
 
     # There has to be regular spacing between cells
-    x_coord, x_spacing = np.linspace(topright[0], topleft[0], c_n, retstep=True)
-    y_coord, y_spacing = np.linspace(topright[1], bottomright[1], r_n, retstep=True)
+    x_coord, x_spacing = np.linspace(topleft[0], topright[0], c_n, retstep=True)
+    y_coord, y_spacing = np.linspace(topleft[1], bottomleft[1], r_n, retstep=True)
 
     logging.log(level=20, msg="Well plate dimension: length - {}, height - {}".format(length, height))
     logging.log(level=20, msg="Computed well spacing: x:spacing = {} and y_spacing = {}".format(
@@ -26,7 +26,7 @@ def linearspacing(topright, topleft, bottomright, bottomleft, c_n, r_n):
 
     vectors = [x.tolist() for x in vectors]
 
-    well_names = sum([[str(r) + " " + str(c + 1) for c in range(c_n)] for r in range(r_n)], [])
+    well_names = sum([[str(r + 1) + " " + str(c + 1) for c in range(c_n)] for r in range(r_n)], [])
 
     return vectors, well_names, length, height, x_spacing, y_spacing
 

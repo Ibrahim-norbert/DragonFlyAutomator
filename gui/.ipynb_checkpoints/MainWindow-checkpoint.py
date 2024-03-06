@@ -5,8 +5,7 @@ from PyQt6.QtGui import QPainter, QPixmap, QColor, QFont
 from PyQt6.QtWidgets import QApplication, QPushButton, QWidget, QMainWindow, QLineEdit, QVBoxLayout, QStackedWidget
 from PyQt6.QtCore import Qt
 
-import GUI_WellPlate as GUIWP
-import visualisation as VIZ
+from GUI_WellPlate import SelectWellPlateDimensions
 
 # Configure logging
 
@@ -15,7 +14,6 @@ logger.info("This log message is from another module.")
 logging.debug("Directory: {}".format(os.getcwd()))
 
 
-    
 class BackgroundMainWindow(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -44,6 +42,24 @@ class BackgroundMainWindow(QMainWindow):
         painter.drawText(self.overlay_image.width(), 35, self.text)
 
 
+class DragonflyAutomator(BackgroundMainWindow):
+    def __init__(self):
+        super().__init__()
+
+        self.setWindowTitle("Dragonfly Automator")
+        self.setGeometry(500, 300, 800, 400)
+
+        self.stacked_widget = QStackedWidget()
+        # Widget should be in the centre
+        self.setCentralWidget(self.stacked_widget)
+
+        # Frame one
+        self.stacked_widget.addWidget(UsernamePath(self.stacked_widget))
+
+    # def add_switch_to_next_widget(self, widget):
+    #     .addWidget(widget)
+    #     self.stacked_widget.setCurrentWidget(widget)
+
 
 class UsernamePath(QWidget):
     def __init__(self, stacked_widget):
@@ -64,6 +80,8 @@ class UsernamePath(QWidget):
         self.default_stylesheet = self.save_directory.styleSheet()
 
         self.save_directory.textChanged.connect(self.handlePathChanged)
+        # self.save_directory.returnPressed.connect(self.handleEnterPressed)
+        # self.username.returnPressed.connect(self.handleEnterPressed)
 
         # Layout of widget
         layout = QVBoxLayout(self)  # Pass the central widget to the layout
@@ -99,68 +117,14 @@ class UsernamePath(QWidget):
                 self.username.setText(self.username.text())
                 logging.log(level=10, msg="Username: " + self.username.text())
                 # Frame two
-                self.stacked_widget.switch2WPoption()
+                self.stacked_widget.addWidget(SelectWellPlateDimensions(self.stacked_widget))
+                self.stacked_widget.setCurrentIndex(1)
 
     def handlePathChanged(self):
         # Reset the text color and placeholder text when the user starts typing
         self.save_directory.setStyleSheet(self.default_stylesheet)
 
-class FrameManager(QStackedWidget):
-    def __init__(self, parent):
-        super().__init__(parent)
 
-        self.frame0 = GUIWP.UsernamePath(stackedwidget=self)
-        self.frame1 = GUIWP.SelectWellPlateDimensions(stacked_widget=self)
-        self.frame2 = GUIWP.WellPlateDimensions(stacked_widget=self)
-        self.frame3 = GUIWP.CustomButtonGroup(stacked_widget=self)
-        self.frame4 = VIZ.CoordinatePlot(stacked_widget=self)
-        self.frame5 = GUIWP.SaveWindow(stacked_widget=self)
-
-
-
-        self.addWidget(self.frame1)
-        self.addWidget(self.frame2)
-        self.addWidget(self.frame3)
-        self.addWidget(self.frame4)
-        self.addWidget(self.frame5)
-        
-    def switch2WPoption(self):
-        self.setCurrentWidget(self.frame1)
-
-    def switch2WPnew(self):
-        self.setCurrentWidget(self.frame2)
-
-    def switch2WPbuttongrid(self):
-        self.setCurrentWidget(self.frame3)
-
-    def switch2WPrtplotter(self, data):
-        self.setCurrentWidget(self.frame4)
-        #Once the data is assigned we have regular update of the function
-        self.frame.initupdate(data)
-
-    def switch2WPsavewindow(self):
-        self.setCurrentWidget(self.frame5)
-
-
-
-
-class DragonflyAutomator(BackgroundMainWindow):
-    def __init__(self):
-        super().__init__()
-
-        self.setWindowTitle("Dragonfly Automator")
-        self.setGeometry(500, 300, 800, 400)
-
-        self.stacked_widget = QStackedWidget()
-        # Widget should be in the centre
-        self.setCentralWidget(self.stacked_widget)
-
-        # Frame one
-        self.stacked_widget.addWidget(UsernamePath(self.stacked_widget))
-
-    # def add_switch_to_next_widget(self, widget):
-    #     .addWidget(widget)
-    #     self.stacked_widget.setCurrentWidget(widget)
 
 
 
