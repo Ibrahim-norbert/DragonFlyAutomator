@@ -35,7 +35,7 @@ def update(endpoint, obj):
 
 
 class FusionApi:
-    def __init__(self, test=True):
+    def __init__(self):
         self.endpoint = "/v1"
         # self.current_output = get_output(self.endpoint)
         self.endpoint = "/v1"
@@ -44,7 +44,6 @@ class FusionApi:
         self.address = None
         self.selected_key = None
         self.current_output = None
-        self.test = test
 
     def get_current_address(self):
         self.address = get_address(self.endpoint)
@@ -127,16 +126,18 @@ class FusionApi:
 class XYZStage(FusionApi):
     """From what I have seen, the XYZStage path outputs a list."""
 
-    def __init__(self, endpoint="v1"):
+    def __init__(self, endpoint="v1", test=True):
         super().__init__()  # inherits
 
         self.endpoint = self.endpoint + "/{}/{}".format("devices", "xyz-stage")
 
-        if self.test is False:
+        if test is False:
             self.current_output = get_output(self.endpoint)
         else:
             f = open(os.path.join(os.getcwd(), "endpoint_outputs", os.path.basename(self.endpoint) + ".json"))
             self.current_output = json.load(f)
+
+        self.test = test
 
         self.path_options = [x["Name"] for x in self.current_output]
 
@@ -156,7 +157,7 @@ class XYZStage(FusionApi):
         self.selected_path_option = endpoint.split("/")[-1]
         self.selected_key = None
 
-    def get_state(self, test_key=None):
+    def get_state(self, test_key):
 
         if self.test is False:
             return {x: get_output(endpoint=self.endpoint + "/{}".format(x)) for x in

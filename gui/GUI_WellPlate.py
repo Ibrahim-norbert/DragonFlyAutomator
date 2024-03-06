@@ -67,6 +67,12 @@ class SelectWellPlateDimensions(QWidget):
 class WellPlateDimensions(QWidget):
     def __init__(self, stacked_widget):
         super().__init__()
+
+
+        #TODO Add functionality to choose between methods of 
+        # learning the homography matrix
+
+        
         self.well_plate = WellPlate()
         self.stacked_widget = stacked_widget
 
@@ -216,42 +222,21 @@ class CustomButtonGroup(QWidget):
             self.stacked_widget.switch2WPrtplotter() #-> Underneath for loop or in parallel to it ??
 
             #And with for loop -> multithreading?
-            for out in self.checked_buttons:
+            for out in self.checked_buttons:  #Maybe use a function that takes wellplate as parameter?
                 state_dict, coords = out
                 self.well_plate.currentwellposition = out
+
+                # 1) Move to well
                 self.well_plate.move2coord(state_dict) #3 second delay
 
-                #Move well plate
-                sleep(3)
-                
-            
+                # 2) Visualize movement
 
+                # 3) Take z stack
 
+                # 4) Choose best z plane
 
-        
-            # for button in self.checked_buttons:
-            # self.well_plate.execute_template_coords(button[0].values())
-            # logging.log(level=10, msg="Well coordinates: {}".format(button[1]))
-            # self.protocol.z_stack(button[1])
-            
+                # 5) Make montage
 
-
-            # Perform image acquisition of different Z positions
-            # self.run_protocol()
-            # TODO See if there is a cleaner method for this
-            ## TODO Maybe add the self.wellplate into the consturctor and the timer too ? and make it a child ?
-            # Visualiser(CoordinatePlot(well_plate=self.well_plate,
-            #                          checked_buttons=self.checked_buttons),
-            ##          stacked_widget=self.stacked_widget,
-            #        next_widget=SaveWindow(self.well_plate, stacked_widget=self.stacked_widget))
-
-            # execute stage
-
-            # execute pictures
-
-            # execute save
-
-            # self.visualiser.Update()
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
             logging.exception("What happened here ", exc_info=True)

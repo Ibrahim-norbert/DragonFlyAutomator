@@ -13,17 +13,17 @@ logger.info("This log message is from {}.py".format(__name__))
 
 
 class Protocol(FusionApi):
-    def __init__(self):
+    def __init__(self, test=True):
         super().__init__()  # inherits
         self.endpoint = self.endpoint + "/{}".format("protocol")
 
-        if self.test is False:
+        if test is False:
             self.current_output = self.get_state()
             self.protocol_name = fusionrest.get_protocol_name()
         else:
             f = open(os.path.join(os.getcwd(), "endpoint_outputs", os.path.basename(self.endpoint) + "_current.json"))
             self.current_output = json.load(f)
-
+        self.test = test
         self.microscope = Microscope()
 
     def get_state(self):
