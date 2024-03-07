@@ -7,6 +7,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 logger.info("This log message is from {}".format(__name__))
+
+
 def create_colored_label(text, parent):
     label = QLabel(text, parent=parent)
     label.setStyleSheet("color: {};".format("white"))
@@ -40,10 +42,11 @@ class FrameManager(QStackedWidget):
         self.frame3.creatbuttongrid()
         self.setCurrentWidget(self.frame3)
 
-
-    def switch2WPrtplotter(self):
+    def switch2WPrtplotter(self, data):
         self.setCurrentWidget(self.frame4)
-        return self.frame4
+        self.frame4.data = data
+        self.frame4.initviz()
+
 
     def switch2WPsavewindow(self):
         self.setCurrentWidget(self.frame5)

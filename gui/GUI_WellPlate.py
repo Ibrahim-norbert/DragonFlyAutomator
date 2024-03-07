@@ -183,6 +183,9 @@ class CustomButtonGroup(QWidget):
 
         # self.protocol = Protocol()
 
+        self.buttons = None
+        self.enter_button = None
+        self.checked_buttons = None
         self.stacked_widget = stacked_widget
         self.well_plate = well_plate
 
@@ -217,23 +220,16 @@ class CustomButtonGroup(QWidget):
             logging.log(level=10, msg="Wells that have been selected: {}".format(self.checked_buttons))
 
             # Automatic updater -> threading ?
-            self.stacked_widget.switch2WPrtplotter()  # -> Underneath for loop or in parallel to it ??
+            self.stacked_widget.switch2WPrtplotter(self.checked_buttons)  # -> Underneath for loop or in parallel to 
+            # it ??
 
             # And with for loop -> multithreading?
-            for out in self.checked_buttons:  # Maybe use a function that takes wellplate as parameter?
-                state_dict, coords = out
-                self.well_plate.currentwellposition = out
 
-                # 1) Move to well
-                self.well_plate.move2coord(state_dict)  # 3 second delay
 
-                # 2) Visualize movement
 
-                # 3) Take z stack
 
-                # 4) Choose best z plane
 
-                # 5) Make montage
+
 
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
@@ -244,6 +240,8 @@ class SaveWindow(QWidget):
     def __init__(self, stacked_widget, well_plate):
         super().__init__()
 
+        self.partnumber = None
+        self.manufacturer = None
         self.well_plate = well_plate
 
         layout = QHBoxLayout()
