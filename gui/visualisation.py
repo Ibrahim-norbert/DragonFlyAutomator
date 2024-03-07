@@ -40,12 +40,15 @@ class MplCanvas(FigureCanvas):
 class CoordinatePlot(QWidget):
     def __init__(self, stacked_widget, well_plate, parent=None):
         super().__init__(parent)
+        # We need to store a reference to the plotted line
+        # somewhere, so we can apply the new data to it.
 
+        self.data = None
+        self.doneplotting = True
         self.canvas = MplCanvas()
-        main_layout= QVBoxLayout(self)
+        main_layout = QVBoxLayout(self)
         main_layout.addWidget(self.canvas)
         self.setLayout(main_layout)
-
 
         self.stacked_widget = stacked_widget
 
@@ -53,30 +56,36 @@ class CoordinatePlot(QWidget):
 
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_canvas)
-        self.timer.start(1000)  # update every second
+         # update every second
 
         self.exit = False
 
+    def initviz(self):
+
+        self.canvas.axes.set_xlim(self.well_plate.corners_coords[0][0], self.well_plate.corners_coords[1][0])
+        self.canvas.axes.set_ylim(self.well_plate.corners_coords[0][1], self.well_plate.corners_coords[2][1])
+
+        x_values = list(range(1, 25))
+        y_values = [x for x in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[:self.well_plate.r_n]]
+
+        # Set y-axis ticks from P to A
+        self.canvas.axes.set_yticks(
+            np.linspace(self.well_plate.corners_coords[0][1], self.well_plate.corners_coords[2][1],
+                        len(y_values)))
+        self.canvas.axes.set_yticklabels(reversed(y_values))
+
+        self.canvas.axes.set_title(
+            'Real-Time {} well plate positioning'.format(self.well_plate.c_n * self.well_plate.r_n))
+
+        self.timer.start(1000)
+
+
     def drawcoordinate(self, vector, coords):
         try:
-            self.canvas.axes.cla()  # Clear the canvas.
-            self.canvas.axes.set_xlim(self.well_plate.corners_coords[0][0], self.well_plate.corners_coords[1][0])
-            self.canvas.axes.set_ylim(self.well_plate.corners_coords[0][1], self.well_plate.corners_coords[2][1])
-
-            x_values = list(range(1, 25))
-            y_values = [x for x in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[:self.well_plate.r_n]]
-
-            # Set y-axis ticks from P to A
-            self.canvas.axes.set_yticks(
-                np.linspace(self.well_plate.corners_coords[0][1], self.well_plate.corners_coords[2][1],
-                            len(y_values)))
-            self.canvas.axes.set_yticklabels(reversed(y_values))
-
-            self.canvas.axes.set_title(
-                'Real-Time {} well plate positioning'.format(self.well_plate.c_n * self.well_plate.r_n))
             self.canvas.x += [vector[0]]
             self.canvas.y += [vector[1]]
-            self.canvas.axes.scatter(self.canvas.x, self.canvas.y, c="r")
+
+            self.canvas.axes.scatter(self.canvas.x, self.canvas.y)
             self.canvas.draw()
 
             logger.log(level=20,
@@ -85,33 +94,37 @@ class CoordinatePlot(QWidget):
                                                                                                vector))
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
-            logging.exception("What happened here ", exc_info=True)
+            logging.exception(
+                "What happened here. We have the following x {} and y {} values".format(self.canvas.x, self.canvas.y),
+                exc_info=True)
+            self.timer.timeout()
 
     def update_canvas(self):
         # TODO quit Qtimer from repeating itself when the checkedbuttons is empty
         # See if you can find the coordinate mapping problem
 
-        # Check if CoordinatePlot is current widget and then proceed with plotting
-        # Im doing this as I do not want Qtimer after init to switch to the exit window after startup because wellplate has no checkedbuttons attribute
+        # Check if CoordinatePlot is current widget and then proceed with plotting Im doing this as I do not want
+        # Qtimer after init to switch to the exit window after startup because wellplate has no checkedbuttons attribute
 
-        """Updates the scatterplot for the current well plate position"""
-        if self.well_plate.currentwellposition is not None:
-            state_dict, coords = self.well_plate.currentwellposition
-            vector = self.well_plate.state_dict_2_vector(state_dict)
-            self.drawcoordinate(vector, coords)
+        """Updates the scatterplot using the QT event loop"""
+
+        if self.data:
+
+            state_dict, coords = next(iter(self.data))
+
+            if self.well_plate.move2coord(state_dict) is False:  # 3 second delay
+
+                vector = self.well_plate.state_dict_2_vector(state_dict)
+
+                self.drawcoordinate(vector, coords)
+
+                self.data.remove((state_dict, coords))
+
             # Maybe add text ojbect above coordinate point indicating the xyz stage cartesian coordinate
-        elif self.exit is True:
+        elif not self.data:
+            self.timer.stop()
             self.stacked_widget.switch2WPsavewindow()
             logger.log(level=20, msg="Switch to save window")
-
-    def showEvent(self, event):
-        # Start the timer when the widget is shown (window becomes active)
-        self.timer.start()
-
-    def hideEvent(self, event):
-        # Stop the timer when the widget is hidden (window becomes inactive)
-        self.timer.stop()
-
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

@@ -26,8 +26,8 @@ class WellPlate(XYZStage):
         self.coordinate_frame_algorithm = None
         self.currentwellposition = None
 
-       # if preload is True:
-           # self.load_attributes(name="384_falcon_wellplate.json")
+    # if preload is True:
+    # self.load_attributes(name="384_falcon_wellplate.json")
 
     def state_dict_2_vector(self, state_dict):
         logging.log(level=10, msg='Value key: {}, Path options: {},'
@@ -82,7 +82,8 @@ class WellPlate(XYZStage):
         self.height = height
         self.xspacing = x_spacing
         self.yspacing = y_spacing
-        self.corners_coords = [vectors[x] for x in [0, c_n - 1, ((r_n)*(c_n))-(c_n) , ((r_n)*(c_n))-1]]  # Top left, Top right, Bottom left
+        self.corners_coords = [vectors[x] for x in [0, c_n - 1, ((r_n) * (c_n)) - (c_n),
+                                                    ((r_n) * (c_n)) - 1]]  # Top left, Top right, Bottom left
         self.homography_matrix = H
 
         logging.log(level=20, msg="Well plate matrix dimension: rows: {}, columns: {}".format(r_n, c_n))
@@ -130,7 +131,20 @@ class WellPlate(XYZStage):
         try:
             # Move stage to well
             # self.update_state(state_dict, analoguecontrol_bool=False)
-            sleep(3)
+            logger.log(level=20, msg="Stage has its position updated")
+            # Wait until we reach
+            if self.test is False:
+                while self.state_dict_2_vector(self.get_state()) != self.state_dict_2_vector(state_dict):
+                    logger.log(level=20, msg="Stage is moving to new position")
+                    return False
+            else:
+                length = np.linalg.norm(np.array([0, 0]) - np.array(self.state_dict_2_vector(state_dict)))
+                for i in range(0, int(length), 1000):
+                    logger.log(level=20, msg="Stage is moving to new position")
+                    return False
+
+            logger.log(level=20, msg="Stage has arrived at target position")
+            return True
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
             logging.exception("What happened here ", exc_info=True)
@@ -203,6 +217,3 @@ if __name__ == '__main__':
     print(" ")
 
     wellplate2.predict_well_coords(args.columns, args.rows)
-
-
-
