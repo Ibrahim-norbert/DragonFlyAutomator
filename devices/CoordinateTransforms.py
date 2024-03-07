@@ -3,7 +3,7 @@ import numpy as np
 import cv2 as cv
 
 logger = logging.getLogger(__name__)
-logger.info("This log message is from another module.")
+logger.info("This log message is from {}".format(__name__))
 
 
 def linearspacing(topright, topleft, bottomright, bottomleft, c_n, r_n):
@@ -20,9 +20,9 @@ def linearspacing(topright, topleft, bottomright, bottomleft, c_n, r_n):
 
     xv, yv = np.meshgrid(x_coord, y_coord)
 
-    vectors = np.stack([xv, yv], axis=-1)  # rows,columns i.e. x,y,2
+    vectors = np.stack([xv, yv], axis=-1)  # rows,columns,coordinate i.e. [x,y] in column direction
 
-    vectors = vectors.reshape(r_n * c_n, 2)
+    vectors = vectors.reshape(r_n * c_n, 2)  # rows,columns,coordinate i.e. [x,y] in column direction
 
     vectors = [x.tolist() for x in vectors]
 
@@ -71,6 +71,9 @@ def  linearcorrectionmatrix(topright, topleft, bottomright, bottomleft, c_n, r_n
 
 def homography_matrix_estimation(method, vectors, well_names):
     ##Use this to associate a homography matrix to a wellplate
+
+    print("Learning the homography matrix using {} to map from well plate row and column arrangement "
+          "to xzy-stage coordinate space".format(method))
 
     # Define source and destination coordinates
     well_names = [[int(x.split(" ")[0]),int(x.split(" ")[1])] for x in well_names]

@@ -10,7 +10,7 @@ logger.info("This log message is from {}.py".format(__name__))
 
 
 class WellPlate(XYZStage):
-    def __init__(self):
+    def __init__(self, preload=True):
         super().__init__()
         self.well_plate_req_coords = {"Top left well": {}, "Bottom left well": {}, "Top right well": {}}
         self.corners_coords = None
@@ -26,7 +26,8 @@ class WellPlate(XYZStage):
         self.coordinate_frame_algorithm = None
         self.currentwellposition = None
 
-
+       # if preload is True:
+           # self.load_attributes(name="384_falcon_wellplate.json")
 
     def state_dict_2_vector(self, state_dict):
         logging.log(level=10, msg='Value key: {}, Path options: {},'
@@ -40,12 +41,14 @@ class WellPlate(XYZStage):
 
     def get_corner_as_vectors(self):
 
+        print("1. Getting all four corner wells coordinates as vectors")
+
         try:
             specified_vectors = [self.state_dict_2_vector(self.well_plate_req_coords["Top right well"]),
                                  self.state_dict_2_vector(self.well_plate_req_coords["Top left well"]),
                                  self.state_dict_2_vector(self.well_plate_req_coords["Bottom left well"])]
 
-            #Top right, Bottom left = Bottom right
+            # Top right, Bottom left = Bottom right
             specified_vectors = specified_vectors + [np.array([specified_vectors[-3][0], specified_vectors[-1][1]])]
 
             # Add bottom left well
@@ -66,6 +69,8 @@ class WellPlate(XYZStage):
     def set_parameters(self, well_names, vectors,
                        r_n, c_n, length, height, x_spacing, y_spacing, algorithm_CF, algorithm_H):
 
+        print("Saving all variables associated to the coordinate system.")
+
         H = CT.homography_matrix_estimation(algorithm_H, vectors, well_names)
 
         self.coordinate_frame_algorithm = algorithm_CF
@@ -77,8 +82,7 @@ class WellPlate(XYZStage):
         self.height = height
         self.xspacing = x_spacing
         self.yspacing = y_spacing
-        self.corners_coords = [vectors[x] for x in [0, c_n - 1, (r_n - 1) + (c_n - 1),
-                                                    (r_n - 1) + (2 * (c_n - 1))]]  # Top left, Top right, Bottom left
+        self.corners_coords = [vectors[x] for x in [0, c_n - 1, ((r_n)*(c_n))-(c_n) , ((r_n)*(c_n))-1]]  # Top left, Top right, Bottom left
         self.homography_matrix = H
 
         logging.log(level=20, msg="Well plate matrix dimension: rows: {}, columns: {}".format(r_n, c_n))
@@ -90,6 +94,8 @@ class WellPlate(XYZStage):
     def predict_well_coords(self, c_n, r_n, algorithm="linear spacing", algorithm_H="non-linear"):
 
         topleft, bottomleft, topright, bottomright = self.get_corner_as_vectors()
+
+        print("2. Computing coordinate space from well corners using {}".format(algorithm))
 
         if algorithm == "linear spacing":
             vectors, well_names, length, height, x_spacing, y_spacing = CT.linearspacing(topright, topleft,
@@ -169,8 +175,6 @@ if __name__ == '__main__':
         wellplate.well_plate_req_coords[test_key] = {x: [x_, y, None][id] for id,
         x in enumerate(["xposition", "yposition"])}
 
-
-
     print("Before update: " + str(wellplate.__dict__))
 
     args = parser.parse_args()
@@ -190,3 +194,15 @@ if __name__ == '__main__':
     wellplate2.load_attributes(name="384_falcon_wellplate.json")
 
     print("After loading attributes: " + str(wellplate2.__dict__))
+
+    print("-----------------------------------------------------")
+
+    print("Testing well plate row and column arrangement mapping to xyz-stage coordinate system: ")
+    print(" ")
+    print(" ")
+    print(" ")
+
+    wellplate2.predict_well_coords(args.columns, args.rows)
+
+
+

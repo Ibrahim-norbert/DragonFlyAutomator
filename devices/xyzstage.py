@@ -165,6 +165,13 @@ class XYZStage(FusionApi):
             f = open(os.path.join(os.getcwd(), r"endpoint_outputs",
                                   "{}xposition.json".format(test_key.replace(" well", "_"))))
             x_ = json.load(f)
+
+            # Opening JSON file
+            file = os.path.join(os.getcwd(), r"endpoint_outputs",
+                                "{}yposition.json".format(test_key.replace(" well", "_")))
+            f = open(file)
+            y = json.load(f)
+
             return {x: [x_, y, None][id] for id, x in enumerate(self.path_options)}
 
     def enter_coords(self, x, y, state_dict):
@@ -195,13 +202,18 @@ if __name__ == '__main__':
     parser.add_argument("--analoguecontrol", type=bool, default=False,
                         help="Enter boolean for analog control of xyz stage")
     parser.add_argument("--update", type=bool, default=False, help="Enter boolean for analog control of xyz stage")
-    parser.add_argument("--endpoint", type=str, required=True, help="Enter API endpoint of xyz stage")
 
     args = parser.parse_args()
 
-    instance_xyz_Stage = XYZStage(args.endpoint)
+    instance_xyz_Stage = XYZStage()
 
     print("Before update: " + str(instance_xyz_Stage.__dict__))
+
+    print(" ")
+
+    print("Test get state functionality: {}".format(instance_xyz_Stage.get_state()))
+
+
 
     x, y = args.x, args.y
 

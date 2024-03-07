@@ -1,11 +1,8 @@
-import pickle
-from micrscope import Microscope
-from xyzstage import FusionApi, get_output, update
+from devices.micrscope import Microscope
+from devices.xyzstage import FusionApi, get_output, update
 import logging
-import numpy as np
 import os
 import json
-from time import sleep
 from RestAPI import fusionrest
 
 logger = logging.getLogger(__name__)
@@ -27,7 +24,12 @@ class Protocol(FusionApi):
         self.microscope = Microscope()
 
     def get_state(self):
-        return fusionrest.get_state()
+        if self.test is False:
+            return fusionrest.get_state()
+        else:
+            f = open(os.path.join(os.getcwd(), "endpoint_outputs", os.path.basename(self.endpoint) + "_current.json"))
+            return json.load(f)
+
 
     def run_protocol(self):
         if self.test is False:
@@ -71,19 +73,32 @@ class Protocol(FusionApi):
                        height))
         if self.test is False:
             for i in range(n_aqcuisitions):
-                _, z = self.microscope.get_current_z()
-                self.change_image_name(image_name="Image{}_well{}_zheigth{}".format(i + 1, wellcoord, z))
+                state, _ = self.microscope.get_current_z()
+                z = self.microscope.move_z_axis(z_increment, state=state)
+                self.change_image_name(image_name="Image{}_well{}_zheigth{}".format(i + 1, wellcoord, int(z)))
                 self.run_protocol()
         else:
             for i in range(n_aqcuisitions):
-                _, z = self.microscope.get_current_z()
-                self.change_image_name(image_name="Image{}_well{}_zheigth{}".format(i + 1, wellcoord, z))
+                state, _ = self.microscope.get_current_z()
+                z = self.microscope.move_z_axis(z_increment, state=state)
+                self.change_image_name(image_name="Image{}_well{}_zheigth{}".format(
+                    i + 1, wellcoord.replace(" ", ""), int(z)))
                 self.run_protocol()
 
 
 
 if __name__ == '__main__':
     protocol = Protocol()
+
+
+    print("Is this a test? ")
+    answer = input()
+
+    if answer.upper() == "NO":
+        protocol.test = False
+    else:
+        protocol.test = True
+
 
     logger.log(level=10, msg="Current Protocol: {}".format(protocol.get_state()))
 

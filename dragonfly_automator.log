@@ -1,277 +1,84 @@
-2024-03-05 18:12:57,233 - INFO - This log message is from another module.
-2024-03-05 18:12:57,233 - INFO - This log message is from xyzstage.
-2024-03-05 18:12:57,233 - INFO - This log message is from micrscope.py
-2024-03-05 18:12:57,233 - INFO - This log message is from __main__.py
-2024-03-05 18:12:57,237 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:12:57,241 - DEBUG - http://localhost:15120 "GET /v1/protocol/current HTTP/1.1" 200 22
-2024-03-05 18:12:57,245 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:12:57,245 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope HTTP/1.1" 200 1002
-2024-03-05 18:12:57,245 - DEBUG - The next path destinations of microscope: ['objectiveescaped', 'port', 'objectivefeatureselector', 'objectivefeatureselector', 'driftstabilisationactive', 'driftstabilisationoffset', 'excitationfilterwheel1', 'referencezposition', 'zdrivemode', 'dialamponoff']
-2024-03-05 18:12:57,245 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:12:57,249 - DEBUG - http://localhost:15120 "GET /v1/protocol/current HTTP/1.1" 200 22
-2024-03-05 18:12:57,249 - DEBUG - Current Protocol: {'current': {'Name': 'Protocol 59'}}
-2024-03-05 18:13:02,852 - DEBUG - Z stacking is on
-2024-03-05 18:13:02,852 - DEBUG - Height travelled in total 50 mm. Please determine from current position that this is safe
-2024-03-05 18:13:02,852 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:02,856 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/objectiveescaped HTTP/1.1" 200 17
-2024-03-05 18:13:02,856 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:02,860 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/port HTTP/1.1" 200 13
-2024-03-05 18:13:02,860 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:02,860 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/objectivefeatureselector HTTP/1.1" 200 13
-2024-03-05 18:13:02,864 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:02,864 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/objectivefeatureselector HTTP/1.1" 200 13
-2024-03-05 18:13:02,864 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:02,868 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/driftstabilisationactive HTTP/1.1" 200 17
-2024-03-05 18:13:02,868 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:02,868 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/driftstabilisationoffset HTTP/1.1" 200 16
-2024-03-05 18:13:02,872 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:02,872 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/excitationfilterwheel1 HTTP/1.1" 200 13
-2024-03-05 18:13:02,872 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:02,876 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/referencezposition HTTP/1.1" 200 18
-2024-03-05 18:13:02,876 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:02,876 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/zdrivemode HTTP/1.1" 200 13
-2024-03-05 18:13:02,876 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:02,880 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/dialamponoff HTTP/1.1" 200 17
-2024-03-05 18:13:02,880 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:02,884 - DEBUG - http://localhost:15120 "PUT /v1/protocol/state HTTP/1.1" 200 0
-2024-03-05 18:13:02,884 - DEBUG - Running protocol: dict_values([{'Name': 'Protocol 59'}])
-2024-03-05 18:13:05,888 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:05,890 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/objectiveescaped HTTP/1.1" 200 17
-2024-03-05 18:13:05,892 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:05,894 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/port HTTP/1.1" 200 13
-2024-03-05 18:13:05,895 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:05,896 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/objectivefeatureselector HTTP/1.1" 200 13
-2024-03-05 18:13:05,898 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:05,899 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/objectivefeatureselector HTTP/1.1" 200 13
-2024-03-05 18:13:05,900 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:05,902 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/driftstabilisationactive HTTP/1.1" 200 17
-2024-03-05 18:13:05,903 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:05,904 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/driftstabilisationoffset HTTP/1.1" 200 16
-2024-03-05 18:13:05,905 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:05,907 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/excitationfilterwheel1 HTTP/1.1" 200 13
-2024-03-05 18:13:05,908 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:05,909 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/referencezposition HTTP/1.1" 200 18
-2024-03-05 18:13:05,910 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:05,912 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/zdrivemode HTTP/1.1" 200 13
-2024-03-05 18:13:05,913 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:05,927 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/dialamponoff HTTP/1.1" 200 17
-2024-03-05 18:13:05,929 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:05,934 - DEBUG - http://localhost:15120 "PUT /v1/protocol/state HTTP/1.1" 200 0
-2024-03-05 18:13:05,934 - DEBUG - Running protocol: dict_values([{'Name': 'Protocol 59'}])
-2024-03-05 18:13:08,936 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:08,938 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/objectiveescaped HTTP/1.1" 200 17
-2024-03-05 18:13:08,940 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:08,942 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/port HTTP/1.1" 200 13
-2024-03-05 18:13:08,943 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:08,945 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/objectivefeatureselector HTTP/1.1" 200 13
-2024-03-05 18:13:08,946 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:08,948 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/objectivefeatureselector HTTP/1.1" 200 13
-2024-03-05 18:13:08,949 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:08,951 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/driftstabilisationactive HTTP/1.1" 200 17
-2024-03-05 18:13:08,952 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:08,953 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/driftstabilisationoffset HTTP/1.1" 200 16
-2024-03-05 18:13:08,955 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:08,956 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/excitationfilterwheel1 HTTP/1.1" 200 13
-2024-03-05 18:13:08,957 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:08,959 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/referencezposition HTTP/1.1" 200 18
-2024-03-05 18:13:08,959 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:08,960 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/zdrivemode HTTP/1.1" 200 13
-2024-03-05 18:13:08,961 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:08,963 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/dialamponoff HTTP/1.1" 200 17
-2024-03-05 18:13:08,964 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:08,968 - DEBUG - http://localhost:15120 "PUT /v1/protocol/state HTTP/1.1" 200 0
-2024-03-05 18:13:08,968 - DEBUG - Running protocol: dict_values([{'Name': 'Protocol 59'}])
-2024-03-05 18:13:11,971 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:11,973 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/objectiveescaped HTTP/1.1" 200 17
-2024-03-05 18:13:11,975 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:11,976 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/port HTTP/1.1" 200 13
-2024-03-05 18:13:11,978 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:11,985 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/objectivefeatureselector HTTP/1.1" 200 13
-2024-03-05 18:13:11,987 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:11,988 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/objectivefeatureselector HTTP/1.1" 200 13
-2024-03-05 18:13:11,989 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:11,991 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/driftstabilisationactive HTTP/1.1" 200 17
-2024-03-05 18:13:11,991 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:11,993 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/driftstabilisationoffset HTTP/1.1" 200 16
-2024-03-05 18:13:11,994 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:11,995 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/excitationfilterwheel1 HTTP/1.1" 200 13
-2024-03-05 18:13:11,996 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:11,998 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/referencezposition HTTP/1.1" 200 17
-2024-03-05 18:13:11,999 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:12,001 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/zdrivemode HTTP/1.1" 200 13
-2024-03-05 18:13:12,002 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:12,003 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/dialamponoff HTTP/1.1" 200 17
-2024-03-05 18:13:12,004 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:12,009 - DEBUG - http://localhost:15120 "PUT /v1/protocol/state HTTP/1.1" 200 0
-2024-03-05 18:13:12,009 - DEBUG - Running protocol: dict_values([{'Name': 'Protocol 59'}])
-2024-03-05 18:13:15,012 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:15,014 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/objectiveescaped HTTP/1.1" 200 17
-2024-03-05 18:13:15,015 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:15,017 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/port HTTP/1.1" 200 13
-2024-03-05 18:13:15,018 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:15,019 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/objectivefeatureselector HTTP/1.1" 200 13
-2024-03-05 18:13:15,020 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:15,022 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/objectivefeatureselector HTTP/1.1" 200 13
-2024-03-05 18:13:15,023 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:15,024 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/driftstabilisationactive HTTP/1.1" 200 17
-2024-03-05 18:13:15,025 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:15,027 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/driftstabilisationoffset HTTP/1.1" 200 16
-2024-03-05 18:13:15,028 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:15,030 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/excitationfilterwheel1 HTTP/1.1" 200 13
-2024-03-05 18:13:15,031 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:15,032 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/referencezposition HTTP/1.1" 200 18
-2024-03-05 18:13:15,033 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:15,034 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/zdrivemode HTTP/1.1" 200 13
-2024-03-05 18:13:15,035 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:15,037 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/dialamponoff HTTP/1.1" 200 17
-2024-03-05 18:13:15,038 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:15,040 - DEBUG - http://localhost:15120 "PUT /v1/protocol/state HTTP/1.1" 409 0
-2024-03-05 18:13:15,040 - ERROR - An unexpected update error occurred
-Traceback (most recent call last):
-  File "C:\Users\Piotr Wajda\Desktop\384_wellplate\Dragonfly_package\384_wellplate_automation\devices\xyzstage.py", line 30, in update
-    fusionrest.__put(endpoint, obj)
-  File "C:\Users\Piotr Wajda\Desktop\384_wellplate\Dragonfly_package\384_wellplate_automation\devices\fusionrest.py", line 87, in __put
-    __put_plain(endpoint, body)
-  File "C:\Users\Piotr Wajda\Desktop\384_wellplate\Dragonfly_package\384_wellplate_automation\devices\fusionrest.py", line 92, in __put_plain
-    __raise_on_error(endpoint, response)
-  File "C:\Users\Piotr Wajda\Desktop\384_wellplate\Dragonfly_package\384_wellplate_automation\devices\fusionrest.py", line 64, in __raise_on_error
-    raise ApiError(endpoint, response.status_code, response.reason)
-fusionrest.ApiError: <ApiError at /v1/protocol/state: 409 Invalid state transition>
-2024-03-05 18:13:15,041 - DEBUG - Running protocol: dict_values([{'Name': 'Protocol 59'}])
-2024-03-05 18:13:18,048 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:18,048 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/objectiveescaped HTTP/1.1" 200 17
-2024-03-05 18:13:18,048 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:18,054 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/port HTTP/1.1" 200 13
-2024-03-05 18:13:18,054 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:18,054 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/objectivefeatureselector HTTP/1.1" 200 13
-2024-03-05 18:13:18,054 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:18,060 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/objectivefeatureselector HTTP/1.1" 200 13
-2024-03-05 18:13:18,060 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:18,060 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/driftstabilisationactive HTTP/1.1" 200 17
-2024-03-05 18:13:18,060 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:18,060 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/driftstabilisationoffset HTTP/1.1" 200 16
-2024-03-05 18:13:18,066 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:18,066 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/excitationfilterwheel1 HTTP/1.1" 200 13
-2024-03-05 18:13:18,066 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:18,066 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/referencezposition HTTP/1.1" 200 18
-2024-03-05 18:13:18,066 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:18,072 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/zdrivemode HTTP/1.1" 200 13
-2024-03-05 18:13:18,072 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:18,072 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/dialamponoff HTTP/1.1" 200 17
-2024-03-05 18:13:18,072 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:18,078 - DEBUG - http://localhost:15120 "PUT /v1/protocol/state HTTP/1.1" 200 0
-2024-03-05 18:13:18,078 - DEBUG - Running protocol: dict_values([{'Name': 'Protocol 59'}])
-2024-03-05 18:13:21,082 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:21,084 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/objectiveescaped HTTP/1.1" 200 17
-2024-03-05 18:13:21,086 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:21,088 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/port HTTP/1.1" 200 13
-2024-03-05 18:13:21,089 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:21,090 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/objectivefeatureselector HTTP/1.1" 200 13
-2024-03-05 18:13:21,092 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:21,093 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/objectivefeatureselector HTTP/1.1" 200 13
-2024-03-05 18:13:21,094 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:21,096 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/driftstabilisationactive HTTP/1.1" 200 17
-2024-03-05 18:13:21,097 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:21,098 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/driftstabilisationoffset HTTP/1.1" 200 16
-2024-03-05 18:13:21,099 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:21,101 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/excitationfilterwheel1 HTTP/1.1" 200 13
-2024-03-05 18:13:21,102 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:21,103 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/referencezposition HTTP/1.1" 200 18
-2024-03-05 18:13:21,104 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:21,106 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/zdrivemode HTTP/1.1" 200 13
-2024-03-05 18:13:21,107 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:21,108 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/dialamponoff HTTP/1.1" 200 17
-2024-03-05 18:13:21,109 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:21,114 - DEBUG - http://localhost:15120 "PUT /v1/protocol/state HTTP/1.1" 200 0
-2024-03-05 18:13:21,114 - DEBUG - Running protocol: dict_values([{'Name': 'Protocol 59'}])
-2024-03-05 18:13:24,117 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:24,119 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/objectiveescaped HTTP/1.1" 200 17
-2024-03-05 18:13:24,121 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:24,122 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/port HTTP/1.1" 200 13
-2024-03-05 18:13:24,123 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:24,125 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/objectivefeatureselector HTTP/1.1" 200 13
-2024-03-05 18:13:24,126 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:24,128 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/objectivefeatureselector HTTP/1.1" 200 13
-2024-03-05 18:13:24,129 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:24,130 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/driftstabilisationactive HTTP/1.1" 200 17
-2024-03-05 18:13:24,131 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:24,133 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/driftstabilisationoffset HTTP/1.1" 200 16
-2024-03-05 18:13:24,134 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:24,135 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/excitationfilterwheel1 HTTP/1.1" 200 13
-2024-03-05 18:13:24,136 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:24,138 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/referencezposition HTTP/1.1" 200 18
-2024-03-05 18:13:24,139 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:24,140 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/zdrivemode HTTP/1.1" 200 13
-2024-03-05 18:13:24,141 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:24,143 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/dialamponoff HTTP/1.1" 200 17
-2024-03-05 18:13:24,144 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:24,145 - DEBUG - http://localhost:15120 "PUT /v1/protocol/state HTTP/1.1" 409 0
-2024-03-05 18:13:24,146 - ERROR - An unexpected update error occurred
-Traceback (most recent call last):
-  File "C:\Users\Piotr Wajda\Desktop\384_wellplate\Dragonfly_package\384_wellplate_automation\devices\xyzstage.py", line 30, in update
-    fusionrest.__put(endpoint, obj)
-  File "C:\Users\Piotr Wajda\Desktop\384_wellplate\Dragonfly_package\384_wellplate_automation\devices\fusionrest.py", line 87, in __put
-    __put_plain(endpoint, body)
-  File "C:\Users\Piotr Wajda\Desktop\384_wellplate\Dragonfly_package\384_wellplate_automation\devices\fusionrest.py", line 92, in __put_plain
-    __raise_on_error(endpoint, response)
-  File "C:\Users\Piotr Wajda\Desktop\384_wellplate\Dragonfly_package\384_wellplate_automation\devices\fusionrest.py", line 64, in __raise_on_error
-    raise ApiError(endpoint, response.status_code, response.reason)
-fusionrest.ApiError: <ApiError at /v1/protocol/state: 409 Invalid state transition>
-2024-03-05 18:13:24,146 - DEBUG - Running protocol: dict_values([{'Name': 'Protocol 59'}])
-2024-03-05 18:13:27,149 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:27,151 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/objectiveescaped HTTP/1.1" 200 17
-2024-03-05 18:13:27,152 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:27,153 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/port HTTP/1.1" 200 13
-2024-03-05 18:13:27,154 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:27,156 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/objectivefeatureselector HTTP/1.1" 200 13
-2024-03-05 18:13:27,157 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:27,159 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/objectivefeatureselector HTTP/1.1" 200 13
-2024-03-05 18:13:27,160 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:27,161 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/driftstabilisationactive HTTP/1.1" 200 17
-2024-03-05 18:13:27,162 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:27,164 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/driftstabilisationoffset HTTP/1.1" 200 16
-2024-03-05 18:13:27,165 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:27,166 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/excitationfilterwheel1 HTTP/1.1" 200 13
-2024-03-05 18:13:27,167 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:27,169 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/referencezposition HTTP/1.1" 200 18
-2024-03-05 18:13:27,170 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:27,171 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/zdrivemode HTTP/1.1" 200 13
-2024-03-05 18:13:27,172 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:27,174 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/dialamponoff HTTP/1.1" 200 17
-2024-03-05 18:13:27,175 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:27,180 - DEBUG - http://localhost:15120 "PUT /v1/protocol/state HTTP/1.1" 200 0
-2024-03-05 18:13:27,180 - DEBUG - Running protocol: dict_values([{'Name': 'Protocol 59'}])
-2024-03-05 18:13:30,181 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:30,181 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/objectiveescaped HTTP/1.1" 200 17
-2024-03-05 18:13:30,181 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:30,187 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/port HTTP/1.1" 200 13
-2024-03-05 18:13:30,187 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:30,187 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/objectivefeatureselector HTTP/1.1" 200 13
-2024-03-05 18:13:30,187 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:30,187 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/objectivefeatureselector HTTP/1.1" 200 13
-2024-03-05 18:13:30,193 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:30,193 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/driftstabilisationactive HTTP/1.1" 200 17
-2024-03-05 18:13:30,193 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:30,193 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/driftstabilisationoffset HTTP/1.1" 200 16
-2024-03-05 18:13:30,193 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:30,199 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/excitationfilterwheel1 HTTP/1.1" 200 13
-2024-03-05 18:13:30,199 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:30,199 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/referencezposition HTTP/1.1" 200 18
-2024-03-05 18:13:30,199 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:30,205 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/zdrivemode HTTP/1.1" 200 13
-2024-03-05 18:13:30,205 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:30,205 - DEBUG - http://localhost:15120 "GET /v1/devices/microscope/dialamponoff HTTP/1.1" 200 17
-2024-03-05 18:13:30,205 - DEBUG - Starting new HTTP connection (1): localhost:15120
-2024-03-05 18:13:30,205 - DEBUG - http://localhost:15120 "PUT /v1/protocol/state HTTP/1.1" 409 0
-2024-03-05 18:13:30,205 - ERROR - An unexpected update error occurred
-Traceback (most recent call last):
-  File "C:\Users\Piotr Wajda\Desktop\384_wellplate\Dragonfly_package\384_wellplate_automation\devices\xyzstage.py", line 30, in update
-    fusionrest.__put(endpoint, obj)
-  File "C:\Users\Piotr Wajda\Desktop\384_wellplate\Dragonfly_package\384_wellplate_automation\devices\fusionrest.py", line 87, in __put
-    __put_plain(endpoint, body)
-  File "C:\Users\Piotr Wajda\Desktop\384_wellplate\Dragonfly_package\384_wellplate_automation\devices\fusionrest.py", line 92, in __put_plain
-    __raise_on_error(endpoint, response)
-  File "C:\Users\Piotr Wajda\Desktop\384_wellplate\Dragonfly_package\384_wellplate_automation\devices\fusionrest.py", line 64, in __raise_on_error
-    raise ApiError(endpoint, response.status_code, response.reason)
-fusionrest.ApiError: <ApiError at /v1/protocol/state: 409 Invalid state transition>
-2024-03-05 18:13:30,211 - DEBUG - Running protocol: dict_values([{'Name': 'Protocol 59'}])
+2024-03-07 15:10:18,115 - INFO - This log message is from another module.
+2024-03-07 15:10:18,115 - INFO - This log message is from devices.xyzstage.
+2024-03-07 15:10:18,115 - INFO - This log message is from devices.micrscope.py
+2024-03-07 15:10:18,115 - INFO - This log message is from devices.protocol.py
+2024-03-07 15:10:18,128 - INFO - This log message is from devices.CoordinateTransforms
+2024-03-07 15:10:18,128 - INFO - This log message is from devices.wellplate.py
+2024-03-07 15:10:18,141 - INFO - This log message is from visualisation.py
+2024-03-07 15:10:18,141 - INFO - This log message is from config
+2024-03-07 15:10:18,142 - INFO - This log message is from gui.helperfunctions
+2024-03-07 15:10:18,142 - INFO - This log message is from GUI_WellPlate
+2024-03-07 15:10:18,142 - INFO - This log message is from helperfunctions
+2024-03-07 15:10:18,142 - INFO - This log message is from __main__
+2024-03-07 15:10:25,784 - INFO - Well plate dimension: state dict as vectors [array(['59.4', '33.8'], dtype='<U4'), array(['-47.7', '33.1'], dtype='<U5'), array(['-47.7', '-38.6'], dtype='<U5'), array(['59.4', '-38.6'], dtype='<U5')]
+2024-03-07 15:10:25,784 - INFO - Well plate dimension: length - 107.10228755726928, height - 71.7
+2024-03-07 15:10:25,784 - INFO - Computed well spacing: x:spacing = 4.656521739130435 and y_spacing = -4.78
+2024-03-07 15:10:25,785 - INFO - Well plate matrix dimension: rows: 16, columns: 24
+2024-03-07 15:10:25,785 - INFO - Well plate corner coordinates: [[-47.7, 33.1], [59.4, 33.1], [-47.7, -38.6], [59.4, -38.6]]
+2024-03-07 15:10:25,785 - INFO - Well plate dimension: length - 107.10228755726928, height - 71.7
+2024-03-07 15:10:25,785 - INFO - Computed well spacing: x:spacing = 4.656521739130435 and y_spacing = -4.78
+2024-03-07 15:10:49,184 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:10:49,229 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:10:50,219 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:10:51,218 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:10:52,227 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:10:53,220 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:10:54,221 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:10:55,239 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:10:56,235 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:10:57,255 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:10:58,269 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:10:59,275 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:11:00,279 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:11:01,280 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:11:02,279 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:11:03,266 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:11:04,267 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:11:05,272 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:11:06,278 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:11:07,277 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:11:09,404 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:11:24,814 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:11:25,827 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:11:26,833 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:11:27,828 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:11:28,856 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:11:29,856 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:11:30,843 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:11:31,848 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:11:32,851 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:11:33,853 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:11:34,845 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:11:35,851 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:11:36,873 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:11:37,864 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:11:38,868 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:11:39,881 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:11:40,899 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:11:41,919 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:11:42,931 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:11:43,951 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:11:44,939 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:11:45,957 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:11:46,974 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:11:47,987 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:11:49,004 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:11:50,027 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:11:51,044 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:11:52,036 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:11:53,053 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:11:54,070 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:11:55,071 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:11:56,071 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:11:57,072 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:11:58,074 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:11:59,088 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:12:00,082 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:12:01,085 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:12:02,081 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:12:03,705 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:12:04,718 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:12:05,711 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:12:06,714 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:12:07,712 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]
+2024-03-07 15:12:08,723 - INFO - Wells that have been selected: (16, 24) and their coordinates [ 59.4 -38.6]

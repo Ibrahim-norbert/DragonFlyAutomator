@@ -1,5 +1,4 @@
-import pickle
-from xyzstage import get_output, update, FusionApi
+from devices.xyzstage import get_output, update, FusionApi
 import logging
 import numpy as np
 import os
@@ -29,8 +28,9 @@ class Microscope(FusionApi):
             return {x: get_output(endpoint=self.endpoint + "/{}".format(x)) for x in
                     self.path_options}
         else:
+            f = open(os.path.join(os.getcwd(), "endpoint_outputs", os.path.basename(self.endpoint) + ".json"))
             return {x: y for x, y in
-                    zip(self.path_options, self.current_output)}
+                    zip(self.path_options, json.load(f))}
 
     def update_state(self, key, state_dict):
         if self.test is False:
@@ -47,13 +47,15 @@ class Microscope(FusionApi):
         else:
             state = self.get_state()
             z = eval(state["referencezposition"]["Value"].replace(",", "."))
+            state["referencezposition"]["Value"] = z
             return state, z
 
     def move_z_axis(self, z_increment, state):
-        if state["driftstabilisationactive"]["Value"] == "False":
-            current = state["referencezposition"]["Value"]
-            state["referencezposition"]["Value"] -= z_increment
-            self.update_state(key="referencezposition", state_dict=state)
-            logger.log(level=10, msg="Updated referencezposition from {} to {}".format(current,
-                                                                                       state["referencezposition"][
-                                                                                           "Value"]))
+            if state["driftstabilisationactive"]["Value"] == "False":
+                current = state["referencezposition"]["Value"]
+                state["referencezposition"]["Value"] -= z_increment
+                self.update_state(key="referencezposition", state_dict=state)
+                logger.log(level=10, msg="Updated referencezposition from {} to {}".format(current,
+                                                                                           state["referencezposition"][
+                                                                                               "Value"]))
+            return state["referencezposition"]["Value"]

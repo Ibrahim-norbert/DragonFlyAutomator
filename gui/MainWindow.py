@@ -2,14 +2,13 @@ import os.path
 import sys
 import logging
 from PyQt6.QtGui import QPainter, QPixmap, QColor, QFont
-from PyQt6.QtWidgets import QApplication, QPushButton, QWidget, QMainWindow, QLineEdit, QVBoxLayout
-from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QApplication, QMainWindow
 from helperfunctions import FrameManager
 
 # Configure logging
 
 logger = logging.getLogger(__name__)
-logger.info("This log message is from another module.")
+logger.info("This log message is from {}".format(__name__))
 logging.debug("Directory: {}".format(os.getcwd()))
 
 
@@ -49,8 +48,6 @@ class DragonflyAutomator(BackgroundMainWindow):
         self.setGeometry(500, 300, 800, 400)
         # Widget should be in the centre
         self.setCentralWidget(FrameManager(parent=self))
-        # Userinput
-        # FrameManager(UserInput)
 
 
 if __name__ == '__main__':

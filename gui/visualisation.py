@@ -38,14 +38,18 @@ class MplCanvas(FigureCanvas):
 
 
 class CoordinatePlot(QWidget):
-    def __init__(self, stacked_widget, parent=None):
+    def __init__(self, stacked_widget, well_plate, parent=None):
         super().__init__(parent)
 
         self.canvas = MplCanvas()
+        main_layout= QVBoxLayout(self)
+        main_layout.addWidget(self.canvas)
+        self.setLayout(main_layout)
+
 
         self.stacked_widget = stacked_widget
 
-        self.well_plate = WellPlate()
+        self.well_plate = well_plate
 
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_canvas)
@@ -53,7 +57,7 @@ class CoordinatePlot(QWidget):
 
         self.exit = False
 
-    def drawcoordinate(self, vector):
+    def drawcoordinate(self, vector, coords):
         try:
             self.canvas.axes.cla()  # Clear the canvas.
             self.canvas.axes.set_xlim(self.well_plate.corners_coords[0][0], self.well_plate.corners_coords[1][0])
@@ -72,13 +76,13 @@ class CoordinatePlot(QWidget):
                 'Real-Time {} well plate positioning'.format(self.well_plate.c_n * self.well_plate.r_n))
             self.canvas.x += [vector[0]]
             self.canvas.y += [vector[1]]
-            self.canvas.axes.scatter(self.x, self.y, c="r")
+            self.canvas.axes.scatter(self.canvas.x, self.canvas.y, c="r")
             self.canvas.draw()
 
             logger.log(level=20,
-                       msg="Wells that have been selected: {} and their coordinates {}".format(self.canvas.coords,
+                       msg="Wells that have been selected: {} and their coordinates {}".format(coords,
 
-                                                                                               self.canvas.state_dict))
+                                                                                               vector))
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
             logging.exception("What happened here ", exc_info=True)
@@ -94,11 +98,11 @@ class CoordinatePlot(QWidget):
         if self.well_plate.currentwellposition is not None:
             state_dict, coords = self.well_plate.currentwellposition
             vector = self.well_plate.state_dict_2_vector(state_dict)
-            self.drawcoordinate(vector)
+            self.drawcoordinate(vector, coords)
             # Maybe add text ojbect above coordinate point indicating the xyz stage cartesian coordinate
         elif self.exit is True:
             self.stacked_widget.switch2WPsavewindow()
-            logger.log(level=10, msg="Switch to save window")
+            logger.log(level=20, msg="Switch to save window")
 
     def showEvent(self, event):
         # Start the timer when the widget is shown (window becomes active)

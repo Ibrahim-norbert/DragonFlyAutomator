@@ -4,7 +4,9 @@ import logging
 from PyQt6.QtGui import QPainter, QPixmap, QColor, QFont
 from PyQt6.QtWidgets import QApplication, QPushButton, QWidget, QMainWindow, QLineEdit, QVBoxLayout
 from PyQt6.QtCore import Qt
-from helperfunctions import FrameManager
+
+logger = logging.getLogger(__name__)
+logger.info("This log message is from {}".format(__name__))
 
 
 class UsernamePath(QWidget):
