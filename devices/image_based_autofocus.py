@@ -117,7 +117,8 @@ def analyze_power_spectrum(img, power_threshold=0.02):
 
     return [mean, std, mean_bin]
 
+
 def combinatorial():
-    #Combine INvsStd and Entropy for noise and fine detail?
+    # Combine INvsStd and Entropy for noise and fine detail?
 
     pass
