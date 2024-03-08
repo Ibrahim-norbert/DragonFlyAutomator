@@ -16,7 +16,7 @@ from gui.helperfunctions import create_colored_label
 wellplate_paths = [os.path.basename(x) for x in glob.glob(os.path.join(os.getcwd(), "models", "*WellPlate*"))]
 
 logger = logging.getLogger(__name__)
-logger.info("This log message is from {}".format(__name__))
+logger.info("This log message is from {}.py".format(__name__))
 logging.debug("Directory: {}".format(os.getcwd()))
 
 

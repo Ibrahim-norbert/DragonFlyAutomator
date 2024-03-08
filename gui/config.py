@@ -6,7 +6,7 @@ from PyQt6.QtWidgets import QApplication, QPushButton, QWidget, QMainWindow, QLi
 from PyQt6.QtCore import Qt
 
 logger = logging.getLogger(__name__)
-logger.info("This log message is from {}".format(__name__))
+logger.info("This log message is from {}.py".format(__name__))
 
 
 class UsernamePath(QWidget):

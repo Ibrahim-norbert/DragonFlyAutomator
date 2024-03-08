@@ -9,7 +9,6 @@ import logging
 import sys
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib import pyplot as plt
-from devices.wellplate import WellPlate
 
 logger = logging.getLogger(__name__)
 logger.info("This log message is from {}.py".format(__name__))
@@ -38,11 +37,12 @@ class MplCanvas(FigureCanvas):
 
 
 class CoordinatePlot(QWidget):
-    def __init__(self, stacked_widget, well_plate, parent=None):
+    def __init__(self, stacked_widget, well_plate, protocol, parent=None):
         super().__init__(parent)
         # We need to store a reference to the plotted line
         # somewhere, so we can apply the new data to it.
 
+        self.protocol = protocol
         self.data = None
         self.doneplotting = True
         self.canvas = MplCanvas()
@@ -58,25 +58,24 @@ class CoordinatePlot(QWidget):
 
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_canvas)
-         # update every second
+        # update every second
 
         self.exit = False
 
     def initviz(self):
 
-        self.canvas.axes.set_xlim(self.well_plate.corners_coords[0][0], self.well_plate.corners_coords[1][0] + (self.well_plate.corners_coords[1][0]*0.1))
-        self.canvas.axes.set_ylim(self.well_plate.corners_coords[0][1], self.well_plate.corners_coords[2][1]+ (self.well_plate.corners_coords[2][1]*0.1))
+        self.canvas.axes.set_xlim(self.well_plate.corners_coords[0][0],
+                                  self.well_plate.corners_coords[1][0] + (self.well_plate.corners_coords[1][0] * 0.1))
+        self.canvas.axes.set_ylim(self.well_plate.corners_coords[0][1],
+                                  self.well_plate.corners_coords[2][1] + (self.well_plate.corners_coords[2][1] * 0.1))
 
-
-        
         x_values = list(range(1, 25))
         y_values = [x for x in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[:self.well_plate.r_n]]
-
 
         self.canvas.axes.set_xticks(
             np.linspace(self.well_plate.corners_coords[0][0], self.well_plate.corners_coords[1][0],
                         len(x_values)))
-        
+
         # Set y-axis ticks from P to A
         self.canvas.axes.set_yticks(
             np.linspace(self.well_plate.corners_coords[0][1], self.well_plate.corners_coords[2][1],
@@ -89,7 +88,6 @@ class CoordinatePlot(QWidget):
         self.canvas.axes.grid(which='both')
 
         self.timer.start(1000)
-
 
     def drawcoordinate(self, vector, coords):
         try:
@@ -111,38 +109,38 @@ class CoordinatePlot(QWidget):
             self.timer.timeout()
 
     def update_canvas(self):
-        # TODO quit Qtimer from repeating itself when the checkedbuttons is empty
-        # See if you can find the coordinate mapping problem
 
-        # Check if CoordinatePlot is current widget and then proceed with plotting Im doing this as I do not want
-        # Qtimer after init to switch to the exit window after startup because wellplate has no checkedbuttons attribute
+        """Updates the scatterplot using the QTimer events."""
 
-        """Updates the scatterplot using the QT event loop"""
-
-        #Only proceeds if data exists and DragonFly has completed a process
+        # Only proceeds if data exists and DragonFly has completed a process
         if self.data and self.DF_notengaged is True:
-            
+
+            # Start DragonFly process
             self.DF_notengaged = False
             state_dict, coords = next(iter(self.data))
-            
-            #Draw graph only when xyzstage has arrived at well
-            if self.well_plate.move2coord(state_dict) is False:  # 3 second delay
+
+            # Draw graph only when xyz-stage has arrived at well
+            if self.well_plate.move2coord(state_dict) is False:  # Delay
+
+                # Obtain images of well content
+                self.protocol.well_image_acquisition(wellcoord=coords)  # Delay
 
                 vector = self.well_plate.state_dict_2_vector(state_dict)
 
                 self.drawcoordinate(vector, coords)
 
+                # Once data has been processed, we remove it
                 self.data.remove((state_dict, coords))
 
-                
-
+                # End DragonFly process
                 self.DF_notengaged = True
 
-            # Maybe add text ojbect above coordinate point indicating the xyz stage cartesian coordinate
+            # Maybe add text object above coordinate point indicating the xyz stage cartesian coordinate
         elif not self.data:
             self.timer.stop()
             self.stacked_widget.switch2WPsavewindow()
             logger.log(level=20, msg="Switch to save window")
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

@@ -1,3 +1,5 @@
+import sys
+
 from devices.xyzstage import XYZStage
 import logging
 import numpy as np
@@ -132,19 +134,24 @@ class WellPlate(XYZStage):
             # Move stage to well
             # self.update_state(state_dict, analoguecontrol_bool=False)
             logger.log(level=20, msg="Stage has its position updated")
-            # Wait until we reach
+
+            # Wait until we reach well position
             if self.test is False:
+                count = 0
                 while self.state_dict_2_vector(self.get_state()) != self.state_dict_2_vector(state_dict):
                     logger.log(level=20, msg="Stage is moving to new position")
-                    return False
+                    if count == 60:
+                        sys.exit("XYZ-stage failed to reach well position. Current {} and target {}. Please look at"
+                                 "log file to find any errors".format(self.state_dict_2_vector(state_dict),
+                                                                      self.state_dict_2_vector(self.get_state())))
+                    count += 1
+                    sleep(1)
             else:
                 length = np.linalg.norm(np.array([0, 0]) - np.array(self.state_dict_2_vector(state_dict)))
                 for i in range(0, int(length), 1000):
                     logger.log(level=20, msg="Stage is moving to new position")
-                    return False
 
             logger.log(level=20, msg="Stage has arrived at target position")
-            return True
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
             logging.exception("What happened here ", exc_info=True)

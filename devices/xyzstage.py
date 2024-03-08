@@ -5,7 +5,7 @@ import numpy as np
 from RestAPI import fusionrest
 
 logger = logging.getLogger(__name__)
-logger.info("This log message is from {}.".format(__name__))
+logger.info("This log message is from {}.py".format(__name__))
 
 
 # TODO need to remove the testers

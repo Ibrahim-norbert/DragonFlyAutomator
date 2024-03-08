@@ -1,8 +1,11 @@
+import sys
+
 from devices.xyzstage import get_output, update, FusionApi
 import logging
 import numpy as np
 import os
 import json
+from time import sleep
 
 logger = logging.getLogger(__name__)
 logger.info("This log message is from {}.py".format(__name__))
@@ -51,11 +54,22 @@ class Microscope(FusionApi):
             return state, z
 
     def move_z_axis(self, z_increment, state):
-            if state["driftstabilisationactive"]["Value"] == "False":
-                current = state["referencezposition"]["Value"]
-                state["referencezposition"]["Value"] -= z_increment
-                self.update_state(key="referencezposition", state_dict=state)
-                logger.log(level=10, msg="Updated referencezposition from {} to {}".format(current,
-                                                                                           state["referencezposition"][
-                                                                                               "Value"]))
+        if state["driftstabilisationactive"]["Value"] == "False":
+            current = state["referencezposition"]["Value"]
+            state["referencezposition"]["Value"] -= z_increment
+            self.update_state(key="referencezposition", state_dict=state)
+            logger.log(level=10, msg="Updated referencezposition from {} to {}".format(current,
+                                                                                       state["referencezposition"][
+                                                                                           "Value"]))
+            # We wait until the microscope has moved position to target Z.
+            count = 0
+            while state["referencezposition"]["Value"] != self.get_current_z()[-1]:
+                logger.log(level=20, msg="Microscope is moving to new position")
+                if count == 10:
+                    sys.exit("Microscope failed to reach z position. Current {} and target {}. Please look at"
+                             "log file to find any errors".format(self.get_current_z()[-1],
+                                                                  state["referencezposition"]["Value"]))
+                count += 1
+                sleep(3)
+
             return state["referencezposition"]["Value"]

@@ -3,7 +3,7 @@ import numpy as np
 import cv2 as cv
 
 logger = logging.getLogger(__name__)
-logger.info("This log message is from {}".format(__name__))
+logger.info("This log message is from {}.py".format(__name__))
 
 
 def linearspacing(topright, topleft, bottomright, bottomleft, c_n, r_n):

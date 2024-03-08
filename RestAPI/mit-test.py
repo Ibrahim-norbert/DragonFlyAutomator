@@ -4,12 +4,11 @@ print("initialising")
 
 import fusionrest
 from time import sleep
-import os
 import logging
 
-
-logging.basicConfig(filename=os.path.join(os.getcwd(), '../dragonfly_automator.log'), level=logging.DEBUG,
-                    format='%(asctime)s - %(levelname)s - %(message)s')
+# Example: Log a message from another module
+logger = logging.getLogger(__name__)
+logger.info("This log message is from {}".format(__name__))
 
 #logging.basicConfig(filename=os.path.join(os.getcwd(), 'dragonfly_automator.log'), level=logging.DEBUG,
  #                   format='%(asctime)s - %(levelname)s - %(message)s')

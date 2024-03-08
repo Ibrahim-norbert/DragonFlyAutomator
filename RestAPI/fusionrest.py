@@ -12,7 +12,7 @@ logging.basicConfig(level=logging.INFO, filemode="w", filename=os.path.join(os.g
 
 # Example: Log a message from another module
 logger = logging.getLogger(__name__)
-logger.info("This log message is from another module.")
+logger.info("This log message is from {}".format(__name__))
 
 host = "localhost"
 port = 15120

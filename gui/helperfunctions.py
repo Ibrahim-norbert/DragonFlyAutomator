@@ -6,7 +6,7 @@ import config
 import logging
 
 logger = logging.getLogger(__name__)
-logger.info("This log message is from {}".format(__name__))
+logger.info("This log message is from {}.py".format(__name__))
 
 
 def create_colored_label(text, parent):
@@ -23,7 +23,8 @@ class FrameManager(QStackedWidget):
         self.frame1 = GUIWP.SelectWellPlateDimensions(stacked_widget=self)
         self.frame2 = GUIWP.WellPlateDimensions(stacked_widget=self, well_plate=self.frame1.well_plate)
         self.frame3 = GUIWP.CustomButtonGroup(stacked_widget=self, well_plate=self.frame1.well_plate)
-        self.frame4 = VIZ.CoordinatePlot(stacked_widget=self, well_plate=self.frame1.well_plate)
+        self.frame4 = GUIP.Protocol(stacked_widget=self)
+        self.frame4 = VIZ.CoordinatePlot(stacked_widget=self, well_plate=self.frame1.well_plate, protocol=self.frame4)
         self.frame5 = GUIWP.SaveWindow(stacked_widget=self, well_plate=self.frame1.well_plate)
 
         self.addWidget(self.frame1)
