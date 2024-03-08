@@ -1,11 +1,8 @@
-import pickle
-from micrscope import Microscope
-from xyzstage import FusionApi, get_output, update
+from devices.micrscope import Microscope
+from devices.xyzstage import FusionApi, get_output, update
 import logging
-import numpy as np
 import os
 import json
-from time import sleep
 from RestAPI import fusionrest
 
 logger = logging.getLogger(__name__)
@@ -13,21 +10,26 @@ logger.info("This log message is from {}.py".format(__name__))
 
 
 class Protocol(FusionApi):
-    def __init__(self, test=True):
+    def __init__(self):
         super().__init__()  # inherits
         self.endpoint = self.endpoint + "/{}".format("protocol")
 
-        if test is False:
+        if self.test is False:
             self.current_output = self.get_state()
             self.protocol_name = fusionrest.get_protocol_name()
         else:
             f = open(os.path.join(os.getcwd(), "endpoint_outputs", os.path.basename(self.endpoint) + "_current.json"))
             self.current_output = json.load(f)
-        self.test = test
+
         self.microscope = Microscope()
 
     def get_state(self):
-        return fusionrest.get_state()
+        if self.test is False:
+            return fusionrest.get_state()
+        else:
+            f = open(os.path.join(os.getcwd(), "endpoint_outputs", os.path.basename(self.endpoint) + "_current.json"))
+            return json.load(f)
+
 
     def run_protocol(self):
         if self.test is False:
@@ -61,29 +63,39 @@ class Protocol(FusionApi):
             img_name_dict["Path"] = os.path.join(os.path.split(img_path)[0], image_name)
             logger.log(level=20, msg="New image path: {}".format(img_name_dict["Path"]))
 
-    def z_stack(self, wellcoord="0 0"):
+    def z_stack(self, img_name="image", wellcoord="0 0", z_increment = 5, n_aqcuisitions = 10):
         # Set image name
-        z_increment = 5
-        n_aqcuisitions = 10
         height = z_increment * n_aqcuisitions
         logger.log(level=10,
                    msg="Height travelled in total {} mm. Please determine from current position that this is safe".format(
                        height))
         if self.test is False:
             for i in range(n_aqcuisitions):
-                _, z = self.microscope.get_current_z()
-                self.change_image_name(image_name="Image{}_well{}_zheigth{}".format(i + 1, wellcoord, z))
+                state, _ = self.microscope.get_current_z()
+                z = self.microscope.move_z_axis(z_increment, state=state)
+                self.change_image_name(image_name="{}{}_well{}_zheigth{}".format(img_name, i + 1, wellcoord, int(z)))
                 self.run_protocol()
         else:
             for i in range(n_aqcuisitions):
-                _, z = self.microscope.get_current_z()
-                self.change_image_name(image_name="Image{}_well{}_zheigth{}".format(i + 1, wellcoord, z))
+                state, _ = self.microscope.get_current_z()
+                z = self.microscope.move_z_axis(z_increment, state=state)
+                self.change_image_name(image_name="{}{}_well{}_zheigth{}".format(img_name, i + 1, wellcoord, int(z)))
                 self.run_protocol()
 
 
 
 if __name__ == '__main__':
     protocol = Protocol()
+
+
+    print("Is this a test? ")
+    answer = input()
+
+    if answer.upper() == "NO":
+        protocol.test = False
+    else:
+        protocol.test = True
+
 
     logger.log(level=10, msg="Current Protocol: {}".format(protocol.get_state()))
 

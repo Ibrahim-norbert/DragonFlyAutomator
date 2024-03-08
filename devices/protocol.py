@@ -63,10 +63,8 @@ class Protocol(FusionApi):
             img_name_dict["Path"] = os.path.join(os.path.split(img_path)[0], image_name)
             logger.log(level=20, msg="New image path: {}".format(img_name_dict["Path"]))
 
-    def z_stack(self, wellcoord="0 0"):
+    def z_stack(self, img_name="image", wellcoord="0 0", z_increment = 5, n_aqcuisitions = 10):
         # Set image name
-        z_increment = 5
-        n_aqcuisitions = 10
         height = z_increment * n_aqcuisitions
         logger.log(level=10,
                    msg="Height travelled in total {} mm. Please determine from current position that this is safe".format(
@@ -75,14 +73,13 @@ class Protocol(FusionApi):
             for i in range(n_aqcuisitions):
                 state, _ = self.microscope.get_current_z()
                 z = self.microscope.move_z_axis(z_increment, state=state)
-                self.change_image_name(image_name="Image{}_well{}_zheigth{}".format(i + 1, wellcoord, int(z)))
+                self.change_image_name(image_name="{}{}_well{}_zheigth{}".format(img_name, i + 1, wellcoord, int(z)))
                 self.run_protocol()
         else:
             for i in range(n_aqcuisitions):
                 state, _ = self.microscope.get_current_z()
                 z = self.microscope.move_z_axis(z_increment, state=state)
-                self.change_image_name(image_name="Image{}_well{}_zheigth{}".format(
-                    i + 1, wellcoord.replace(" ", ""), int(z)))
+                self.change_image_name(image_name="{}{}_well{}_zheigth{}".format(img_name, i + 1, wellcoord, int(z)))
                 self.run_protocol()
 
 

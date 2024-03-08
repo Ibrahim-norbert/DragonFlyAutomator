@@ -5,20 +5,18 @@ import sys
 from time import sleep
 import numpy as np
 from PyQt6.QtWidgets import QGridLayout, QPushButton, QWidget, QLineEdit, QVBoxLayout, QComboBox, QHBoxLayout, \
-    QApplication, QStackedWidget
+    QApplication
 from PyQt6.QtCore import Qt, QTimer
 from matplotlib import pyplot as plt
-
 from devices.micrscope import Microscope
-from gui.helperfunctions import create_colored_label
-from visualisation import MplCanvas, CoordinatePlot
 from devices.protocol import Protocol
 from devices.wellplate import WellPlate
+from gui.helperfunctions import create_colored_label
 
 wellplate_paths = [os.path.basename(x) for x in glob.glob(os.path.join(os.getcwd(), "models", "*WellPlate*"))]
 
 logger = logging.getLogger(__name__)
-logger.info("This log message is from another module.")
+logger.info("This log message is from {}".format(__name__))
 logging.debug("Directory: {}".format(os.getcwd()))
 
 
@@ -52,25 +50,28 @@ class SelectWellPlateDimensions(QWidget):
         try:
             path = self.dropdown.currentText()
             self.well_plate.load_attributes(path)
-            self.stacked_widget.addWidget(CustomButtonGroup(self.well_plate, self.stacked_widget))
-            self.stacked_widget.setCurrentIndex(2)
+            self.stacked_widget.switch2WPbuttongrid()
+
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
             logging.exception("What happened here: ", exc_info=True)
 
     def addwell(self):
         try:
-            self.stacked_widget.addWidget(WellPlateDimensions(self.stacked_widget, self.well_plate))
-            self.stacked_widget.setCurrentIndex(2)
+            self.stacked_widget.switch2WPnew()
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
             logging.exception("What happened here: ", exc_info=True)
 
 
 class WellPlateDimensions(QWidget):
-    def __init__(self, stacked_widget, wellplate):
+    def __init__(self, stacked_widget, well_plate):
         super().__init__()
-        self.well_plate = wellplate
+
+        # TODO Add functionality to choose between methods of
+        # learning the homography matrix
+
+        self.well_plate = well_plate
         self.stacked_widget = stacked_widget
 
         self.column_n = QLineEdit(parent=self)
@@ -141,13 +142,12 @@ class WellPlateDimensions(QWidget):
 
         try:
             if None not in self.well_plate.well_plate_req_coords.values():
+                # Compute the wellplate grid
                 self.well_plate.predict_well_coords(int(self.column_n.text()), int(self.row_n.text()))
 
-                # Frame three
+                # Switch to frame three
+                self.stacked_widget.switch2WPbuttongrid()
 
-                # self.setCentralWidget(self.visualiser)
-                self.stacked_widget.addWidget(CustomButtonGroup(self.well_plate, self.stacked_widget))
-                self.stacked_widget.setCurrentIndex(3)
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
             logging.exception("What happened here ", exc_info=True)
@@ -178,15 +178,23 @@ class WellAsButton(QPushButton):
 
 
 class CustomButtonGroup(QWidget):
-    def __init__(self, well_plate, stacked_widget):
+    def __init__(self, stacked_widget, well_plate):
         super().__init__()
 
-        #self.protocol = Protocol()
+        # self.protocol = Protocol()
+
+        self.buttons = None
+        self.enter_button = None
+        self.checked_buttons = None
+        self.stacked_widget = stacked_widget
         self.well_plate = well_plate
+
+    def creatbuttongrid(self):
 
         layout = QGridLayout()
 
         self.buttons = []
+
         for key, well_state_dict in self.well_plate.all_well_dicts.items():
             r, c = int(key.split(" ")[0]), int(key.split(" ")[-1])
             label = "abcdefghijklmnopqrstuvwxyz".upper()[r] + key.split(" ")[-1]
@@ -204,9 +212,6 @@ class CustomButtonGroup(QWidget):
 
         self.setLayout(main_layout)
 
-        self.stacked_widget = stacked_widget
-
-
     def handleEnterPressed(self):
         try:
             self.checked_buttons = [(button.well_state_dict, button.coordinates) for button in self.buttons if
@@ -214,40 +219,30 @@ class CustomButtonGroup(QWidget):
 
             logging.log(level=10, msg="Wells that have been selected: {}".format(self.checked_buttons))
 
-            # for button in self.checked_buttons:
-            # self.well_plate.execute_template_coords(button[0].values())
-            # logging.log(level=10, msg="Well coordinates: {}".format(button[1]))
-            # self.protocol.z_stack(button[1])
-            self.stacked_widget.addWidget(SaveWindow(self.well_plate, stacked_widget=self.stacked_widget))
-            self.stacked_widget.setCurrentIndex(4)
+            # Automatic updater -> threading ?
+            self.stacked_widget.switch2WPrtplotter(self.checked_buttons)  # -> Underneath for loop or in parallel to 
+            # it ??
+
+            # And with for loop -> multithreading?
 
 
-            # Perform image acquisition of different Z positions
-            # self.run_protocol()
-            # TODO See if there is a cleaner method for this
-            ## TODO Maybe add the self.wellplate into the consturctor and the timer too ? and make it a child ?
-            # Visualiser(CoordinatePlot(well_plate=self.well_plate,
-            #                          checked_buttons=self.checked_buttons),
-            ##          stacked_widget=self.stacked_widget,
-            #        next_widget=SaveWindow(self.well_plate, stacked_widget=self.stacked_widget))
 
-            # execute stage
 
-            # execute pictures
 
-            # execute save
 
-            # self.visualiser.Update()
+
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
             logging.exception("What happened here ", exc_info=True)
 
 
 class SaveWindow(QWidget):
-    def __init__(self, wellplate, stacked_widget):
+    def __init__(self, stacked_widget, well_plate):
         super().__init__()
 
-        self.wellplate = wellplate
+        self.partnumber = None
+        self.manufacturer = None
+        self.well_plate = well_plate
 
         layout = QHBoxLayout()
         layout.addWidget(create_colored_label("Would you like to save this new coordinate transformation ?", self))
@@ -262,26 +257,24 @@ class SaveWindow(QWidget):
         self.stacked_widget = stacked_widget
 
     def save(self):
+        # layout = QHBoxLayout()
+        # self.manufacturer = QLineEdit(parent=self)
+        # self.manufacturer.setPlaceholderText("Manufacturer name")
+        # layout.addWidget(self.manufacturer)
+        # self.partnumber = QLineEdit(parent=self)
+        # self.partnumber.setPlaceholderText("Part number")
+        # layout.addWidget(self.partnumber)
+        # self.confirm_button = QPushButton("Confirm", parent=self)
+        # self.confirm_button.clicked.connect(self.confirm)
+        # layout.addWidget(self.confirm_button)
+        #
+        # main_layout = QVBoxLayout()
+        # main_layout.addLayout(self.layout())
+        # main_layout.addLayout(layout)
+        #
+        # self.setLayout(main_layout)
 
-
-            # layout = QHBoxLayout()
-            # self.manufacturer = QLineEdit(parent=self)
-            # self.manufacturer.setPlaceholderText("Manufacturer name")
-            # layout.addWidget(self.manufacturer)
-            # self.partnumber = QLineEdit(parent=self)
-            # self.partnumber.setPlaceholderText("Part number")
-            # layout.addWidget(self.partnumber)
-            # self.confirm_button = QPushButton("Confirm", parent=self)
-            # self.confirm_button.clicked.connect(self.confirm)
-            # layout.addWidget(self.confirm_button)
-            #
-            # main_layout = QVBoxLayout()
-            # main_layout.addLayout(self.layout())
-            # main_layout.addLayout(layout)
-            #
-            # self.setLayout(main_layout)
-
-        self.wellplate.save_attributes2json("Falcon", "12345678")
+        self.well_plate.save_attributes2json("Falcon", "12345678")
         logger.log(level=10, msg="SAVED")
         sys.exit()
 
@@ -295,8 +288,7 @@ class SaveWindow(QWidget):
         #     self.stacked_widget.setCurrentWidget(button)
 
     def confirm(self):
-        self.wellplate.save_attributes2json(self.manufacturer.text(), self.partnumber.text())
-
+        self.well_plate.save_attributes2json(self.manufacturer.text(), self.partnumber.text())
 
 
 if __name__ == '__main__':

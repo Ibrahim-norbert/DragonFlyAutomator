@@ -54,6 +54,8 @@ class CoordinatePlot(QWidget):
 
         self.well_plate = well_plate
 
+        self.DF_notengaged = True
+
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_canvas)
          # update every second
@@ -62,12 +64,19 @@ class CoordinatePlot(QWidget):
 
     def initviz(self):
 
-        self.canvas.axes.set_xlim(self.well_plate.corners_coords[0][0], self.well_plate.corners_coords[1][0])
-        self.canvas.axes.set_ylim(self.well_plate.corners_coords[0][1], self.well_plate.corners_coords[2][1])
+        self.canvas.axes.set_xlim(self.well_plate.corners_coords[0][0], self.well_plate.corners_coords[1][0] + (self.well_plate.corners_coords[1][0]*0.1))
+        self.canvas.axes.set_ylim(self.well_plate.corners_coords[0][1], self.well_plate.corners_coords[2][1]+ (self.well_plate.corners_coords[2][1]*0.1))
 
+
+        
         x_values = list(range(1, 25))
         y_values = [x for x in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[:self.well_plate.r_n]]
 
+
+        self.canvas.axes.set_xticks(
+            np.linspace(self.well_plate.corners_coords[0][0], self.well_plate.corners_coords[1][0],
+                        len(x_values)))
+        
         # Set y-axis ticks from P to A
         self.canvas.axes.set_yticks(
             np.linspace(self.well_plate.corners_coords[0][1], self.well_plate.corners_coords[2][1],
@@ -76,6 +85,8 @@ class CoordinatePlot(QWidget):
 
         self.canvas.axes.set_title(
             'Real-Time {} well plate positioning'.format(self.well_plate.c_n * self.well_plate.r_n))
+
+        self.canvas.axes.grid(which='both')
 
         self.timer.start(1000)
 
@@ -108,10 +119,13 @@ class CoordinatePlot(QWidget):
 
         """Updates the scatterplot using the QT event loop"""
 
-        if self.data:
-
+        #Only proceeds if data exists and DragonFly has completed a process
+        if self.data and self.DF_notengaged is True:
+            
+            self.DF_notengaged = False
             state_dict, coords = next(iter(self.data))
-
+            
+            #Draw graph only when xyzstage has arrived at well
             if self.well_plate.move2coord(state_dict) is False:  # 3 second delay
 
                 vector = self.well_plate.state_dict_2_vector(state_dict)
@@ -119,6 +133,10 @@ class CoordinatePlot(QWidget):
                 self.drawcoordinate(vector, coords)
 
                 self.data.remove((state_dict, coords))
+
+                
+
+                self.DF_notengaged = True
 
             # Maybe add text ojbect above coordinate point indicating the xyz stage cartesian coordinate
         elif not self.data:
