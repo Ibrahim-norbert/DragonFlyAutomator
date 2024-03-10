@@ -64,6 +64,8 @@ class CoordinatePlot(QWidget):
 
     def initviz(self):
 
+        self.data = self.well_plate.selected_wells
+
         self.canvas.axes.set_xlim(self.well_plate.corners_coords[0][0],
                                   self.well_plate.corners_coords[1][0] + (self.well_plate.corners_coords[1][0] * 0.1))
         self.canvas.axes.set_ylim(self.well_plate.corners_coords[0][1],
@@ -122,8 +124,10 @@ class CoordinatePlot(QWidget):
             # Draw graph only when xyz-stage has arrived at well
             if self.well_plate.move2coord(state_dict) is False:  # Delay
 
+
+                #Get protocol from GUI PRotocol ?
                 # Obtain images of well content
-                self.protocol.well_image_acquisition(wellcoord=coords)  # Delay
+                self.protocol.image_acquisition(wellcoord=coords)  # Delay
 
                 vector = self.well_plate.state_dict_2_vector(state_dict)
 
@@ -138,6 +142,7 @@ class CoordinatePlot(QWidget):
             # Maybe add text object above coordinate point indicating the xyz stage cartesian coordinate
         elif not self.data:
             self.timer.stop()
+            self.protocol.autofocus.save2DT_excel()
             self.stacked_widget.switch2WPsavewindow()
             logger.log(level=20, msg="Switch to save window")
 

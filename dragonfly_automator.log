@@ -1,13 +1,68 @@
-2024-03-08 17:26:11,406 - INFO - This log message is from RestAPI.fusionrest
-2024-03-08 17:26:11,406 - INFO - This log message is from devices.xyzstage.py
-2024-03-08 17:26:11,407 - INFO - This log message is from devices.micrscope.py
-2024-03-08 17:26:11,411 - INFO - This log message is from devices.protocol.py
-2024-03-08 17:26:11,506 - INFO - This log message is from devices.CoordinateTransforms.py
-2024-03-08 17:26:11,506 - INFO - This log message is from devices.wellplate.py
-2024-03-08 17:26:11,562 - INFO - This log message is from visualisation.py
-2024-03-08 17:26:11,566 - INFO - This log message is from config.py
-2024-03-08 17:26:11,566 - INFO - This log message is from gui.helperfunctions.py
-2024-03-08 17:26:11,566 - INFO - This log message is from GUI_WellPlate.py
-2024-03-08 17:26:11,566 - INFO - This log message is from helperfunctions.py
-2024-03-08 17:26:11,566 - INFO - This log message is from __main__.py
-2024-03-08 17:26:11,566 - INFO - Directory: C:\Schapiro Lab\ibrahim_hiwi\348_wellplate_automation
+2024-03-10 18:38:04,412 - INFO - This log message is from RestAPI.fusionrest
+2024-03-10 18:38:04,467 - INFO - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2024-03-10 18:38:04,467 - INFO - NumExpr defaulting to 8 threads.
+2024-03-10 18:38:04,597 - INFO - This log message is from devices.xyzstage.py
+2024-03-10 18:38:04,598 - INFO - This log message is from devices.micrscope.py
+2024-03-10 18:38:04,598 - INFO - This log message is from __main__.py
+2024-03-10 18:38:04,598 - INFO - Current Z: 487.42
+2024-03-10 18:38:07,064 - INFO - Current Protocol: {'Path': 'D:\\PikaSpheroids\\2024-02-19\\H2B_H33342_250_25min_2024-02-19.ims', 'Id': 'd3138d7e-3ad4-4004-83c1-be9cc859d8ca'}
+2024-03-10 18:38:07,064 - INFO - Change name of image taken
+2024-03-10 18:38:07,064 - INFO - New image path: /media/ibrahim/Extended Storage/cloud/Internship/bioquant/348_wellplate_automation/test_rn/New_picture.ims
+2024-03-10 18:38:07,064 - INFO - Protocol set to running
+2024-03-10 18:38:07,064 - INFO - Running protocol: dict_values(['D:\\PikaSpheroids\\2024-02-19\\H2B_H33342_250_25min_2024-02-19.ims', 'd3138d7e-3ad4-4004-83c1-be9cc859d8ca'])
+2024-03-10 18:38:07,065 - INFO - New state: {'Path': 'D:\\PikaSpheroids\\2024-02-19\\H2B_H33342_250_25min_2024-02-19.ims', 'Id': 'd3138d7e-3ad4-4004-83c1-be9cc859d8ca'}
+2024-03-10 18:38:07,065 - INFO - Z stacking is on
+2024-03-10 18:38:07,065 - INFO - Height travelled in total 50 mm. Please determine from current position that this is safe
+2024-03-10 18:38:07,066 - INFO - Current Z: 487.42
+2024-03-10 18:38:07,066 - INFO - Updated referencezposition from 487.42 to 482.42
+2024-03-10 18:38:07,066 - INFO - Current Z: 482.42
+2024-03-10 18:38:07,066 - INFO - New image path: /media/ibrahim/Extended Storage/cloud/Internship/bioquant/348_wellplate_automation/test_rn/well_0-0/rawtake_n1_well0-0_zheigth482.ims
+2024-03-10 18:38:12,410 - INFO - Running protocol: dict_values(['D:\\PikaSpheroids\\2024-02-19\\H2B_H33342_250_25min_2024-02-19.ims', 'd3138d7e-3ad4-4004-83c1-be9cc859d8ca'])
+2024-03-10 18:38:13,181 - INFO - Current Z: 482.42
+2024-03-10 18:38:13,395 - INFO - Updated referencezposition from 482.42 to 477.42
+2024-03-10 18:38:13,395 - INFO - Current Z: 477.42
+2024-03-10 18:38:13,998 - INFO - New image path: /media/ibrahim/Extended Storage/cloud/Internship/bioquant/348_wellplate_automation/test_rn/well_0-0/rawtake_n2_well0-0_zheigth477.ims
+2024-03-10 18:38:14,407 - INFO - Running protocol: dict_values(['D:\\PikaSpheroids\\2024-02-19\\H2B_H33342_250_25min_2024-02-19.ims', 'd3138d7e-3ad4-4004-83c1-be9cc859d8ca'])
+2024-03-10 18:38:14,816 - INFO - Current Z: 477.42
+2024-03-10 18:38:15,031 - INFO - Updated referencezposition from 477.42 to 472.42
+2024-03-10 18:38:15,031 - INFO - Current Z: 472.42
+2024-03-10 18:38:16,713 - INFO - New image path: /media/ibrahim/Extended Storage/cloud/Internship/bioquant/348_wellplate_automation/test_rn/well_0-0/rawtake_n3_well0-0_zheigth472.ims
+2024-03-10 18:38:19,551 - INFO - Running protocol: dict_values(['D:\\PikaSpheroids\\2024-02-19\\H2B_H33342_250_25min_2024-02-19.ims', 'd3138d7e-3ad4-4004-83c1-be9cc859d8ca'])
+2024-03-10 18:38:19,551 - INFO - Current Z: 472.42
+2024-03-10 18:38:19,551 - INFO - Updated referencezposition from 472.42 to 467.42
+2024-03-10 18:38:19,552 - INFO - Current Z: 467.42
+2024-03-10 18:38:19,552 - INFO - New image path: /media/ibrahim/Extended Storage/cloud/Internship/bioquant/348_wellplate_automation/test_rn/well_0-0/rawtake_n4_well0-0_zheigth467.ims
+2024-03-10 18:38:20,805 - INFO - Running protocol: dict_values(['D:\\PikaSpheroids\\2024-02-19\\H2B_H33342_250_25min_2024-02-19.ims', 'd3138d7e-3ad4-4004-83c1-be9cc859d8ca'])
+2024-03-10 18:38:20,805 - INFO - Current Z: 467.42
+2024-03-10 18:38:20,805 - INFO - Updated referencezposition from 467.42 to 462.42
+2024-03-10 18:38:20,805 - INFO - Current Z: 462.42
+2024-03-10 18:38:20,806 - INFO - New image path: /media/ibrahim/Extended Storage/cloud/Internship/bioquant/348_wellplate_automation/test_rn/well_0-0/rawtake_n5_well0-0_zheigth462.ims
+2024-03-10 18:38:21,254 - INFO - Running protocol: dict_values(['D:\\PikaSpheroids\\2024-02-19\\H2B_H33342_250_25min_2024-02-19.ims', 'd3138d7e-3ad4-4004-83c1-be9cc859d8ca'])
+2024-03-10 18:38:21,255 - INFO - Current Z: 462.42
+2024-03-10 18:38:21,255 - INFO - Updated referencezposition from 462.42 to 457.42
+2024-03-10 18:38:21,255 - INFO - Current Z: 457.42
+2024-03-10 18:38:21,255 - INFO - New image path: /media/ibrahim/Extended Storage/cloud/Internship/bioquant/348_wellplate_automation/test_rn/well_0-0/rawtake_n6_well0-0_zheigth457.ims
+2024-03-10 18:38:21,735 - INFO - Running protocol: dict_values(['D:\\PikaSpheroids\\2024-02-19\\H2B_H33342_250_25min_2024-02-19.ims', 'd3138d7e-3ad4-4004-83c1-be9cc859d8ca'])
+2024-03-10 18:38:21,735 - INFO - Current Z: 457.42
+2024-03-10 18:38:21,735 - INFO - Updated referencezposition from 457.42 to 452.42
+2024-03-10 18:38:21,736 - INFO - Current Z: 452.42
+2024-03-10 18:38:21,736 - INFO - New image path: /media/ibrahim/Extended Storage/cloud/Internship/bioquant/348_wellplate_automation/test_rn/well_0-0/rawtake_n7_well0-0_zheigth452.ims
+2024-03-10 18:38:22,477 - INFO - Running protocol: dict_values(['D:\\PikaSpheroids\\2024-02-19\\H2B_H33342_250_25min_2024-02-19.ims', 'd3138d7e-3ad4-4004-83c1-be9cc859d8ca'])
+2024-03-10 18:38:22,477 - INFO - Current Z: 452.42
+2024-03-10 18:38:22,477 - INFO - Updated referencezposition from 452.42 to 447.42
+2024-03-10 18:38:22,478 - INFO - Current Z: 447.42
+2024-03-10 18:38:22,478 - INFO - New image path: /media/ibrahim/Extended Storage/cloud/Internship/bioquant/348_wellplate_automation/test_rn/well_0-0/rawtake_n8_well0-0_zheigth447.ims
+2024-03-10 18:38:23,166 - INFO - Running protocol: dict_values(['D:\\PikaSpheroids\\2024-02-19\\H2B_H33342_250_25min_2024-02-19.ims', 'd3138d7e-3ad4-4004-83c1-be9cc859d8ca'])
+2024-03-10 18:38:23,167 - INFO - Current Z: 447.42
+2024-03-10 18:38:23,167 - INFO - Updated referencezposition from 447.42 to 442.42
+2024-03-10 18:38:23,167 - INFO - Current Z: 442.42
+2024-03-10 18:38:23,167 - INFO - New image path: /media/ibrahim/Extended Storage/cloud/Internship/bioquant/348_wellplate_automation/test_rn/well_0-0/rawtake_n9_well0-0_zheigth442.ims
+2024-03-10 18:38:23,922 - INFO - Running protocol: dict_values(['D:\\PikaSpheroids\\2024-02-19\\H2B_H33342_250_25min_2024-02-19.ims', 'd3138d7e-3ad4-4004-83c1-be9cc859d8ca'])
+2024-03-10 18:38:23,922 - INFO - Current Z: 442.42
+2024-03-10 18:38:23,922 - INFO - Updated referencezposition from 442.42 to 437.42
+2024-03-10 18:38:23,922 - INFO - Current Z: 437.42
+2024-03-10 18:38:23,923 - INFO - New image path: /media/ibrahim/Extended Storage/cloud/Internship/bioquant/348_wellplate_automation/test_rn/well_0-0/rawtake_n10_well0-0_zheigth437.ims
+2024-03-10 18:38:24,703 - INFO - Running protocol: dict_values(['D:\\PikaSpheroids\\2024-02-19\\H2B_H33342_250_25min_2024-02-19.ims', 'd3138d7e-3ad4-4004-83c1-be9cc859d8ca'])
+2024-03-10 18:38:24,703 - INFO - Autofocusing is on
+2024-03-10 18:40:37,135 - INFO - image acquisition is on
+2024-03-10 18:40:39,233 - INFO - Current Z: 437.42

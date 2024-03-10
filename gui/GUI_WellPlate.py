@@ -44,6 +44,8 @@ class SelectWellPlateDimensions(QWidget):
         main_layout.addWidget(self.dropdown)
         main_layout.addLayout(layout1)
 
+        self.setLayout(main_layout)
+
         self.well_plate = WellPlate()
 
     def selectwellplate(self):
@@ -123,13 +125,20 @@ class WellPlateDimensions(QWidget):
     def read_well_coordinate(self):
 
         try:
+            # Read and save well plate corners
             self.well_plate.well_plate_req_coords[self.dropdown.currentText()] = self.well_plate.get_state(
                 test_key=self.dropdown.currentText())
-            # self.well_plate.well_plate_req_coords[self.dropdown.currentText()] = self.well_plate.get_state()
+
+            # Return them as vectors
             vector = self.well_plate.state_dict_2_vector(
                 self.well_plate.well_plate_req_coords[self.dropdown.currentText()])
+
+            # Display them in GUI
             self.placeholder_coordinates.setText(str(vector))
+
             logging.log(level=10, msg="Well: " + self.dropdown.currentText() + " - " + str(vector))
+
+            # Once all corners are read, log the values
             if None not in self.well_plate.well_plate_req_coords.values():
                 final = self.well_plate.well_plate_req_coords.items()
                 logging.log(level=10, msg="Final coordinates: " + str(final))
@@ -219,17 +228,13 @@ class CustomButtonGroup(QWidget):
 
             logging.log(level=10, msg="Wells that have been selected: {}".format(self.checked_buttons))
 
+            # Add to well plate instance
+            self.well_plate.selected_wells = self.checked_buttons
+
             # Automatic updater -> threading ?
-            self.stacked_widget.switch2WPrtplotter(self.checked_buttons)  # -> Underneath for loop or in parallel to 
-            # it ??
+            self.stacked_widget.switch2Protocol()  # -> Underneath for loop or in parallel to
 
             # And with for loop -> multithreading?
-
-
-
-
-
-
 
         except Exception as e:
             print(f"An unexpected error occurred: {e}")

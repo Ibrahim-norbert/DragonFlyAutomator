@@ -3,7 +3,7 @@ import sys
 import logging
 from PyQt6.QtGui import QPainter, QPixmap, QColor, QFont
 from PyQt6.QtWidgets import QApplication, QMainWindow
-from helperfunctions import FrameManager
+from FrameSwitcher import FrameManager
 
 # Configure logging
 

@@ -1,8 +1,10 @@
 """ All methods gotten from:
 Koho, S., Fazeli, E., Eriksson, J. et al. Image Quality Ranking Method for Microscopy.
 Sci Rep 6, 28962 (2016). https://doi.org/10.1038/srep28962"""
+import os
 
 import numpy as np
+import pandas as pd
 
 
 def calculate_power_spectrum(data, normalize=True):
@@ -29,34 +31,38 @@ def calculate_percent_spectrum(simple_power):
 class AutoFocus:
     def __init__(self):
         self.num = 0
-        self.variables = {"Time to execute": None, "Memory requirement": None, "Accuracy estimator": None}
-        self.metrics = ["Variance", "Brenner", "Spectral Moments", "Psm mean", "Psm std", "Psm meanbin",
-                        "Metric comparison"]
+        self.variables = {
+            "Img_ID": [], "Z plane": [], "Well coords": [], "Acquisition number": [], "Metrics": []}
 
-    def Variance(self, img):
+        self.metrics = [func for func in dir(self) if callable(getattr(self, func)) and
+                        func not in ["calculate_summed_power", "power_spectrum", "combinatorial"] and "__" not in func]
+
+    def Variance(self, img, img_name=None):
         res = np.var(img)
         key = "Variance"
-        self.variables["Metrics"] = key
-        self.variables[key] = res
-        self.variables["Img_ID"] = self.num
+        self.variables["Metrics"] += [key]
+        self.variables[key] = res  # self.collector
+        self.variables["Img_ID"] += [img_name]
+        self.variables["Z plane"] += [eval((img_name.split("_zheigth")[1]).split(".")[0])]
+        self.variables["Well coords"] += [(img_name.split("_well")[1]).split("_zheigth")[0]]
+        self.variables["Acquisition number"] += [eval((img_name.split("_n")[1]).split("_well")[0])]
 
         return res
 
-    def Brenner(self, img):
-        rows = img.shape[0]
-        columns = img.shape[1] - 2
-        temp = np.zeros((rows, columns))
-
-        temp[:] = ((img[:, 0:-2] - img[:, 2:]) ** 2)
+    def Brenner(self, img, img_name=None):
+        temp = ((img[:, 0:-2] - img[:, 2:]) ** 2)
         res = temp.sum()
         key = "Brenner"
         self.variables["Metrics"] = key
         self.variables[key] = res
-        self.variables["Img_ID"] = self.num
+        self.variables["Img_ID"] += [img_name]
+        self.variables["Z plane"] += [eval((img_name.split("_zheigth")[1]).split(".")[0])]
+        self.variables["Well coords"] += [(img_name.split("_well")[1]).split("_zheigth")[0]]
+        self.variables["Acquisition number"] += [eval((img_name.split("_n")[1]).split("_well")[0])]
 
         return res
 
-    def calculate_summed_power(self, power, x_spacing=(1 / 0.01)):
+    def calculate_summed_power(self, power, x_spacing=(1 / 0.01), img_name=None):
         """
             Calculate a 1D power spectrum from 2D power spectrum, by summing all rows and
             columns, and then summing negative and positive frequencies, to form a
@@ -80,11 +86,14 @@ class AutoFocus:
         self.variables["Total power"] = sum_
         self.variables["Frequency"] = f_k
 
-        self.variables["Img_ID"] = self.num
+        self.variables["Img_ID"] += [img_name]
+        self.variables["Z plane"] += [eval((img_name.split("_zheigth")[1]).split(".")[0])]
+        self.variables["Well coords"] += [(img_name.split("_well")[1]).split("_zheigth")[0]]
+        self.variables["Acquisition number"] += [eval((img_name.split("_n")[1]).split("_well")[0])]
 
         return [f_k, sum_]
 
-    def Spectral_moments(self, img):
+    def Spectral_moments(self, img, img_name):
         """
         Our implementation of the Spectral Moments autofocus metric
         Firestone, L. et al (1991). Comparison of autofocus methods for automated
@@ -104,7 +113,10 @@ class AutoFocus:
 
         key = "Spectral Moments"
         self.variables["Metrics"] = key
-        self.variables["Img_ID"] = self.num
+        self.variables["Img_ID"] += [img_name]
+        self.variables["Z plane"] += [eval((img_name.split("_zheigth")[1]).split(".")[0])]
+        self.variables["Well coords"] += [(img_name.split("_well")[1]).split("_zheigth")[0]]
+        self.variables["Acquisition number"] += [eval((img_name.split("_n")[1]).split("_well")[0])]
 
         self.variables[key] = res
 
@@ -118,7 +130,7 @@ class AutoFocus:
         # Extract the power spectrum tail
         return summed_power[1][summed_power[0] > power_threshold * summed_power[0].max()]
 
-    def Psw_mean(self, img, power_threshold=0.02):
+    def Psw_mean(self, img, img_name, power_threshold=0.02):
         """
         Run the image quality analysis on the power spectrum
         """
@@ -127,9 +139,12 @@ class AutoFocus:
         key = "Psm mean"
         self.variables["Metrics"] = key
         self.variables[key] = mean
-        self.variables["Img_ID"] = self.num
+        self.variables["Img_ID"] += [img_name]
+        self.variables["Z plane"] += [eval((img_name.split("_zheigth")[1]).split(".")[0])]
+        self.variables["Well coords"] += [(img_name.split("_well")[1]).split("_zheigth")[0]]
+        self.variables["Acquisition number"] += [eval((img_name.split("_n")[1]).split("_well")[0])]
 
-    def Psw_std(self, img, power_threshold=0.02):
+    def Psw_std(self, img, power_threshold=0.02, img_name=None):
         """
         Run the image quality analysis on the power spectrum
         """
@@ -138,16 +153,34 @@ class AutoFocus:
         key = "Psm std"
         self.variables["Metrics"] = key
         self.variables[key] = mean
-        self.variables["Img_ID"] = self.num
+        self.variables["Img_ID"] += [img_name]
+        self.variables["Z plane"] += [eval((img_name.split("_zheigth")[1]).split(".")[0])]
+        self.variables["Well coords"] += [(img_name.split("_well")[1]).split("_zheigth")[0]]
+        self.variables["Acquisition number"] += [eval((img_name.split("_n")[1]).split("_well")[0])]
 
-    def Psw_meanbin(self, img, power_threshold=0.02):
+    def Psw_meanbin(self, img, power_threshold=0.02, img_name=None):
         mean_bin = np.mean(self.power_spectrum(img, power_threshold=power_threshold)[0:5])
         key = "Psm meanbin"
         self.variables["Metrics"] = key
         self.variables[key] = mean_bin
-        self.variables["Img_ID"] = self.num
+        self.variables["Img_ID"] += [img_name]
+        self.variables["Z plane"] += [eval((img_name.split("_zheigth")[1]).split(".")[0])]
+        self.variables["Well coords"] += [(img_name.split("_well")[1]).split("_zheigth")[0]]
+        self.variables["Acquisition number"] += [eval((img_name.split("_n")[1]).split("_well")[0])]
 
     def combinatorial(self):
         # Combine INvsStd and Entropy for noise and fine detail?
-
         pass
+
+    def turn2dt(self):
+        dt = pd.DataFrame(self.variables)
+        self.variables = dt
+        return dt
+
+    def save2DT_excel(self, directory, dt):
+        dt.to_csv(os.path.join(os.getcwd(), "well_plate_data"))
+
+
+if __name__ == '__main__':
+    autofocus = AutoFocus()
+    print("Before update: " + str(dir(autofocus)))
