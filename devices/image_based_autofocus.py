@@ -178,7 +178,7 @@ class AutoFocus:
         return dt
 
     def save2DT_excel(self, directory, dt):
-        dt.to_csv(os.path.join(os.getcwd(), "well_plate_data"))
+        dt.to_csv(os.path.join(directory, "well_plate_data.csv"))
 
 
 if __name__ == '__main__':

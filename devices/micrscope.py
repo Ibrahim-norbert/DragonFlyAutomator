@@ -25,7 +25,7 @@ class Microscope(FusionApi):
         self.path_options = [x["Name"] for x in self.current_output if x is not None]
         logging.log(level=10, msg="The next path destinations of microscope: {}".format(self.path_options))
 
-        # Get it once
+        # Used only in test phase
         self.test_state = {x: {"Value": y["Value"]} for x, y in
                            zip(self.path_options, self.current_output)}
 
@@ -48,18 +48,11 @@ class Microscope(FusionApi):
                                                                                                                     ",")
 
     def get_current_z(self):
-        if self.test is False:
-            state = self.get_state()
-            z = eval(state["referencezposition"]["Value"].replace(",", "."))
-            state["referencezposition"]["Value"] = z
-            logger.log(level=20, msg="Current Z: {}".format(z))
-            return state, z
-        else:
-            state = self.get_state()
-            z = eval(state["referencezposition"]["Value"].replace(",", "."))
-            state["referencezposition"]["Value"] = z
-            logger.log(level=20, msg="Current Z: {}".format(z))
-            return state, z
+        state = self.get_state()
+        z = eval(state["referencezposition"]["Value"].replace(",", "."))
+        state["referencezposition"]["Value"] = z
+        logger.log(level=20, msg="Current Z: {}".format(z))
+        return state, z
 
     def move_z_axis(self, z_increment=None, state=None, new_z_height=None):
         if state["driftstabilisationactive"]["Value"] == "False":

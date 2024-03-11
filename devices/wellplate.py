@@ -200,15 +200,15 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    ###Predict well cords from corners
+    # Predict well cords from corners
     wellplate.predict_well_coords(args.columns, args.rows)
 
     print("After update: " + str(wellplate.__dict__))
 
-    ###Save the attributes
+    # Save the attributes
     wellplate.save_attributes2json(partnumber="12345", manufacturer="Falcon")
 
-    ###Test if wellplate can load attributes
+    # Test if wellplate can load attributes
 
     wellplate2 = WellPlate()
 
