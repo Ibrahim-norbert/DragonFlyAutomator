@@ -188,7 +188,7 @@ class XYZStage(FusionApi):
             return state_dict
 
 
-if __name__ == '__main__':
+def main():
     import argparse
 
     parser = argparse.ArgumentParser(description='train a phase registration model')
@@ -214,3 +214,7 @@ if __name__ == '__main__':
         out = instance_xyz_Stage.enter_coords(x_, y_, instance_xyz_Stage.get_state())
         if args.update is True:
             instance_xyz_Stage.update_state(state_dict=out, analoguecontrol_bool=args.analoguecontrol)
+
+
+if __name__ == '__main__':
+    main()

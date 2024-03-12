@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 logger.info("This log message is from {}.py".format(__name__))
 logging.info("Directory: {}".format(os.getcwd()))
 
+
 # TODO Test the script
 
 class BackgroundMainWindow(QMainWindow):

@@ -7,7 +7,8 @@ logger = logging.getLogger(__name__)
 logger.info("This log message is from {}.py".format(__name__))
 
 
-# TODO perform testing and maek explicit the methods that return all coordinates or well by well
+# TODO perform testing and maek explicit the methods that returns all coordinates or well by well
+# TODO create function that calibrates homography matrix
 
 def linearspacing(topright, topleft, bottomright, bottomleft, c_n, r_n):
     length = np.linalg.norm(topleft - topright)
@@ -29,9 +30,9 @@ def linearspacing(topright, topleft, bottomright, bottomleft, c_n, r_n):
 
     vectors = [x.tolist() for x in vectors]
 
-    well_names = sum([[str(r + 1) + " " + str(c + 1) for c in range(c_n)] for r in range(r_n)], [])
+    wellcoords_key = sum([[str(r + 1) + "-" + str(c + 1) for c in range(c_n)] for r in range(r_n)], [])
 
-    return vectors, well_names, length, height, x_spacing, y_spacing
+    return vectors, wellcoords_key, length, height, x_spacing, y_spacing
 
 
 def linearcorrectionmatrix(topright, topleft, bottomright, bottomleft, c_n, r_n):
@@ -61,7 +62,7 @@ def linearcorrectionmatrix(topright, topleft, bottomright, bottomleft, c_n, r_n)
 
     logging.log(level=20, msg="The resulting vectors: {}".format(vectors))
 
-    well_names = sum([[str(r) + " " + str(c + 1) for c in range(c_n)] for r in range(r_n)], [])
+    wellcoords_key = sum([[str(r) + "-" + str(c + 1) for c in range(c_n)] for r in range(r_n)], [])
 
     x_spacing = np.abs(vectors[int(c_n / 2)][0] - vectors[int(c_n / 2) + 1][0])
     y_spacing = np.abs(vectors[c_n * 2][1] - vectors[(c_n * 2) + 1][1])
@@ -69,19 +70,19 @@ def linearcorrectionmatrix(topright, topleft, bottomright, bottomleft, c_n, r_n)
     length = np.linalg.norm(topleft - topright)
     height = np.linalg.norm(topleft - bottomleft)
 
-    return vectors, well_names, length, height, x_spacing, y_spacing
+    return vectors, wellcoords_key, length, height, x_spacing, y_spacing
 
 
-def homography_matrix_estimation(method, vectors, well_names):
+def homography_matrix_estimation(method, vectors, wellcoords_key):
     # Use this to associate a homography matrix to a wellplate
 
     print("Learning the homography matrix using {} to map from well plate row and column arrangement "
           "to xzy-stage coordinate space".format(method))
 
     # Define source and destination coordinates
-    well_names = [[int(x.split(" ")[0]), int(x.split(" ")[1])] for x in well_names]
+    wellcoords = [[int(x.split("-")[0]), int(x.split("-")[1])] for x in wellcoords_key]
 
-    pts_src = np.array(well_names, dtype=np.float32)
+    pts_src = np.array(wellcoords, dtype=np.float32)
     pts_dst = np.array(vectors, dtype=np.float32)
 
     if method == "non-linear":

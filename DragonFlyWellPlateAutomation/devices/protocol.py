@@ -2,9 +2,10 @@ import glob
 import logging
 import os
 import shutil
+import time
 
 from imaris_ims_file_reader.ims import ims
-
+import json
 from DragonFlyWellPlateAutomation.RestAPI import fusionrest
 from image_based_autofocus import AutoFocus
 from micrscope import Microscope
@@ -14,12 +15,16 @@ logger = logging.getLogger(__name__)
 logger.info("This log message is from {}.py".format(__name__))
 
 
+# TODO Need to move all files to the discarded folder and perform the focal plane acquisition in the root directory
 class Protocol(FusionApi):
-    def __init__(self):
+    def __init__(self, img_dir):
         super().__init__()  # inherits
 
         self.endpoint = self.endpoint + "/{}".format("protocol")
+
+        # TODO Calibrate starting z position using fusion, then use the autofocus
         self.autofocus = AutoFocus()
+        self.autofocus_algorithm = None
         self.microscope = Microscope()
 
         if self.test is False:
@@ -32,8 +37,8 @@ class Protocol(FusionApi):
         # For z-stack algorithm
         self.z_increment = None
         self.n_acquisitions = None
-        self.image_dir = None  # os.path.join(os.getcwd(), "test_rn")
-        self.img_name_dict, _ = self.get_image_dir()
+        self.image_dir = img_dir  # os.path.join(os.getcwd(), "test_rn")
+        self.img_name_dict = self.get_image_dir()
 
         # Only for live image acquisition method
         self.image_name = None  # "Phalloidin_Hoechst_GfP_HeLa"
@@ -59,7 +64,7 @@ class Protocol(FusionApi):
         else:
             f = open(os.path.join(os.getcwd(), "endpoint_outputs", "dataset.json"))
             img_name_dict = json.load(f)
-            return img_name_dict, os.path.split(img_name_dict["Path"])[0]
+            return img_name_dict
 
     def change_image_name(self, image_name):
 
@@ -75,26 +80,29 @@ class Protocol(FusionApi):
             logger.log(level=20, msg="New image path: {}".format(self.img_name_dict["Path"]))
             update(self.endpoint + "/{}".format("filename"), self.img_name_dict)
 
-    def well_folder(self, wellcoords):
-        well_dir = os.path.join(self.image_dir, "well_{}".format(wellcoords))
+    def well_folder(self, wellname):
+        well_dir = os.path.join(self.image_dir, "well_{}".format(wellname))
         if not os.path.exists(well_dir):
             os.mkdir(well_dir)
         return well_dir
 
-    def z_stack(self, well_coord="0 0", z_increment=5, n_acquisitions=10):
+    def z_stack(self, wellname="0 0", z_increment=5, n_acquisitions=10):
+
+        logger.log(level=20, msg="Z stack begins for well: {}".format(wellname))
 
         # Maximum z plane displacement
         height = z_increment * n_acquisitions
         logger.log(level=20,
-                   msg="Height travelled in total {} mm. Please determine from current position that this "
+                   msg="Total height to travel {} mm. Please determine from current position that this "
                        "is safe".format(height))
 
         # Get well folder
-        well_coord = well_coord.replace(" ", "-")
-        well_dir = self.well_folder(wellcoords=well_coord)
+        well_dir = self.well_folder(wellname=wellname)
 
         if self.test is False:
             for i in range(n_acquisitions):
+                logger.log(level=20, msg="Acquisition number {} of well {}".format(i + 1, wellname))
+
                 # Request current z position
                 state, _ = self.microscope.get_current_z()
 
@@ -103,7 +111,7 @@ class Protocol(FusionApi):
 
                 # Request path change for saving images
                 self.change_image_name(image_name=os.path.join(well_dir, "rawtake_n{}_well{}_zheigth{}".
-                                                               format(i + 1, well_coord, int(z))))
+                                                               format(i + 1, wellname, int(z))))
 
                 # Request image acquisition
                 fusionrest.run_protocol_completely("Protocol 59")
@@ -113,20 +121,33 @@ class Protocol(FusionApi):
                 state, _ = self.microscope.get_current_z()
                 z = self.microscope.move_z_axis(z_increment)
                 self.change_image_name(image_name=os.path.join(well_dir, "rawtake_n{}_well{}_zheigth{}".
-                                                               format(i + 1, well_coord, int(z))))
+                                                               format(i + 1, wellname, int(z))))
 
                 shutil.copy2(paths[i], self.img_name_dict["Path"])
                 self.run_protocol()
 
-        return well_dir, wellcoord
+        # Return to original height
+        logger.log(level=20, msg="Z stack done for well and returning to original z height: {}".format(wellname))
+        self.microscope.return2start_z()
 
-    def autofocusing(self, well_dir, autofocus_algorithm):
+        return well_dir, wellname
+
+    def autofocusing(self, wellname):
+
+        # TODO Turn well plate coordinates into actual A-1 coordinates
+
+        logger.log(level=20, msg="Autofocus begins for well: {}".format(wellname))
+
+        start = time.time()
+
+        # Get well folder
+        well_dir, wellname = self.z_stack(wellname, self.z_increment, self.n_acquisitions)
 
         # Get all recent z stack acquisitions
         img_paths = glob.glob(os.path.join(well_dir, "*.ims"))
 
         # Get autofocus algorithm
-        func = getattr(self.autofocus, autofocus_algorithm)
+        func = getattr(self.autofocus, self.autofocus_algorithm)
 
         # Read .ims images
         if func is not None and callable(func):
@@ -140,11 +161,17 @@ class Protocol(FusionApi):
         self.autofocus.turn2dt()
 
         # Index the best image
-        best_score = self.autofocus.variables[autofocus_algorithm].idxmax()
+        best_score = self.autofocus.variables[self.autofocus_algorithm].idxmax()
 
         # Indicate the best score
         self.autofocus.variables["Estimated f"] = 0
         self.autofocus.variables.at[best_score, "Estimated f"] = 1
+
+        # Index the z height of the best image
+        well_f = self.autofocus.variables[best_score, "Z plane"].tolist()[0]
+
+        # Request update to target z position
+        self.microscope.move_z_axis(new_z_height=well_f)
 
         # Make directory for out of focus images
         if not os.path.exists(os.path.join(well_dir, "discarded")):
@@ -158,31 +185,25 @@ class Protocol(FusionApi):
         [os.replace(x, os.path.join(disc_dir, os.path.basename(x))) for x in img_paths if
          [y for y in discarded_img_ids if y in x]]
 
+        self.autofocus.variables["Elapsed time"] = time.time() - start
+
         # Save dataframe in well directory
         self.autofocus.save2DT_excel(well_dir, self.autofocus.variables)
 
-    def image_acquisition(self, well_coord="0-0"):
-
-        # Index the z height of the best image
-        well_f = self.autofocus.variables[(self.autofocus.variables["Well coords"] == wellcoord) &
-                                          (self.autofocus.variables["Estimated f"] == 1.)]["Z plane"].tolist()[0]
+    def image_acquisition(self, wellname="0-0"):
 
         # Return well folder
-        well_dir = self.well_folder(wellcoords=well_coord)
+        well_dir = self.well_folder(wellname=wellname)
 
         # Request path change for saving images
         self.change_image_name(image_name=os.path.join(well_dir, self.image_name))
-
-        # Request update to target z position
-        self.microscope.move_z_axis(new_z_height=well_f)
 
         # Request image acquisition using currently selected protocol
         self.run_protocol()
 
 
-if __name__ == '__main__':
+def main():
     import argparse
-    import json
 
     parser = argparse.ArgumentParser(description='train a phase registration model')
     parser.add_argument("--img_name", type=str, required=False, help="Enter image name",
@@ -190,8 +211,8 @@ if __name__ == '__main__':
     parser.add_argument("--well_coords", type=str, required=True, help="Enter well coordinates as 0-0 "
                                                                        "instead of A1")
     parser.add_argument("--z_spacing", type=float, required=True, help="Enter z spacing for z-stack")
-    parser.add_argument("--n_acquisitions", type=float, required=True, help="Enter number of acquisitions "
-                                                                            "in z-stack")
+    parser.add_argument("--n_acquisitions", type=int, required=True, help="Enter number of acquisitions "
+                                                                          "in z-stack")
     parser.add_argument("--autofocus_alg", type=str, required=True,
                         help="Choose autofocus algorithm: " + str(AutoFocus().metrics))
     parser.add_argument("--image_dir", type=str, required=True, help="Enter the image directory path")
@@ -204,11 +225,14 @@ if __name__ == '__main__':
     n_aqcuisitions = args.n_acquisitions
     autofocus_alg = args.autofocus_alg
 
-    protocol = Protocol()
+    protocol = Protocol(args.image_dir)
 
     print("This is a test run, no change in state of the microscope is performed.")
 
     protocol.test = True
+
+    protocol.image_name = imagename
+    protocol.autofocus_algorithm = autofocus_alg
 
     logger.log(level=20, msg="Current Protocol: {}".format(protocol.get_state()))
 
@@ -220,10 +244,14 @@ if __name__ == '__main__':
     logger.log(level=20, msg="New state: {}".format(protocol.get_state()))
 
     logger.log(level=20, msg="Z stacking is on")
-    welldir, wellcoord = protocol.z_stack(well_coord=wellcoord, z_increment=z_spacing, n_acquisitions=n_aqcuisitions)
+    welldir, wellcoord = protocol.z_stack(wellname=wellcoord, z_increment=z_spacing, n_acquisitions=n_aqcuisitions)
 
     logger.log(level=20, msg="Autofocusing is on")
-    protocol.autofocusing(welldir, autofocus_algorithm=autofocus_alg)
+    protocol.autofocusing(wellcoord)
 
     logger.log(level=20, msg="image acquisition is on")
     protocol.image_acquisition(wellcoord)
+
+
+if __name__ == '__main__':
+    main()

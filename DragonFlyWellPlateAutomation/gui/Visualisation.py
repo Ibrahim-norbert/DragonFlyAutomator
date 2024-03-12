@@ -1,11 +1,14 @@
 import matplotlib
 import numpy as np
 from PyQt6.QtCore import QTimer
+from PyQt6.QtGui import QPixmap, QImage
 from PyQt6.QtWidgets import QApplication, QVBoxLayout, QWidget, QHBoxLayout, QPushButton
 import logging
 import sys
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib import pyplot as plt
+
+from DragonFlyWellPlateAutomation.gui.helperfunctions import create_colored_label
 
 matplotlib.use("QtAgg")
 logger = logging.getLogger(__name__)
@@ -42,12 +45,21 @@ class CoordinatePlot(QWidget):
         # We need to store a reference to the plotted line
         # somewhere, so we can apply the new data to it.
 
+        self.image_array = None
         self.protocol = protocol
         self.data = None
         self.doneplotting = True
         self.canvas = MplCanvas()
-        main_layout = QVBoxLayout(self)
+
+        layout1 = QVBoxLayout(self)  # TODO Label should display all current logs relating to autofocus and xyz stage
+        self.text_display = create_colored_label(" ", self)
+        self.img_display = QPixmap()
+        layout1.addWidget(self.text_display)
+        layout1.addWidget(self.img_display)
+
+        main_layout = QHBoxLayout(self)
         main_layout.addWidget(self.canvas)
+
         self.setLayout(main_layout)
 
         self.stacked_widget = stacked_widget
@@ -72,7 +84,7 @@ class CoordinatePlot(QWidget):
                                   self.well_plate.corners_coords[2][1] + (self.well_plate.corners_coords[2][1] * 0.1))
 
         x_values = list(range(1, 25))
-        y_values = [x for x in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[:self.well_plate.r_n]]
+        y_values = [x for x in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[:self.well_plate.r_]]
 
         self.canvas.axes.set_xticks(
             np.linspace(self.well_plate.corners_coords[0][0], self.well_plate.corners_coords[1][0],
@@ -91,7 +103,17 @@ class CoordinatePlot(QWidget):
 
         self.timer.start(1000)
 
-    def drawcoordinate(self, vector, coords):
+    def display_img_from_array(self):
+
+        # Convert NumPy array to QImage
+        height, width, channel = self.image_array.shape
+        bytes_per_line = 3 * width
+        self.img_display.fromImage(QImage(self.image_array.data, width, height, bytes_per_line, QImage.Format_RGB888))
+
+    def display_text_updates(self):
+        self.text_display.setText()
+
+    def drawcoordinate(self, vector, wellname):
         try:
             self.canvas.x += [vector[0]]
             self.canvas.y += [vector[1]]
@@ -100,7 +122,7 @@ class CoordinatePlot(QWidget):
             self.canvas.draw()
 
             logger.log(level=20,
-                       msg="Wells that have been selected: {} and their coordinates {}".format(coords,
+                       msg="Wells that have been selected: {} and their coordinates {}".format(wellname,
 
                                                                                                vector))
         except Exception as e:
@@ -115,38 +137,46 @@ class CoordinatePlot(QWidget):
         """Updates the scatterplot using the QTimer events."""
 
         # Only proceeds if data exists and DragonFly has completed a process
-        if self.data and self.DF_notengaged is True:
+        if self.well_plate.selected_wells and self.DF_notengaged is True:
 
             # Start DragonFly process
             self.DF_notengaged = False
-            state_dict, coords = next(iter(self.data))
+            state_dict, coords, wellname = next(iter(self.well_plate.selected_wells))
 
             # Draw graph only when xyz-stage has arrived at well
             if self.well_plate.move2coord(state_dict) is False:  # Delay
 
-                # Get protocol from GUI PRotocol ?
-                # Obtain images of well content
-                self.protocol.image_acquisition(wellcoord=coords)  # Delay
+                # TODO a) To check quality of current session: compare linearspacing coordinates to linear correction matrix
+                # TODO b) To check quality between current and subsequent session: compare current session to homography prediction
+                # TODO c) To check quality of subsequent session: compare Homography with nonlinear correction and Homography calibration
 
                 vector = self.well_plate.state_dict_2_vector(state_dict)
 
-                self.drawcoordinate(vector, coords)
+                self.drawcoordinate(vector, wellname)
+
+                # Perform autofocus
+                self.protocol.autofocusing(wellname=wellname)  # Significant delay
+
+                # Obtain image with current protocol
+                self.protocol.image_acquisition(wellname=wellname)  # Delay
 
                 # Once data has been processed, we remove it
-                self.data.remove((state_dict, coords))
+                self.data.remove((state_dict, coords, wellname))
 
                 # End DragonFly process
                 self.DF_notengaged = True
 
             # Maybe add text object above coordinate point indicating the xyz stage cartesian coordinate
-        elif not self.data:
+        elif not self.well_plate.selected_wells:
             self.timer.stop()
+            logger.log(level=20, msg="All wells have been dealt with. The associated variables have been saved.")
             self.protocol.autofocus.save2DT_excel()
-            self.stacked_widget.switch2WPsavewindow()
-            logger.log(level=20, msg="Switch to save window")
+            sys.exit()
+            # logger.log(level=20, msg="Switch to save window")
 
 
 if __name__ == '__main__':
+    # TODO Correct this
     app = QApplication(sys.argv)
     # Update the canvas with new data
     wellplate2 = WellPlate()

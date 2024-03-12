@@ -7,12 +7,12 @@ from helperfunctions import create_colored_label
 # TODO Test the script and add a widget that informs operator to select the protocol needed
 
 class GUIProtocol(QWidget):
-    def __init__(self, stacked_widget):
+    def __init__(self, stacked_widget, img_dir):
         super().__init__()
 
         self.wellcords = None
         self.stacked_widget = stacked_widget
-        self.protocol = Protocol()
+        self.protocol = Protocol(img_dir=img_dir)
 
         z_stack_layout_0 = QVBoxLayout()
         self.img_name = QLineEdit(parent=self)
@@ -60,8 +60,8 @@ class GUIProtocol(QWidget):
             self.z_height_travelled.setText("Z position starts at {} and will end at {}.\n"
                                             "<font color='red'>Please confirm that the objective will "
                                             "not crash into the well plate.</font>".format
-                                            (self.protocol.microscope.current_z_height()[-1],
-                                             self.protocol.microscope.current_z_height()[-1] +
+                                            (self.protocol.microscope.starting_z_height()[-1],
+                                             self.protocol.microscope.starting_z_height()[-1] +
                                              (n_acquisitions * z_increment)))
 
             # Assign the acquisition number and z increment to protocol instance
@@ -71,11 +71,13 @@ class GUIProtocol(QWidget):
             # Assign image name
             self.protocol.image_name = self.img_name
 
+            # Assign chosen algorithm
+            self.protocol.autofocus_algorithm = self.dropdown.currentText()
+
         else:
             self.z_height_travelled.setText("<font color='red'>Both entries must be integers or floats.</font>")
 
     def run_automated_acquisition(self):
 
         if self.protocol.n_acquisitions is not None and self.protocol.z_increment is not None:
-            self.protocol.autofocus.alg = getattr(self.protocol.autofocus, self.dropdown.currentText())
             self.stacked_widget.switch2WPrtplotter()

@@ -29,7 +29,7 @@ class Microscope(FusionApi):
         self.test_state = {x: {"Value": y["Value"]} for x, y in
                            zip(self.path_options, self.current_output)}
 
-        self.current_z_height = self.get_current_z()
+        self.starting_z_height = self.get_current_z()
 
     def get_state(self):
         if self.test is False:
@@ -55,6 +55,8 @@ class Microscope(FusionApi):
         return state, z
 
     def move_z_axis(self, z_increment=None, new_z_height=None):
+
+        logger.log(level=20, msg="Moving z axis")
 
         state, z = self.get_current_z()
 
@@ -85,8 +87,12 @@ class Microscope(FusionApi):
 
             return state["referencezposition"]["Value"]
 
+    def return2start_z(self):
 
-if __name__ == '__main__':
+        self.move_z_axis(new_z_height=self.starting_z_height)
+
+
+def main():
     import argparse
 
     parser = argparse.ArgumentParser(description='Testing microscope stage for movement of z stage')
@@ -113,3 +119,7 @@ if __name__ == '__main__':
     # Move stage to new z height
     microscope.move_z_axis(new_z_height=args.z_height)
     logger.log(level=20, msg="Move z height from {} to {}".format(z, microscope.get_current_z()))
+
+
+if __name__ == '__main__':
+    main()

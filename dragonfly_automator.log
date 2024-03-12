@@ -1,2 +1,44 @@
-2024-03-11 13:56:19,525 - INFO - This log message is from RestAPI.fusionrest
-2024-03-11 13:56:19,525 - INFO - This log message is from __main__.py
+2024-03-12 10:20:16,885 - INFO - This log message is from DragonFlyWellPlateAutomation.RestAPI.fusionrest
+2024-03-12 10:20:17,021 - INFO - This log message is from xyzstage.py
+2024-03-12 10:20:17,021 - INFO - This log message is from micrscope.py
+2024-03-12 10:20:17,021 - INFO - This log message is from __main__.py
+2024-03-12 10:20:17,022 - INFO - Current Z: 487.42
+2024-03-12 10:20:17,022 - INFO - Current Protocol: {'Path': 'D:\\PikaSpheroids\\2024-02-19\\H2B_H33342_250_25min_2024-02-19.ims', 'Id': 'd3138d7e-3ad4-4004-83c1-be9cc859d8ca'}
+2024-03-12 10:20:17,022 - INFO - Change name of image taken
+2024-03-12 10:20:17,022 - INFO - Protocol set to running
+2024-03-12 10:20:17,022 - INFO - Running protocol: dict_values(['D:\\PikaSpheroids\\2024-02-19\\H2B_H33342_250_25min_2024-02-19.ims', 'd3138d7e-3ad4-4004-83c1-be9cc859d8ca'])
+2024-03-12 10:20:17,022 - INFO - New state: {'Path': 'D:\\PikaSpheroids\\2024-02-19\\H2B_H33342_250_25min_2024-02-19.ims', 'Id': 'd3138d7e-3ad4-4004-83c1-be9cc859d8ca'}
+2024-03-12 10:20:17,022 - INFO - Z stacking is on
+2024-03-12 10:20:17,022 - INFO - Height travelled in total 25.0 mm. Please determine from current position that this is safe
+2024-03-12 10:20:17,023 - INFO - Current Z: 487.42
+2024-03-12 10:20:17,023 - INFO - Current Z: 487.42
+2024-03-12 10:20:17,023 - INFO - Updated referencezposition from 487.42 to 482.42
+2024-03-12 10:20:17,023 - INFO - Current Z: 482.42
+2024-03-12 10:20:17,024 - INFO - Running protocol: dict_values(['D:\\PikaSpheroids\\2024-02-19\\H2B_H33342_250_25min_2024-02-19.ims', 'd3138d7e-3ad4-4004-83c1-be9cc859d8ca'])
+2024-03-12 10:20:17,024 - INFO - Current Z: 482.42
+2024-03-12 10:20:17,025 - INFO - Current Z: 482.42
+2024-03-12 10:20:17,025 - INFO - Updated referencezposition from 482.42 to 477.42
+2024-03-12 10:20:17,025 - INFO - Current Z: 477.42
+2024-03-12 10:20:17,026 - INFO - Running protocol: dict_values(['D:\\PikaSpheroids\\2024-02-19\\H2B_H33342_250_25min_2024-02-19.ims', 'd3138d7e-3ad4-4004-83c1-be9cc859d8ca'])
+2024-03-12 10:20:17,026 - INFO - Current Z: 477.42
+2024-03-12 10:20:17,026 - INFO - Current Z: 477.42
+2024-03-12 10:20:17,026 - INFO - Updated referencezposition from 477.42 to 472.42
+2024-03-12 10:20:17,026 - INFO - Current Z: 472.42
+2024-03-12 10:20:17,027 - INFO - Running protocol: dict_values(['D:\\PikaSpheroids\\2024-02-19\\H2B_H33342_250_25min_2024-02-19.ims', 'd3138d7e-3ad4-4004-83c1-be9cc859d8ca'])
+2024-03-12 10:20:17,027 - INFO - Current Z: 472.42
+2024-03-12 10:20:17,027 - INFO - Current Z: 472.42
+2024-03-12 10:20:17,027 - INFO - Updated referencezposition from 472.42 to 467.42
+2024-03-12 10:20:17,027 - INFO - Current Z: 467.42
+2024-03-12 10:20:17,029 - INFO - Running protocol: dict_values(['D:\\PikaSpheroids\\2024-02-19\\H2B_H33342_250_25min_2024-02-19.ims', 'd3138d7e-3ad4-4004-83c1-be9cc859d8ca'])
+2024-03-12 10:20:17,029 - INFO - Current Z: 467.42
+2024-03-12 10:20:17,029 - INFO - Current Z: 467.42
+2024-03-12 10:20:17,029 - INFO - Updated referencezposition from 467.42 to 462.42
+2024-03-12 10:20:17,029 - INFO - Current Z: 462.42
+2024-03-12 10:20:17,030 - INFO - Running protocol: dict_values(['D:\\PikaSpheroids\\2024-02-19\\H2B_H33342_250_25min_2024-02-19.ims', 'd3138d7e-3ad4-4004-83c1-be9cc859d8ca'])
+2024-03-12 10:20:17,030 - INFO - Autofocusing is on
+2024-03-12 10:20:17,065 - INFO - Image quality metric applied to all z-stack images
+2024-03-12 10:20:17,069 - INFO - image acquisition is on
+2024-03-12 10:20:17,070 - INFO - Current Z: 462.42
+2024-03-12 10:20:17,070 - INFO - Updated referencezposition from 462.42 to 482.0
+2024-03-12 10:20:17,070 - INFO - Current Z: 482.0
+2024-03-12 10:20:17,071 - INFO - Running protocol: dict_values(['D:\\PikaSpheroids\\2024-02-19\\H2B_H33342_250_25min_2024-02-19.ims', 'd3138d7e-3ad4-4004-83c1-be9cc859d8ca'])

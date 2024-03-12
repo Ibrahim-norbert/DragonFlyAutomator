@@ -2,7 +2,9 @@ import logging
 import os
 import sys
 from time import sleep
+
 import numpy as np
+
 import CoordinateTransforms as CT
 from xyzstage import XYZStage
 
@@ -66,6 +68,12 @@ class WellPlate(XYZStage):
             print(f"An unexpected error occurred: {e}")
             logging.exception("State dict might be None", exc_info=True)
 
+    def createwellplatestatedict(self, wellcoords_key, vectors):
+
+        all_well_dicts = {wellcoords_key: self.vector_2_state_dict(vector) for wellcoords_key,
+        vector in zip(wellcoords_key, vectors)}
+        return all_well_dicts
+
     def set_parameters(self, well_names, vectors,
                        r_n, c_n, length, height, x_spacing, y_spacing, algorithm_CF, algorithm_H):
 
@@ -77,7 +85,7 @@ class WellPlate(XYZStage):
         self.homography_matrix_algorithm = algorithm_H
         self.r_n = r_n
         self.c_n = c_n
-        self.all_well_dicts = self.list_well_state_dict_2dict(well_names, vectors)
+        self.all_well_dicts = self.createwellplatestatedict(well_names, vectors)
         self.length = length
         self.height = height
         self.xspacing = x_spacing
@@ -118,11 +126,11 @@ class WellPlate(XYZStage):
 
         return vectors, well_names, length, height, x_spacing
 
-    def list_well_state_dict_2dict(self, well_names, vectors):
-
-        all_well_dicts = {well_name: self.vector_2_state_dict(vector) for well_name, vector in zip(well_names,
-                                                                                                   vectors)}
-        return all_well_dicts
+    def mapwellintegercoords2alphabet(self, wellcoords_key):
+        r_str, c_str = wellcoords_key.split("-")
+        r, c = int(r_str), int(c_str)
+        label = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".upper()[r] + c_str
+        return label, r_str, c_str, r, c
 
     def move2coord(self, state_dict):
 
