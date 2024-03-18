@@ -4,7 +4,7 @@ import os
 import numpy as np
 from DragonFlyWellPlateAutomation.RestAPI import fusionrest
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("DragonFlyWellPlateAutomation.RestAPI.fusionrest")
 logger.info("This log message is from {}.py".format(__name__))
 
 

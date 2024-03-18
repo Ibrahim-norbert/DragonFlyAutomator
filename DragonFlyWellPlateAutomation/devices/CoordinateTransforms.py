@@ -3,12 +3,9 @@ import logging
 import cv2 as cv
 import numpy as np
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("DragonFlyWellPlateAutomation.RestAPI.fusionrest")
 logger.info("This log message is from {}.py".format(__name__))
 
-
-# TODO perform testing and maek explicit the methods that returns all coordinates or well by well
-# TODO create function that calibrates homography matrix
 
 def linearspacing(topright, topleft, bottomright, bottomleft, c_n, r_n):
     length = np.linalg.norm(topleft - topright)
@@ -18,8 +15,8 @@ def linearspacing(topright, topleft, bottomright, bottomleft, c_n, r_n):
     x_coord, x_spacing = np.linspace(topleft[0], topright[0], c_n, retstep=True)
     y_coord, y_spacing = np.linspace(topleft[1], bottomleft[1], r_n, retstep=True)
 
-    logging.log(level=20, msg="Well plate dimension: length - {}, height - {}".format(length, height))
-    logging.log(level=20, msg="Computed well spacing: x:spacing = {} and y_spacing = {}".format(
+    logger.log(level=20, msg="Well plate dimension: length - {}, height - {}".format(length, height))
+    logger.log(level=20, msg="Computed well spacing: x:spacing = {} and y_spacing = {}".format(
         x_spacing, y_spacing))
 
     xv, yv = np.meshgrid(x_coord, y_coord)
@@ -47,20 +44,20 @@ def linearcorrectionmatrix(topright, topleft, bottomright, bottomleft, c_n, r_n)
                     [corx[1], cory[1], 0],
                     [0, 0, 0]))
 
-    logging.log(level=20, msg="The correction matrix: {}".format(cor))
+    logger.log(level=20, msg="The correction matrix: {}".format(cor))
 
     blpred = np.dot(cor, np.array(((c_n - 1), (r_n - 1), 0)))  # predicted position of bl based on tl and br
-    logging.log(level=20, msg="The bottom left well coordinate prediction: {}".format(blpred))
+    logger.log(level=20, msg="The bottom left well coordinate prediction: {}".format(blpred))
 
     fixit = (np.append(bottomleft, 0) - blpred) / float((c_n - 1) * (r_n - 1))  # this is the correction based on bl
-    logging.log(level=20, msg="The non linear prediction: {}".format(fixit))
+    logger.log(level=20, msg="The non linear prediction: {}".format(fixit))
     # x = numbers i.e. columns
     # y = letters i.e. rows
     vectors = sum(
         [[(np.dot(cor, np.array(np.array((c, r, 0)))) + fixit * (c * r)) + np.append(topright, 0) for c in
-          range(c_n)] for r in range(r_n)], [])
+          range(1, c_n + 1)] for r in range(1, r_n + 1)], [])
 
-    logging.log(level=20, msg="The resulting vectors: {}".format(vectors))
+    logger.log(level=20, msg="The resulting vectors: {}".format(vectors))
 
     wellcoords_key = sum([[str(r) + "-" + str(c + 1) for c in range(c_n)] for r in range(r_n)], [])
 
@@ -85,11 +82,11 @@ def homography_matrix_estimation(method, vectors, wellcoords_key):
     pts_src = np.array(wellcoords, dtype=np.float32)
     pts_dst = np.array(vectors, dtype=np.float32)
 
-    if method == "non-linear":
+    if method == "Levenberg-Marquardt":
 
         H = cv.findHomography(pts_src, pts_dst)[0]
 
-    else:
+    elif method == "SVD":
         # Construct matrix A
         A = []
         for i in range(len(pts_src)):
@@ -108,3 +105,12 @@ def homography_matrix_estimation(method, vectors, wellcoords_key):
         H /= H[2, 2]
 
     return H
+
+
+def homography_application(homography, c, r):
+    return np.dot(homography, np.array(np.array((c, r, 0))))
+
+
+def homography_fixit_calibration(blpred, bl, homography, c, r, c_n, r_n):
+    fixit = (np.append(bl, 0) - np.append(blpred, 0)) / float((c_n - 1) * (r_n - 1))
+    return homography_application(homography, c, r) + fixit

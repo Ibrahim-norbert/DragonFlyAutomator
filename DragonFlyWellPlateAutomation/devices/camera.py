@@ -14,7 +14,7 @@ class EMCCD2(FusionApi):
         super().__init__()  # inherits
 
         self.endpoint = self.endpoint + "/{}/{}".format("devices", "ixon-emccd-2")
-        f = open(os.path.join(os.getcwd(), r"../../endpoint_outputs", "ixon-emccd-2.json"))
+        f = open(os.path.join(os.getcwd(), r"../endpoint_outputs", "ixon-emccd-2.json"))
 
         self.current_output = json.load(f)
 

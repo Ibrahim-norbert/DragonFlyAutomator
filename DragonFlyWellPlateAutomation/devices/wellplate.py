@@ -2,13 +2,12 @@ import logging
 import os
 import sys
 from time import sleep
-
 import numpy as np
+import json
+from DragonFlyWellPlateAutomation.devices import CoordinateTransforms as CT
+from .xyzstage import XYZStage, get_output
 
-import CoordinateTransforms as CT
-from xyzstage import XYZStage
-
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("DragonFlyWellPlateAutomation.RestAPI.fusionrest")
 logger.info("This log message is from {}.py".format(__name__))
 
 
@@ -17,6 +16,7 @@ logger.info("This log message is from {}.py".format(__name__))
 class WellPlate(XYZStage):
     def __init__(self):
         super().__init__()
+        self.selected_wells = None
         self.well_plate_req_coords = {"Top left well": {}, "Bottom left well": {}, "Top right well": {}}
         self.corners_coords = None
         self.yspacing = None
@@ -28,12 +28,36 @@ class WellPlate(XYZStage):
         self.c_n = None
         self.r_n = None
         self.homography_matrix_algorithm = None
+        # TODO Add to protocol window
+        self.homography_matrix_algorithms = ["Levenberg-Marquardt", "SVD"]
         self.coordinate_frame_algorithm = None
+        self.coordinate_frame_algorithms = ["Linear spacing", "Linear correction matrix"]
         self.currentwellposition = None
+        self.wellbywell = False
+        self.non_linear_correction = True
+
+    def get_state(self, test_key=None):
+
+        if self.test is False:
+            return {x: get_output(endpoint=self.endpoint + "/{}".format(x)) for x in
+                    self.path_options}
+
+        else:
+            file = os.path.join(os.getcwd(), r"endpoint_outputs",
+                                "{}xposition.json".format(test_key.replace(" well", "_")))
+            f = open(file)
+            x_ = json.load(f)
+            # Opening JSON file
+            file = os.path.join(os.getcwd(), r"endpoint_outputs",
+                                "{}yposition.json".format(test_key.replace(" well", "_")))
+            f = open(file)
+            y_ = json.load(f)
+
+            return {x: [x_, y_, None][id] for id, x in enumerate(self.path_options)}
 
     def state_dict_2_vector(self, state_dict):
-        logging.log(level=10, msg='Value key: {}, Path options: {},'
-                                  'State dictionary: {}'.format(self.value_key, self.path_options, state_dict))
+        logger.log(level=10, msg='Value key: {}, Path options: {},'
+                                 'State dictionary: {}'.format(self.value_key, self.path_options, state_dict))
         return np.array(
             [state_dict[self.path_options[0]][self.value_key], state_dict[self.path_options[1]][self.value_key]])
 
@@ -60,13 +84,13 @@ class WellPlate(XYZStage):
             topright = specified_vectors[0].astype(float)
             bottomright = specified_vectors[3].astype(float)
 
-            logging.log(level=20, msg="Well plate dimension: state dict as vectors {}".format(specified_vectors))
+            logger.log(level=20, msg="Well plate dimension: state dict as vectors {}".format(specified_vectors))
 
             return topleft, bottomleft, topright, bottomright
 
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
-            logging.exception("State dict might be None", exc_info=True)
+            logger.exception("State dict might be None", exc_info=True)
 
     def createwellplatestatedict(self, wellcoords_key, vectors):
 
@@ -94,10 +118,10 @@ class WellPlate(XYZStage):
                                                     (r_n * c_n) - 1]]  # Top left, Top right, Bottom left
         self.homography_matrix = H
 
-        logging.log(level=20, msg="Well plate matrix dimension: rows: {}, columns: {}".format(r_n, c_n))
-        logging.log(level=20, msg="Well plate corner coordinates: {}".format(self.corners_coords))
-        logging.log(level=20, msg="Well plate dimension: length - {}, height - {}".format(length, height))
-        logging.log(level=20, msg="Computed well spacing: x:spacing = {} and y_spacing = {}".format(
+        logger.log(level=20, msg="Well plate matrix dimension: rows: {}, columns: {}".format(r_n, c_n))
+        logger.log(level=20, msg="Well plate corner coordinates: {}".format(self.corners_coords))
+        logger.log(level=20, msg="Well plate dimension: length - {}, height - {}".format(length, height))
+        logger.log(level=20, msg="Computed well spacing: x:spacing = {} and y_spacing = {}".format(
             x_spacing, y_spacing))
 
     def predict_well_coords(self, c_n, r_n, algorithm="linear spacing", algorithm_H="non-linear"):
@@ -106,7 +130,7 @@ class WellPlate(XYZStage):
 
         print("2. Computing coordinate space from well corners using {}".format(algorithm))
 
-        if algorithm == "linear spacing":
+        if algorithm == self.coordinate_frame_algorithms[0]:
             vectors, well_names, length, height, x_spacing, y_spacing = CT.linearspacing(topright, topleft,
                                                                                          bottomright,
                                                                                          bottomleft, c_n=c_n,
@@ -117,7 +141,7 @@ class WellPlate(XYZStage):
                                                                                                   bottomleft,
                                                                                                   c_n=c_n,
                                                                                                   r_n=r_n)
-            algorithm = "linear correction matrix"
+            algorithm = self.coordinate_frame_algorithms[1]
 
         # Save all variables as parameters
         self.set_parameters(well_names, vectors,
@@ -126,11 +150,22 @@ class WellPlate(XYZStage):
 
         return vectors, well_names, length, height, x_spacing
 
+    # TODO Create widget that gives option for mapping
     def mapwellintegercoords2alphabet(self, wellcoords_key):
         r_str, c_str = wellcoords_key.split("-")
         r, c = int(r_str), int(c_str)
         label = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".upper()[r] + c_str
         return label, r_str, c_str, r, c
+
+    # TODO Include widget for mandatory calibration in protocol window
+    def mapwell2xyzstagecoords(self, c, r, non_linear_correction=True):
+        if non_linear_correction is False:
+            xyz_vector = CT.homography_application(self.homography_matrix, c, r)
+        else:
+            blpred = CT.homography_application(self.homography_matrix, 1, self.r_n)
+            xyz_vector = CT.homography_fixit_calibration(blpred, self.bl, self.homography_matrix,
+                                                         c, r, self.c_n, self.r_n)
+        return xyz_vector
 
     def move2coord(self, state_dict):
 
@@ -138,11 +173,12 @@ class WellPlate(XYZStage):
 
         try:
             # Move stage to well
-            # self.update_state(state_dict, analoguecontrol_bool=False)
+            #
             logger.log(level=20, msg="Stage has its position updated")
 
             # Wait until we reach well position
             if self.test is False:
+                self.update_state(state_dict, analoguecontrol_bool=False)
                 count = 0
                 while self.state_dict_2_vector(self.get_state()) != self.state_dict_2_vector(state_dict):
                     logger.log(level=20, msg="Stage is moving to new position")
@@ -153,14 +189,14 @@ class WellPlate(XYZStage):
                     count += 1
                     sleep(1)
             else:
-                length = np.linalg.norm(np.array([0, 0]) - np.array(self.state_dict_2_vector(state_dict)))
-                for i in range(0, int(length), 1000):
-                    logger.log(level=20, msg="Stage is moving to new position")
+                #length = np.linalg.norm(np.array([0, 0]) - np.array(self.state_dict_2_vector(state_dict)))
+                logger.log(level=20, msg="Stage is moving to new position")
+                sleep(10)
 
             logger.log(level=20, msg="Stage has arrived at target position")
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
-            logging.exception("What happened here ", exc_info=True)
+            logger.exception("What happened here ", exc_info=True)
 
     def save_attributes2json(self, partnumber, manufacturer):
 
@@ -176,10 +212,32 @@ class WellPlate(XYZStage):
                                                                                        manufacturer)), 'w') as f:
             json.dump(attributes, f)
 
+    def load_attributes(self, name):
+        f = open(os.path.join(os.getcwd(), "models", '{}'.format(name)))
+        attributes = json.load(f)
+        self.__dict__.update(attributes)
+        self.wellbywell = True
 
-if __name__ == '__main__':
+    def automated_wp_movement(self, selected_wellbuttons):
+        state_dict, coords, wellname = selected_wellbuttons
+
+        # Draw graph only when xyz-stage has arrived at well
+        self.move2coord(state_dict)  # Delay
+
+        # TODO a) To check quality of current session: compare linearspacing coordinates to linear correction matrix
+        # TODO b) To check quality between current and subsequent session: compare current session to homography prediction
+        # TODO c) To check quality of subsequent session: compare Homography with nonlinear correction and Homography calibration
+
+        vector = self.state_dict_2_vector(state_dict)
+
+        # Once data has been processed, we remove it
+        self.selected_wells.pop(0)
+
+        return vector, wellname
+
+
+def main():
     import argparse
-    import json
 
     parser = argparse.ArgumentParser(description='train a phase registration model')
     parser.add_argument("--rows", type=int, required=False, help="Enter number of rows", default=16)
@@ -230,3 +288,7 @@ if __name__ == '__main__':
     print(" ")
 
     wellplate2.predict_well_coords(args.columns, args.rows)
+
+
+if __name__ == '__main__':
+    main()

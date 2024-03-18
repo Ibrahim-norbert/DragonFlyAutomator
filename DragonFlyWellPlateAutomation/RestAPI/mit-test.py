@@ -8,7 +8,7 @@ from time import sleep
 import fusionrest
 
 # Example: Log a message from another module
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("DragonFlyWellPlateAutomation.RestAPI.fusionrest")
 logger.info("This log message is from {}".format(__name__))
 
 

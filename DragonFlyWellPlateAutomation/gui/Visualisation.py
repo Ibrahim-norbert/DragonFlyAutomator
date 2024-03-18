@@ -1,34 +1,26 @@
+import copy
+import traceback
+
 import matplotlib
 import numpy as np
-from PyQt6.QtCore import QTimer
+from PyQt6.QtCore import *
 from PyQt6.QtGui import QPixmap, QImage
-from PyQt6.QtWidgets import QApplication, QVBoxLayout, QWidget, QHBoxLayout, QPushButton, QSizePolicy
+from PyQt6.QtWidgets import QApplication, QVBoxLayout, QWidget, QHBoxLayout, QPushButton, QLabel
 import logging
 import sys
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib import pyplot as plt
 from matplotlib.figure import Figure
 
+from imaris_ims_file_reader.ims import ims
 from DragonFlyWellPlateAutomation.gui.helperfunctions import create_colored_label
 
 matplotlib.use("QtAgg")
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("DragonFlyWellPlateAutomation.RestAPI.fusionrest")
 logger.info("This log message is from {}.py".format(__name__))
 
 
 # TODO Test the script, include labels that inform on microscope status and maybe optimize the script
-
-class VisualiserWidget(QWidget):
-    def __init__(self):
-        super().__init__()
-
-        self.layout = QHBoxLayout
-
-        self.nextbutton = QPushButton("Next")
-        self.nextbutton.clicked.connect(self.nextbutton)
-
-    # def nextbutton(self):
-
 
 class MplCanvas(FigureCanvas):
 
@@ -45,6 +37,93 @@ class MplCanvas(FigureCanvas):
         super(MplCanvas, self).__init__(fig)
 
 
+class WorkerSignals(QObject):
+    '''
+    Defines the signals available from a running worker thread.
+
+    Supported signals are:
+
+    finished
+        No data
+
+    error
+        tuple (exctype, value, traceback.format_exc() )
+
+    result
+        object data returned from processing, anything
+
+    '''
+    finished = pyqtSignal()
+    error = pyqtSignal(tuple)
+    result = pyqtSignal(object)
+
+
+class QtWorker(QRunnable):
+    """Worker thread"""
+
+    def __init__(self, fn, *args, **kwargs):
+        super(QtWorker, self).__init__()
+        # Store constructor arguments (re-used for processing)
+        self.is_working = False
+        self.fn = fn
+        self.args = args
+        self.kwargs = kwargs
+        self.signals = WorkerSignals()
+
+    @pyqtSlot()
+    def run(self):
+        """My code"""
+        # Retrieve args/kwargs here; and fire processing using them
+        self.is_working = True
+        try:
+            result = self.fn(
+                *self.args, **self.kwargs
+            )
+
+        except:
+            traceback.print_exc()
+            exctype, value = sys.exc_info()[:2]
+            self.signals.error.emit((exctype, value, traceback.format_exc()))
+        else:
+            self.signals.finished.emit()
+
+
+class Automation(QRunnable):
+    def __init__(self, well_plate, protocol):
+        super().__init__()
+        self.well_plate = well_plate
+        self.protocol = protocol
+        self.signals_coords = WorkerSignals()
+        self.signals_img = WorkerSignals()
+       # self.mutex = QMutex()
+
+    @pyqtSlot()
+    def run(self):
+
+        for state_dict, coords, wellname in self.well_plate.selected_wells:
+
+            if self.well_plate.wellbywell is True:
+                vector = self.well_plate.mapwell2xyzstagecoords(coords[1], coords[0],
+                                                                non_linear_correction=self.protocol.non_linear_correction)
+                state_dict = self.well_plate.vector_2_state_dict(vector)
+
+            result = self.well_plate.state_dict_2_vector(state_dict), wellname
+
+            # Emit the result from the thread
+            self.signals_coords.result.emit(result)
+
+            # Move stage
+            vector, wellname = self.well_plate.automated_wp_movement((state_dict, coords, wellname))
+
+            # Perform image acquisition
+            img_path = self.protocol.processwell(vector, wellname, self.well_plate.wellbywell,
+                                                 self.well_plate.coordinate_frame_algorithm,
+                                                 self.well_plate.homography_matrix_algorithm)
+
+            # Emit the current image from the thread
+            self.signals_img.result.emit(img_path)
+
+
 class CoordinatePlotAndImgDisplay(QWidget):
     def __init__(self, stacked_widget, well_plate, protocol, parent=None):
         super().__init__(parent)
@@ -58,21 +137,23 @@ class CoordinatePlotAndImgDisplay(QWidget):
 
 
 
-        self.image_array = None
+        self.current_wells = []
         self.protocol = protocol
+        self.nocoordsleft = None
+        self.image_array = None
+        self.img = []
         self.data = None
         self.doneplotting = True
 
-
-        layout1 = QVBoxLayout(self)  # TODO Label should display all current logs relating to autofocus and xyz stage
+        layout1 = QVBoxLayout()
         self.text_display = create_colored_label(" ", self)
-        self.img_display = QPixmap()
+        self.img_display = QLabel()
         layout1.addWidget(self.text_display)
         layout1.addWidget(self.img_display)
 
         main_layout = QHBoxLayout(self)
         main_layout.addWidget(self.canvas)
-
+        main_layout.addLayout(layout1)
         self.setLayout(main_layout)
 
         self.stacked_widget = stacked_widget
@@ -82,10 +163,16 @@ class CoordinatePlotAndImgDisplay(QWidget):
         self.DF_notengaged = True
 
         self.timer = QTimer(self)
-        self.timer.timeout.connect(self.update_canvas)
+        self.timer.timeout.connect(self.drawcoordinate)
+        self.timer.start(1000)
+
         # update every second
 
         self.exit = False
+
+
+
+        self.threadpool = QThreadPool()
 
     def initviz(self, tl, bl, tr, br, r_n, c_n):
 
@@ -115,19 +202,36 @@ class CoordinatePlotAndImgDisplay(QWidget):
 
         self.canvas.axes.grid(which='both')
 
-        self.timer.start(1000)
+        self.startprocess()
+    @pyqtSlot(object)
+    def addcoorddata(self, result):
+        vector, wellname = result
+        self.canvas.x += [vector[0]]
+        self.canvas.y += [vector[1]]
+        self.current_wells += [wellname]
+        logger.log(level=20,
+                   msg="Wells that have been selected: {} and their coordinates {}".format(wellname,
 
-    def display_img_from_array(self):
+                                                                                           vector))
 
-        # Convert NumPy array to QImage
-        height, width, channel = self.image_array.shape
-        bytes_per_line = 3 * width
-        self.img_display.fromImage(QImage(self.image_array.data, width, height, bytes_per_line, QImage.Format_RGB888))
+    @pyqtSlot(object)
+    def display_img_from_array(self, img_path):
+        """Updates the scatterplot using the QTimer events."""
+        try:
+            # TODO we should look into this
+            img = ims(img_path, squeeze_output=True)
+            logger.log(level=20, msg="Shape of img: {}".format(img.shape))
+            time, channel, z, height, width = img.shape
+            input_img = img[0, :, 0].astype(np.uint8)
+            logger.log(level=20, msg="Image has dimensions: {}".format(input_img.shape))
+            bytes_per_line = 3 * width
+            image = QImage(input_img.data, width, height, bytes_per_line, QImage.Format.Format_RGB888)
+            pixmap = QPixmap.fromImage(image)
+            self.img_display.setPixmap(pixmap)
+        except Exception as e:
+            logger.log(level=40, msg="What happened here {}".format(e))
 
-    def display_text_updates(self):
-        self.text_display.setText()
-
-    def drawcoordinate(self, vector, wellname):
+    def drawcoordinate(self):
         try:
             # First time we have no plot reference, so do a normal plot.
             # .plot returns a list of line <reference>s, as we're
@@ -152,73 +256,38 @@ class CoordinatePlotAndImgDisplay(QWidget):
 
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
-            logging.exception(
+            logger.exception(
                 "What happened here. We have the following x {} and y {} values".format(self.canvas.x, self.canvas.y),
                 exc_info=True)
-            self.timer.timeout()
 
-    def update_canvas(self):
+    # TODO Appears to be the best option.
 
-        """Updates the scatterplot using the QTimer events."""
+    def startprocess(self):
+        self.text_display.setText(logger.handlers[-1].log_messages[-1])
+        worker = Automation(self.well_plate, self.protocol)
+        worker.signals_coords.result.connect(self.addcoorddata, Qt.ConnectionType.BlockingQueuedConnection)
+        worker.signals_img.result.connect(self.display_img_from_array,Qt.ConnectionType.BlockingQueuedConnection)
+        worker.setAutoDelete(True)
+        self.threadpool.start(worker)
 
-        # Only proceeds if data exists and DragonFly has completed a process
-        if self.well_plate.selected_wells and self.DF_notengaged is True:
-
-            # Start DragonFly process
-            self.DF_notengaged = False
-            state_dict, coords, wellname = next(iter(self.well_plate.selected_wells))
-
-            # Draw graph only when xyz-stage has arrived at well
-            if self.well_plate.move2coord(state_dict) is False:  # Delay
-
-                # TODO a) To check quality of current session: compare linearspacing coordinates to linear correction matrix
-                # TODO b) To check quality between current and subsequent session: compare current session to homography prediction
-                # TODO c) To check quality of subsequent session: compare Homography with nonlinear correction and Homography calibration
-
-                vector = self.well_plate.state_dict_2_vector(state_dict)
-
-                self.drawcoordinate(vector, wellname)
-
-                # Perform autofocus
-                self.protocol.autofocusing(wellname=wellname)  # Significant delay
-
-                # Obtain image with current protocol
-                self.protocol.image_acquisition(wellname=wellname)  # Delay
-
-                # Once data has been processed, we remove it
-                self.data.remove((state_dict, coords, wellname))
-
-                # End DragonFly process
-                self.DF_notengaged = True
-
-            # Maybe add text object above coordinate point indicating the xyz stage cartesian coordinate
-        elif not self.well_plate.selected_wells:
-            self.timer.stop()
-            logger.log(level=20, msg="All wells have been dealt with. The associated variables have been saved.")
-            self.protocol.autofocus.save2DT_excel()
-            sys.exit()
-            # logger.log(level=20, msg="Switch to save window")
+    def close(self):
+        self.text_display.setText("We are done")
 
 
-if __name__ == '__main__':
+def main():
+    from DragonFlyWellPlateAutomation.devices.wellplate import WellPlate
+    from DragonFlyWellPlateAutomation.devices.protocol import Protocol
     # TODO Correct this
     app = QApplication(sys.argv)
     # Update the canvas with new data
+    p = Protocol("/media/ibrahim/Extended Storage/cloud/Internship/bioquant/348_wellplate_automation/test_rn")
     wellplate2 = WellPlate()
-    wellplate2.load_attributes(name="384_falcon_wellplate.json")
-    window = CoordinatePlotAndImgDisplay(wellplate2)
-
-
-    def update_canvas():
-        if wellplate2.all_well_dicts:
-            key, value = next(iter(wellplate2.all_well_dicts.items()))
-            window.CoordinateFrameVisualisation(wellplate2.corners_coords,
-                                                wellplate2.r_n, wellplate2.c_n,
-                                                wellplate2.state_dict_2_vector(value))
-            wellplate2.all_well_dicts.pop(key)  # Remove the processed entry
-            QTimer.singleShot(5000, update_canvas)
-
-
-    update_canvas()
+    wellplate2.load_attributes(name="384_WellPlate_12345_Falcon.json")
+    window = CoordinatePlot(well_plate=wellplate2, protocol=p)
+    window.initviz()
     window.show()
     sys.exit(app.exec())
+
+
+if __name__ == '__main__':
+    main()

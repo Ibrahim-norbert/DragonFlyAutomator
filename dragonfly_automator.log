@@ -1,44 +1,55 @@
-2024-03-12 10:20:16,885 - INFO - This log message is from DragonFlyWellPlateAutomation.RestAPI.fusionrest
-2024-03-12 10:20:17,021 - INFO - This log message is from xyzstage.py
-2024-03-12 10:20:17,021 - INFO - This log message is from micrscope.py
-2024-03-12 10:20:17,021 - INFO - This log message is from __main__.py
-2024-03-12 10:20:17,022 - INFO - Current Z: 487.42
-2024-03-12 10:20:17,022 - INFO - Current Protocol: {'Path': 'D:\\PikaSpheroids\\2024-02-19\\H2B_H33342_250_25min_2024-02-19.ims', 'Id': 'd3138d7e-3ad4-4004-83c1-be9cc859d8ca'}
-2024-03-12 10:20:17,022 - INFO - Change name of image taken
-2024-03-12 10:20:17,022 - INFO - Protocol set to running
-2024-03-12 10:20:17,022 - INFO - Running protocol: dict_values(['D:\\PikaSpheroids\\2024-02-19\\H2B_H33342_250_25min_2024-02-19.ims', 'd3138d7e-3ad4-4004-83c1-be9cc859d8ca'])
-2024-03-12 10:20:17,022 - INFO - New state: {'Path': 'D:\\PikaSpheroids\\2024-02-19\\H2B_H33342_250_25min_2024-02-19.ims', 'Id': 'd3138d7e-3ad4-4004-83c1-be9cc859d8ca'}
-2024-03-12 10:20:17,022 - INFO - Z stacking is on
-2024-03-12 10:20:17,022 - INFO - Height travelled in total 25.0 mm. Please determine from current position that this is safe
-2024-03-12 10:20:17,023 - INFO - Current Z: 487.42
-2024-03-12 10:20:17,023 - INFO - Current Z: 487.42
-2024-03-12 10:20:17,023 - INFO - Updated referencezposition from 487.42 to 482.42
-2024-03-12 10:20:17,023 - INFO - Current Z: 482.42
-2024-03-12 10:20:17,024 - INFO - Running protocol: dict_values(['D:\\PikaSpheroids\\2024-02-19\\H2B_H33342_250_25min_2024-02-19.ims', 'd3138d7e-3ad4-4004-83c1-be9cc859d8ca'])
-2024-03-12 10:20:17,024 - INFO - Current Z: 482.42
-2024-03-12 10:20:17,025 - INFO - Current Z: 482.42
-2024-03-12 10:20:17,025 - INFO - Updated referencezposition from 482.42 to 477.42
-2024-03-12 10:20:17,025 - INFO - Current Z: 477.42
-2024-03-12 10:20:17,026 - INFO - Running protocol: dict_values(['D:\\PikaSpheroids\\2024-02-19\\H2B_H33342_250_25min_2024-02-19.ims', 'd3138d7e-3ad4-4004-83c1-be9cc859d8ca'])
-2024-03-12 10:20:17,026 - INFO - Current Z: 477.42
-2024-03-12 10:20:17,026 - INFO - Current Z: 477.42
-2024-03-12 10:20:17,026 - INFO - Updated referencezposition from 477.42 to 472.42
-2024-03-12 10:20:17,026 - INFO - Current Z: 472.42
-2024-03-12 10:20:17,027 - INFO - Running protocol: dict_values(['D:\\PikaSpheroids\\2024-02-19\\H2B_H33342_250_25min_2024-02-19.ims', 'd3138d7e-3ad4-4004-83c1-be9cc859d8ca'])
-2024-03-12 10:20:17,027 - INFO - Current Z: 472.42
-2024-03-12 10:20:17,027 - INFO - Current Z: 472.42
-2024-03-12 10:20:17,027 - INFO - Updated referencezposition from 472.42 to 467.42
-2024-03-12 10:20:17,027 - INFO - Current Z: 467.42
-2024-03-12 10:20:17,029 - INFO - Running protocol: dict_values(['D:\\PikaSpheroids\\2024-02-19\\H2B_H33342_250_25min_2024-02-19.ims', 'd3138d7e-3ad4-4004-83c1-be9cc859d8ca'])
-2024-03-12 10:20:17,029 - INFO - Current Z: 467.42
-2024-03-12 10:20:17,029 - INFO - Current Z: 467.42
-2024-03-12 10:20:17,029 - INFO - Updated referencezposition from 467.42 to 462.42
-2024-03-12 10:20:17,029 - INFO - Current Z: 462.42
-2024-03-12 10:20:17,030 - INFO - Running protocol: dict_values(['D:\\PikaSpheroids\\2024-02-19\\H2B_H33342_250_25min_2024-02-19.ims', 'd3138d7e-3ad4-4004-83c1-be9cc859d8ca'])
-2024-03-12 10:20:17,030 - INFO - Autofocusing is on
-2024-03-12 10:20:17,065 - INFO - Image quality metric applied to all z-stack images
-2024-03-12 10:20:17,069 - INFO - image acquisition is on
-2024-03-12 10:20:17,070 - INFO - Current Z: 462.42
-2024-03-12 10:20:17,070 - INFO - Updated referencezposition from 462.42 to 482.0
-2024-03-12 10:20:17,070 - INFO - Current Z: 482.0
-2024-03-12 10:20:17,071 - INFO - Running protocol: dict_values(['D:\\PikaSpheroids\\2024-02-19\\H2B_H33342_250_25min_2024-02-19.ims', 'd3138d7e-3ad4-4004-83c1-be9cc859d8ca'])
+fusionrest.py - 2024-03-16 10:54:00,897 - INFO - This log message is from DragonFlyWellPlateAutomation.RestAPI.fusionrest
+xyzstage.py - 2024-03-16 10:54:00,897 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.xyzstage.py
+micrscope.py - 2024-03-16 10:54:00,897 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.micrscope.py
+utils.py - 2024-03-16 10:54:00,943 - INFO - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+utils.py - 2024-03-16 10:54:00,943 - INFO - NumExpr defaulting to 8 threads.
+protocol.py - 2024-03-16 10:54:01,016 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.protocol.py
+helperfunctions.py - 2024-03-16 10:54:01,017 - INFO - This log message is from helperfunctions.py
+CoordinateTransforms.py - 2024-03-16 10:54:01,177 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.CoordinateTransforms.py
+wellplate.py - 2024-03-16 10:54:01,177 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.wellplate.py
+GUI_WellPlate.py - 2024-03-16 10:54:01,178 - INFO - This log message is from GUI_WellPlate.py
+SaveDirectory.py - 2024-03-16 10:54:01,178 - INFO - This log message is from SaveDirectory.py
+helperfunctions.py - 2024-03-16 10:54:01,197 - INFO - This log message is from DragonFlyWellPlateAutomation.gui.helperfunctions.py
+Visualisation.py - 2024-03-16 10:54:01,226 - INFO - This log message is from Visualisation.py
+FrameSwitcher.py - 2024-03-16 10:54:01,226 - INFO - This log message is from FrameSwitcher.py
+MainWindow.py - 2024-03-16 10:54:01,226 - INFO - This log message is from __main__.py
+MainWindow.py - 2024-03-16 10:54:01,226 - INFO - Directory: /media/ibrahim/Extended Storage/cloud/Internship/bioquant/348_wellplate_automation
+micrscope.py - 2024-03-16 10:54:01,309 - INFO - Current Z: 487.42
+SaveDirectory.py - 2024-03-16 10:54:14,351 - INFO - Selected to create new well-plate dimension
+SaveDirectory.py - 2024-03-16 10:54:14,351 - INFO - Username: ibrahim
+wellplate.py - 2024-03-16 10:54:25,495 - INFO - Well plate dimension: state dict as vectors [array(['59.4', '33.8'], dtype='<U4'), array(['-47.7', '33.1'], dtype='<U5'), array(['-47.7', '-38.6'], dtype='<U5'), array(['59.4', '-38.6'], dtype='<U5')]
+CoordinateTransforms.py - 2024-03-16 10:54:25,495 - INFO - Well plate dimension: length - 107.10228755726928, height - 71.7
+CoordinateTransforms.py - 2024-03-16 10:54:25,495 - INFO - Computed well spacing: x:spacing = 4.656521739130435 and y_spacing = -4.78
+wellplate.py - 2024-03-16 10:54:25,498 - INFO - Well plate matrix dimension: rows: 16, columns: 24
+wellplate.py - 2024-03-16 10:54:25,498 - INFO - Well plate corner coordinates: [[-47.7, 33.1], [59.4, 33.1], [-47.7, -38.6], [59.4, -38.6]]
+wellplate.py - 2024-03-16 10:54:25,498 - INFO - Well plate dimension: length - 107.10228755726928, height - 71.7
+wellplate.py - 2024-03-16 10:54:25,498 - INFO - Computed well spacing: x:spacing = 4.656521739130435 and y_spacing = -4.78
+Visualisation.py - 2024-03-16 10:54:35,449 - INFO - Wells that have been selected: H14 and their coordinates [12.83478261  4.42      ]
+wellplate.py - 2024-03-16 10:54:35,449 - INFO - Stage has its position updated
+wellplate.py - 2024-03-16 10:54:35,449 - INFO - Stage is moving to new position
+wellplate.py - 2024-03-16 10:54:45,453 - INFO - Stage has arrived at target position
+protocol.py - 2024-03-16 10:54:45,453 - INFO - Z stack begins for well: H14
+protocol.py - 2024-03-16 10:54:45,453 - INFO - Total height to travel 2 mm. Please determine from current position that this is safe
+micrscope.py - 2024-03-16 10:54:45,454 - INFO - Current Z: 487.42
+micrscope.py - 2024-03-16 10:54:45,454 - INFO - Moving z axis
+micrscope.py - 2024-03-16 10:54:45,454 - INFO - Current Z: 487.42
+micrscope.py - 2024-03-16 10:54:55,464 - INFO - Updated referencezposition from 487.42 to 485.42
+micrscope.py - 2024-03-16 10:54:55,465 - INFO - Current Z: 485.42
+protocol.py - 2024-03-16 10:55:00,475 - INFO - Running protocol: dict_values(['D:\\PikaSpheroids\\2024-02-19\\H2B_H33342_250_25min_2024-02-19.ims', 'd3138d7e-3ad4-4004-83c1-be9cc859d8ca'])
+protocol.py - 2024-03-16 10:55:00,475 - INFO - Z stack done for well and returning to original z height: H14
+micrscope.py - 2024-03-16 10:55:00,475 - INFO - Moving z axis
+micrscope.py - 2024-03-16 10:55:00,475 - INFO - Current Z: 485.42
+micrscope.py - 2024-03-16 10:55:10,484 - INFO - Updated referencezposition from 485.42 to 487.42
+micrscope.py - 2024-03-16 10:55:10,484 - INFO - Current Z: 487.42
+protocol.py - 2024-03-16 10:55:10,485 - INFO - Autofocus begins for well: H14
+protocol.py - 2024-03-16 10:55:10,485 - INFO - The affected images are: ['well_H14/rawtake_n1_wellH14_zheigth485.ims']
+protocol.py - 2024-03-16 10:55:10,497 - INFO - Image quality metric applied to all z-stack images
+protocol.py - 2024-03-16 10:55:10,497 - INFO - Here we have the columns of dictionary before: 
+protocol.py - 2024-03-16 10:55:10,498 - INFO - Here we have the columns of the newly created dataframe: 
+micrscope.py - 2024-03-16 10:55:10,499 - INFO - Moving z axis
+micrscope.py - 2024-03-16 10:55:10,500 - INFO - Current Z: 487.42
+micrscope.py - 2024-03-16 10:55:20,510 - INFO - Updated referencezposition from 487.42 to 485.0
+micrscope.py - 2024-03-16 10:55:20,510 - INFO - Current Z: 485.0
+protocol.py - 2024-03-16 10:55:20,518 - INFO - Path of image: well_H14/sgeag
+Visualisation.py - 2024-03-16 10:55:20,522 - INFO - Shape of img: (1, 1, 1, 1024, 1024)
+Visualisation.py - 2024-03-16 10:55:20,523 - INFO - Image has dimensions: (1024, 1024)

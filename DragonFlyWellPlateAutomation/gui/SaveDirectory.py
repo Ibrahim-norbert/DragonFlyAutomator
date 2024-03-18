@@ -6,9 +6,8 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QPushButton, QWidget, QLineEdit, QVBoxLayout, QHBoxLayout, QComboBox
 
 from DragonFlyWellPlateAutomation.devices.wellplate import WellPlate
-from DragonFlyWellPlateAutomation.gui.helperfunctions import create_colored_label
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("DragonFlyWellPlateAutomation.RestAPI.fusionrest")
 logger.info("This log message is from {}.py".format(__name__))
 
 wellplate_paths = [os.path.basename(x) for x in glob.glob(os.path.join(os.getcwd(), "models", "*WellPlate*"))]
@@ -38,30 +37,43 @@ class UsernamePath(QWidget):
         self.save_directory.textChanged.connect(self.handlePathChanged)
 
         # Layout of widget
-        layout = QVBoxLayout(self)  # Pass the central widget to the layout
+        layout = QVBoxLayout()  # Pass the central widget to the layout
         layout.addWidget(self.username)
         layout.addWidget(self.save_directory)
-        layout.addWidget(self.enter_button)
-        layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        horizonti_mini = QHBoxLayout()
+        self.selectwell_button = QPushButton("Select Well Plate", self)
+        self.selectwell_button.setCheckable(True)  # Set the button to be checkable
+        self.selectwell_button.clicked.connect(self.clickselectwp)
+        self.addwell_button = QPushButton("Add new Well Plate", self)
+        self.addwell_button.setCheckable(True)  # Set the button to be checkable
+        self.addwell_button.clicked.connect(self.clicknewwp)
+        horizonti_mini.addWidget(self.selectwell_button)
+        horizonti_mini.addWidget(self.addwell_button)
 
         self.dropdown = QComboBox(self)
         for path in wellplate_paths:
             self.dropdown.addItem(path)
 
-        layout1 = QVBoxLayout()
-        self.selectwell_button = QPushButton("Select Well Plate", self)
-        self.addwell_button = QPushButton("Add new Well Plate", self)
-        layout1.addWidget(self.selectwell_button)
-        layout1.addWidget(self.addwell_button)
+        horizonti = QHBoxLayout()
+        horizonti.addWidget(self.dropdown)
+        horizonti.addLayout(horizonti_mini)
 
-        main_layout = QHBoxLayout()
-        main_layout.addWidget(self.dropdown)
-        main_layout.addLayout(layout1)
-
-        layout.addLayout(main_layout)
-        self.setLayout(layout)
+        main_layout = QVBoxLayout(self)
+        main_layout.addLayout(layout)
+        main_layout.addLayout(horizonti)
+        main_layout.addWidget(self.enter_button)
+        main_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.setLayout(main_layout)
 
         self.well_plate = WellPlate()
+
+    def clicknewwp(self):
+        if self.selectwell_button.isChecked():
+            self.selectwell_button.setChecked(False)
+    def clickselectwp(self):
+        if self.addwell_button.isChecked():
+            self.addwell_button.setChecked(False)
 
     def input_text_error_handler(self, path):
         # TODO confirm if this works
@@ -70,10 +82,10 @@ class UsernamePath(QWidget):
                 os.makedirs(path)
                 # If the path is valid, set the text color to white
                 self.save_directory.setStyleSheet("color: white;")
-                logging.log(level=10, msg="Made new directory: " + path)
+                logger.log(level=10, msg="Made new directory: " + path)
             elif not os.path.isdir(os.path.dirname(path)):
                 error_message = "Invalid path: Please enter a valid directory."
-                logging.log(level=10, msg=error_message + ": " + path)
+                logger.log(level=10, msg=error_message + ": " + path)
                 self.save_directory.setText(error_message)
                 self.save_directory.setStyleSheet("color: red;")
             else:
@@ -81,27 +93,27 @@ class UsernamePath(QWidget):
                 self.save_directory.setStyleSheet("color: white;")
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
-            logging.exception("What happened here: ", exc_info=True)
+            logger.exception("What happened here: ", exc_info=True)
 
     def frameswitcher(self, path):
         # TODO confirm if this works
         try:
-            if wellplate_paths and os.path.exists(path) and self.selectwell_button.clicked:
-                logging.log(level=20, msg="Selected saved well-plate dimension")
+            if wellplate_paths and os.path.exists(path) and self.selectwell_button.isChecked():
+                logger.log(level=20, msg="Selected saved well-plate dimension")
                 self.username.setText(self.username.text())
-                logging.log(level=20, msg="Username: " + self.username.text())
+                logger.log(level=20, msg="Username: " + self.username.text())
                 self.well_plate.load_attributes(self.dropdown.currentText())
                 # Frame two
                 self.stacked_widget.switch2WPbuttongrid()
-            elif os.path.exists(path) and self.addwell_button.clicked:
-                logging.log(level=20, msg="Selected to create new well-plate dimension")
+            elif os.path.exists(path) and self.addwell_button.isChecked():
+                logger.log(level=20, msg="Selected to create new well-plate dimension")
                 self.username.setText(self.username.text())
-                logging.log(level=20, msg="Username: " + self.username.text())
+                logger.log(level=20, msg="Username: " + self.username.text())
                 # Frame two
                 self.stacked_widget.switch2WPnew()
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
-            logging.exception("What happened here: ", exc_info=True)
+            logger.exception("What happened here: ", exc_info=True)
 
     def handleEnterPressed(self):
         # This method will be called when the user presses Enter in the line edit widgets

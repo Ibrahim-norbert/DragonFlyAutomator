@@ -3,10 +3,11 @@ import json
 import logging
 import os
 import sys
+import time
 from time import sleep
-from xyzstage import get_output, update, FusionApi
+from .xyzstage import get_output, update, FusionApi
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("DragonFlyWellPlateAutomation.RestAPI.fusionrest")
 logger.info("This log message is from {}.py".format(__name__))
 
 
@@ -23,13 +24,13 @@ class Microscope(FusionApi):
             self.current_output = json.load(f)
 
         self.path_options = [x["Name"] for x in self.current_output if x is not None]
-        logging.log(level=10, msg="The next path destinations of microscope: {}".format(self.path_options))
+        logger.log(level=10, msg="The next path destinations of microscope: {}".format(self.path_options))
 
         # Used only in test phase
         self.test_state = {x: {"Value": y["Value"]} for x, y in
                            zip(self.path_options, self.current_output)}
 
-        self.starting_z_height = self.get_current_z()
+        self.starting_z_height = self.get_current_z()[-1]
 
     def get_state(self):
         if self.test is False:
@@ -44,6 +45,7 @@ class Microscope(FusionApi):
             if state_dict is not None:
                 update(self.endpoint + "/{}".format(key), state_dict[key])
         else:
+            sleep(10)
             self.test_state["referencezposition"]["Value"] = str(state_dict["referencezposition"]["Value"]).replace(".",
                                                                                                                     ",")
 
@@ -55,7 +57,6 @@ class Microscope(FusionApi):
         return state, z
 
     def move_z_axis(self, z_increment=None, new_z_height=None):
-
         logger.log(level=20, msg="Moving z axis")
 
         state, z = self.get_current_z()
@@ -88,7 +89,6 @@ class Microscope(FusionApi):
             return state["referencezposition"]["Value"]
 
     def return2start_z(self):
-
         self.move_z_axis(new_z_height=self.starting_z_height)
 
 

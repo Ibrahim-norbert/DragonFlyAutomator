@@ -2,17 +2,18 @@ import json
 import logging
 import os
 import time
-
 import requests
-from ProjectRoot import change_wd_to_project_root
-
-change_wd_to_project_root()
+import custom_logger
 
 logging.basicConfig(level=logging.INFO, filemode="w", filename=os.path.join(os.getcwd(), 'dragonfly_automator.log'),
-                    format='%(asctime)s - %(levelname)s - %(message)s')
+                    format='%(filename)s - %(asctime)s - %(levelname)s - %(message)s')
 
 # Example: Log a message from another module
 logger = logging.getLogger(__name__)
+print(__name__)
+logger.addHandler(custom_logger.ListHandler())
+
+# Example: Log a message from another module
 logger.info("This log message is from {}".format(__name__))
 
 host = "localhost"

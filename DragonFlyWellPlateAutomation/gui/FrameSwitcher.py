@@ -5,7 +5,7 @@ import GUI_WellPlate as GUIWP
 import SaveDirectory
 import Visualisation as VIZ
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("DragonFlyWellPlateAutomation.RestAPI.fusionrest")
 logger.info("This log message is from {}.py".format(__name__))
 
 
@@ -21,9 +21,9 @@ class FrameManager(QStackedWidget):
         self.frame2 = GUIWP.CustomButtonGroup(stacked_widget=self, well_plate=self.frame0.well_plate)
 
         # Protocol related
-        self.frame3 = GUIP.GUIProtocol(stacked_widget=self, img_dir=self.frame0.save_directory)
-        self.frame4 = VIZ.CoordinatePlotAndImgDisplay(stacked_widget=self, well_plate=self.frame0.well_plate,
-                                                      protocol=self.frame3.protocol)
+        self.frame3 = GUIP.GUIProtocol(stacked_widget=self, img_dir=self.frame0.save_directory.text())
+        self.frame4 = VIZ.CoordinatePlot(stacked_widget=self, well_plate=self.frame0.well_plate,
+                                         protocol=self.frame3.protocol)
 
         self.addWidget(self.frame0)
         self.addWidget(self.frame1)

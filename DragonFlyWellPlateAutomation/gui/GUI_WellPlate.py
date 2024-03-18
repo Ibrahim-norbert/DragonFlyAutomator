@@ -1,7 +1,6 @@
 import glob
 import logging
 import os
-import sys
 from time import sleep
 import numpy as np
 from PyQt6.QtCore import Qt
@@ -12,81 +11,98 @@ from helperfunctions import create_colored_label
 
 wellplate_paths = [os.path.basename(x) for x in glob.glob(os.path.join(os.getcwd(), "models", "*WellPlate*"))]
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("DragonFlyWellPlateAutomation.RestAPI.fusionrest")
 logger.info("This log message is from {}.py".format(__name__))
-logging.debug("Directory: {}".format(os.getcwd()))
+logger.debug("Directory: {}".format(os.getcwd()))
 
 
 # TODO Make this script cohesive
 # TODO Find out what dynamical means in method context
 # TODO Test the script
+# TODO Switch order of widgets enter is below add well plate name and edit boxes must be larger
 
 class CreateNewWellPlateTemplate(QWidget):
     def __init__(self, stacked_widget, well_plate):
         super().__init__()
 
-        # TODO Add functionality to choose between methods of learning the homography matrix
-
         self.well_plate = well_plate
         self.stacked_widget = stacked_widget
 
+        horizonti_tl = QHBoxLayout()
         self.column_n = QLineEdit(parent=self)
         self.column_n.setPlaceholderText("Column number")
+        horizonti_tl.addWidget(self.column_n)
         self.row_n = QLineEdit(parent=self)
         self.row_n.setPlaceholderText("Row number")
+        horizonti_tl.addWidget(self.row_n)
 
-        layout1 = QHBoxLayout()
-        layout1.addWidget(self.column_n)
-        layout1.addWidget(self.row_n)
 
-        label1 = create_colored_label("Please confirm the number of columns and rows in the well plate: ", self)
-        layout2 = QVBoxLayout()
-        layout2.addWidget(label1)
-        layout2.addLayout(layout1)
+        stackie_tl = QVBoxLayout()
+        stackie_tl.addWidget(
+            create_colored_label("Please confirm the number of columns and rows\nin the well plate: ", self))
+        stackie_tl.addLayout(horizonti_tl)
 
-        self.read_button = QPushButton("Read", self)
-        self.read_button.clicked.connect(self.read_well_coordinate)
+
+        stackie_tm = QVBoxLayout()
+        stackie_tm.addWidget(create_colored_label("Select type of coordinate frame prediction: ", self))
+        self.typegridpred = QComboBox(parent=self)
+        for gridpred in self.well_plate.coordinate_frame_algorithms:
+            self.typegridpred.addItem(gridpred)
+        stackie_tm.addWidget(self.typegridpred)
+
+        stackie_tr = QVBoxLayout()
+        stackie_tr.addWidget(create_colored_label("Select type of homography matrix estimator: ", self))
+        self.typehomopred = QComboBox(parent=self)
+        for homopred in self.well_plate.homography_matrix_algorithms:
+            self.typehomopred.addItem(homopred)
+        stackie_tr.addWidget(self.typehomopred)
+
+        horizonti_top = QHBoxLayout()
+        horizonti_top.addLayout(stackie_tl)
+        horizonti_top.addLayout(stackie_tm)
+        horizonti_top.addLayout(stackie_tr)
+
+        horizontie_mt = QHBoxLayout()
+        horizontie_mt.addWidget(create_colored_label(
+            "Please move the stage to the following wells and press read to confirm their coordinates "
+            ": ", self))
+        self.placeholder_coordinates = create_colored_label("", self)
+        horizontie_mt.addWidget(self.placeholder_coordinates)
+
+        horizonti_ml = QHBoxLayout()
         self.dropdown = QComboBox(self)
         options = list(self.well_plate.well_plate_req_coords.keys())
         for x in options:
             self.dropdown.addItem(x)
+        horizonti_ml.addWidget(self.dropdown)
+        self.read_button = QPushButton("Read", self)
+        self.read_button.clicked.connect(self.read_well_coordinate)
+        horizonti_ml.addWidget(self.read_button)
 
-        layout3 = QHBoxLayout()
-        layout3.addWidget(self.read_button)
-        layout3.addWidget(self.dropdown)
+        stackie_middle = QVBoxLayout()
+        stackie_middle.addLayout(horizontie_mt)
+        stackie_middle.addLayout(horizonti_ml)
 
-        self.placeholder_coordinates = create_colored_label("", self)
-        label2 = QHBoxLayout()
-        label2.addWidget(create_colored_label(
-            "Please move the stage to the following wells and press read to confirm their coordinates "
-            ": ", self))
-        label2.addWidget(self.placeholder_coordinates)
+        horizonti_lower = QHBoxLayout()
+        horizonti_lower.addWidget(create_colored_label("To save well plate template please add\nmanufacturer name "
+                                                       "and model ID. If not, leave empty", self))
 
-        layout4 = QVBoxLayout()
-        layout4.addLayout(label2)
-        layout4.addLayout(layout3)
+        self.partnumber = QLineEdit(parent=self)
+        self.partnumber.setPlaceholderText("Model ID")
+        horizonti_lower.addWidget(self.partnumber)
+        self.manufacturer = QLineEdit(parent=self)
+        self.manufacturer.setPlaceholderText("Manufacturer name")
+        horizonti_lower.addWidget(self.manufacturer)
 
         self.enter_button = QPushButton("Enter", parent=self)
         self.enter_button.clicked.connect(self.enter_button_click)
 
         main_layout = QVBoxLayout(self)
-        main_layout.addLayout(layout2)
-        main_layout.addLayout(layout4)
+        main_layout.addLayout(horizonti_top)
+        main_layout.addLayout(stackie_middle)
+        main_layout.addLayout(horizonti_lower)
         main_layout.addWidget(self.enter_button)
         main_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-        layout1 = QHBoxLayout()
-        layout1.addWidget(create_colored_label("To save well plate template please add manufacturer name "
-                                               "and model ID. If not, leave empty", self))
-
-        self.partnumber = QLineEdit(parent=self)
-        self.partnumber.setPlaceholderText("Please enter model ID")
-        layout1.addWidget(self.partnumber)
-        self.manufacturer = QLineEdit(parent=self)
-        self.manufacturer.setPlaceholderText("Please enter manufacturer name")
-        layout1.addWidget(self.manufacturer)
-
-        main_layout.addLayout(layout1)
         self.setLayout(main_layout)
 
     def read_well_coordinate(self):
@@ -103,16 +119,16 @@ class CreateNewWellPlateTemplate(QWidget):
             # Display them in GUI
             self.placeholder_coordinates.setText(str(vector))
 
-            logging.log(level=10, msg="Well: " + self.dropdown.currentText() + " - " + str(vector))
+            logger.log(level=10, msg="Well: " + self.dropdown.currentText() + " - " + str(vector))
 
             # Once all corners are read, log the values
             if None not in self.well_plate.well_plate_req_coords.values():
                 final = self.well_plate.well_plate_req_coords.items()
-                logging.log(level=10, msg="Final coordinates: " + str(final))
+                logger.log(level=10, msg="Final coordinates: " + str(final))
 
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
-            logging.exception("Must select one of the well options first before ", exc_info=True)
+            logger.exception("Must select one of the well options first before ", exc_info=True)
 
     def enter_button_click(self):
 
@@ -124,24 +140,23 @@ class CreateNewWellPlateTemplate(QWidget):
                     self.well_plate.save_attributes2json(self.manufacturer.text(), self.partnumber.text())
                     logger.log(level=10, msg="Saved new well plate template")
 
-                # TODO Make learning homography algorithm an attribute and also grid making algorithm
-
                 # Compute the wellplate grid
-                self.well_plate.predict_well_coords(int(self.column_n.text()), int(self.row_n.text()))
+                self.well_plate.predict_well_coords(int(self.column_n.text()), int(self.row_n.text()),
+                                                    self.typegridpred.currentText(), self.typehomopred.currentText())
 
                 # Switch to frame three
                 self.stacked_widget.switch2WPbuttongrid()
 
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
-            logging.exception("What happened here ", exc_info=True)
+            logger.exception("What happened here ", exc_info=True)
 
 
 class WellAsButton(QPushButton):
-    def __init__(self, text, parent, coordinates, xyz_stage_state):
+    def __init__(self, text=None, parent=None, coordinates=None, xyz_stage_state=None):
         super().__init__(text=text, parent=parent)
 
-        self.coordinates = coordinates #integer coords
+        self.coordinates = coordinates  # integer coords
         self.wellname = text
         self.color = "#00aa00"
         self.setStyleSheet("background-color: {}; color: #ffffff;".format(self.color))
@@ -196,10 +211,11 @@ class CustomButtonGroup(QWidget):
 
     def handleEnterPressed(self):
         try:
-            self.checked_buttons = [(button.well_state_dict, button.coordinates, button.wellname) for button in self.buttons if
+            self.checked_buttons = [(button.well_state_dict, button.coordinates, button.wellname) for button in
+                                    self.buttons if
                                     button.isChecked()]
 
-            logging.log(level=10, msg="Wells that have been selected: {}".format(self.checked_buttons))
+            logger.log(level=10, msg="Wells that have been selected: {}".format(self.checked_buttons))
 
             # Add to well plate instance
             self.well_plate.selected_wells = self.checked_buttons
@@ -211,14 +227,10 @@ class CustomButtonGroup(QWidget):
 
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
-            logging.exception("What happened here ", exc_info=True)
+            logger.exception("What happened here ", exc_info=True)
 
 
-
-
-
-if __name__ == '__main__':
-
+def main():
     # TODO Correct this
     well_plate = WellPlate()
     well_plate.load_attributes(name="384_falcon_wellplate.json")
@@ -258,3 +270,7 @@ if __name__ == '__main__':
     # update_canvas()
     # window.show()
     # sys.exit(app.exec())
+
+
+if __name__ == '__main__':
+    main()

@@ -33,14 +33,14 @@ class AutoFocus:
     def __init__(self):
         self.num = 0
         self.variables = {
-            "Img_ID": [], "Z plane": [], "Well coords": [], "Acquisition number": [], "Metrics": []}
+            "Img_ID": [], "Z plane": [], "Well coords": [], "Acquisition number": [], "Metrics": [], "Value": []}
 
         self.metrics = [func for func in dir(self) if callable(getattr(self, func)) and
                         func not in ["calculate_summed_power", "power_spectrum", "combinatorial"] and "__" not in func]
 
     def savestats2dict(self, key, res, img_name):
         self.variables["Metrics"] += [key]
-        self.variables[key] = res  # self.collector
+        self.variables["Value"] += [res]  # self.collector
         self.variables["Img_ID"] += [img_name]
         self.variables["Z plane"] += [eval((img_name.split("_zheigth")[1]).split(".")[0])]
         self.variables["Well coords"] += [(img_name.split("_well")[1]).split("_zheigth")[0]]
@@ -52,7 +52,8 @@ class AutoFocus:
         self.savestats2dict(key, res, img_name)
         return res
 
-    def Brenner(self, img, img_name=None):
+    def Brenner(self, img_unformated, img_name=None):
+        img = img_unformated[0,0,0]
         temp = ((img[:, 0:-2] - img[:, 2:]) ** 2)
         res = temp.sum()
         key = "Brenner"
@@ -78,10 +79,10 @@ class AutoFocus:
         f_k = np.linspace(0, 1, sum_.size) * (1.0 / (2 * x_spacing))
 
         key = "Psw"
-        self.variables["Variables"] = key
+        self.variables["Variables"] = [key]
 
-        self.variables["Total power"] = sum_
-        self.variables["Frequency"] = f_k
+        self.variables["Total power"] = [sum_]
+        self.variables["Frequency"] = [f_k]
 
         self.variables["Img_ID"] += [img_name]
         self.variables["Z plane"] += [eval((img_name.split("_zheigth")[1]).split(".")[0])]
@@ -149,12 +150,14 @@ class AutoFocus:
         pass
 
     def turn2dt(self):
-        dt = pd.DataFrame(self.variables)
-        self.variables = dt
-        return dt
+        return pd.DataFrame(self.variables)
+
+
 
     def save2DT_excel(self, directory, dt):
         dt.to_csv(os.path.join(directory, "well_plate_data.csv"))
+        self.variables = {
+            "Img_ID": [], "Z plane": [], "Well coords": [], "Acquisition number": [], "Metrics": [], "Value": []}
 
 
 def main():
