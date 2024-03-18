@@ -2,11 +2,12 @@ import matplotlib
 import numpy as np
 from PyQt6.QtCore import QTimer
 from PyQt6.QtGui import QPixmap, QImage
-from PyQt6.QtWidgets import QApplication, QVBoxLayout, QWidget, QHBoxLayout, QPushButton
+from PyQt6.QtWidgets import QApplication, QVBoxLayout, QWidget, QHBoxLayout, QPushButton, QSizePolicy
 import logging
 import sys
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib import pyplot as plt
+from matplotlib.figure import Figure
 
 from DragonFlyWellPlateAutomation.gui.helperfunctions import create_colored_label
 
@@ -30,26 +31,38 @@ class VisualiserWidget(QWidget):
 
 
 class MplCanvas(FigureCanvas):
-    def __init__(self, parent=None):
-        super().__init__(parent)
+
+    def __init__(self, parent=None, n_plots=1,  width=None, height=None, dpi=100):
+        fig = Figure(figsize=(width, height), dpi=dpi)
+        self.axes = fig.add_subplot(int("11{}".format(n_plots)))
+        self.sizepolicy = QSizePolicy()
+        self.sizepolicy.setHeightForWidth(True)
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.x = []
+        self.y = []
         self.coords = None
         self.state_dict = None
-        self.figure, self.axes = plt.subplots()
-        self.x = [0]
-        self.y = [0]
+        super(MplCanvas, self).__init__(fig)
 
 
-class CoordinatePlot(QWidget):
+class CoordinatePlotAndImgDisplay(QWidget):
     def __init__(self, stacked_widget, well_plate, protocol, parent=None):
         super().__init__(parent)
         # We need to store a reference to the plotted line
         # somewhere, so we can apply the new data to it.
 
+        # Plot
+        self.canvas = MplCanvas(parent=self, n_plots=2, dpi=300)
+        self._plot_ref = None
+
+
+
+
         self.image_array = None
         self.protocol = protocol
         self.data = None
         self.doneplotting = True
-        self.canvas = MplCanvas()
+
 
         layout1 = QVBoxLayout(self)  # TODO Label should display all current logs relating to autofocus and xyz stage
         self.text_display = create_colored_label(" ", self)
@@ -74,17 +87,18 @@ class CoordinatePlot(QWidget):
 
         self.exit = False
 
-    def initviz(self):
+    def initviz(self, tl, bl, tr, br, r_n, c_n):
 
         self.data = self.well_plate.selected_wells
 
-        self.canvas.axes.set_xlim(self.well_plate.corners_coords[0][0],
+
+        self.canvas.axes[0].set_xlim(self.well_plate.corners_coords[0][0],
                                   self.well_plate.corners_coords[1][0] + (self.well_plate.corners_coords[1][0] * 0.1))
         self.canvas.axes.set_ylim(self.well_plate.corners_coords[0][1],
                                   self.well_plate.corners_coords[2][1] + (self.well_plate.corners_coords[2][1] * 0.1))
 
-        x_values = list(range(1, 25))
-        y_values = [x for x in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[:self.well_plate.r_]]
+        x_values = list(range(1, c_n))
+        y_values = [x for x in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[:self.well_plate.r_n]]
 
         self.canvas.axes.set_xticks(
             np.linspace(self.well_plate.corners_coords[0][0], self.well_plate.corners_coords[1][0],
@@ -115,16 +129,27 @@ class CoordinatePlot(QWidget):
 
     def drawcoordinate(self, vector, wellname):
         try:
+            # First time we have no plot reference, so do a normal plot.
+            # .plot returns a list of line <reference>s, as we're
+            # only getting one we can take the first element.
             self.canvas.x += [vector[0]]
             self.canvas.y += [vector[1]]
+            # Note: we no longer need to clear the axis.
+            if self._plot_ref is None:
+                self.canvas.axes.scatter(self.canvas.x, self.canvas.y)
+                logger.log(level=20,
+                           msg="Wells that have been selected: {} and their coordinates {}".format(wellname,
 
-            self.canvas.axes.scatter(self.canvas.x, self.canvas.y)
+                                                                                                   vector))
+            else:
+                # We have a reference, we can use it to update the data for that line.
+                self._plot_ref.set_ydata(self.canvas.y)
+                self._plot_ref.set_ydata(self.canvas.x)
+
             self.canvas.draw()
 
-            logger.log(level=20,
-                       msg="Wells that have been selected: {} and their coordinates {}".format(wellname,
 
-                                                                                               vector))
+
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
             logging.exception(
@@ -181,7 +206,7 @@ if __name__ == '__main__':
     # Update the canvas with new data
     wellplate2 = WellPlate()
     wellplate2.load_attributes(name="384_falcon_wellplate.json")
-    window = CoordinatePlot(wellplate2)
+    window = CoordinatePlotAndImgDisplay(wellplate2)
 
 
     def update_canvas():
