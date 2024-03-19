@@ -211,14 +211,13 @@ class CustomButtonGroup(QWidget):
 
     def handleEnterPressed(self):
         try:
-            self.checked_buttons = [(button.well_state_dict, button.coordinates, button.wellname) for button in
-                                    self.buttons if
-                                    button.isChecked()]
-
-            logger.log(level=10, msg="Wells that have been selected: {}".format(self.checked_buttons))
 
             # Add to well plate instance
-            self.well_plate.selected_wells = self.checked_buttons
+            self.well_plate.selected_wells = [(button.well_state_dict, button.coordinates, button.wellname) for button in
+                                    self.buttons if
+                                    button.isChecked()]
+            logger.log(level=20, msg="Wells that have been selected: {}".format([x[-1] for x in
+                                                                                 self.well_plate.selected_wells]))
 
             # Automatic updater -> threading ?
             self.stacked_widget.switch2Protocol()  # -> Underneath for loop or in parallel to

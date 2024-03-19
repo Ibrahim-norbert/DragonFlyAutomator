@@ -154,7 +154,7 @@ class WellPlate(XYZStage):
     def mapwellintegercoords2alphabet(self, wellcoords_key):
         r_str, c_str = wellcoords_key.split("-")
         r, c = int(r_str), int(c_str)
-        label = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".upper()[r] + c_str
+        label = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".upper()[r-1] + c_str
         return label, r_str, c_str, r, c
 
     # TODO Include widget for mandatory calibration in protocol window
@@ -229,9 +229,6 @@ class WellPlate(XYZStage):
         # TODO c) To check quality of subsequent session: compare Homography with nonlinear correction and Homography calibration
 
         vector = self.state_dict_2_vector(state_dict)
-
-        # Once data has been processed, we remove it
-        self.selected_wells.pop(0)
 
         return vector, wellname
 

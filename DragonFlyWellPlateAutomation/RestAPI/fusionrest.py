@@ -8,10 +8,11 @@ import custom_logger
 logging.basicConfig(level=logging.INFO, filemode="w", filename=os.path.join(os.getcwd(), 'dragonfly_automator.log'),
                     format='%(filename)s - %(asctime)s - %(levelname)s - %(message)s')
 
+
+
+
 # Example: Log a message from another module
 logger = logging.getLogger(__name__)
-print(__name__)
-logger.addHandler(custom_logger.ListHandler())
 
 # Example: Log a message from another module
 logger.info("This log message is from {}".format(__name__))
