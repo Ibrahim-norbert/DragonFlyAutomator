@@ -36,8 +36,8 @@ def linearcorrectionmatrix(topright, topleft, bottomright, bottomleft, c_n, r_n)
     """correction matrix obtained from:
         https://scripts.iucr.org/cgi-bin/paper?S2053230X18016515"""
 
-    corx = topleft / float(c_n - 1)
-    cory = bottomright / float(r_n - 1)
+    corx = topright / float(c_n)
+    cory = bottomleft / float(r_n)
 
     # cor is the correction matrix to account for misalignment of the plate vs. translation directions in x,y,z
     cor = np.array(([corx[0], cory[0], 0],
@@ -46,20 +46,21 @@ def linearcorrectionmatrix(topright, topleft, bottomright, bottomleft, c_n, r_n)
 
     logger.log(level=20, msg="The correction matrix: {}".format(cor))
 
-    blpred = np.dot(cor, np.array(((c_n - 1), (r_n - 1), 0)))  # predicted position of bl based on tl and br
-    logger.log(level=20, msg="The bottom left well coordinate prediction: {}".format(blpred))
+    brpred = np.dot(cor, np.array((c_n, r_n, 0)))  # predicted position of bl based on tl and br
+    logger.log(level=20, msg="The bottom left well coordinate prediction: {}".format(brpred))
 
-    fixit = (np.append(bottomleft, 0) - blpred) / float((c_n - 1) * (r_n - 1))  # this is the correction based on bl
+    fixit = (np.append(bottomright, 0) - brpred) / float(c_n * r_n)  # this is the correction based on bl
     logger.log(level=20, msg="The non linear prediction: {}".format(fixit))
     # x = numbers i.e. columns
     # y = letters i.e. rows
     vectors = sum(
-        [[(np.dot(cor, np.array(np.array((c, r, 0)))) + fixit * (c * r)) + np.append(topright, 0) for c in
-          range(1, c_n + 1)] for r in range(1, r_n + 1)], [])
+        [[(np.dot(cor, np.array(np.array((c, r, 0)))) + fixit * (c * r)) for c in
+          range(1, (c_n+1))] for r in range(1, (r_n+1))], [])
 
-    logger.log(level=20, msg="The resulting vectors: {}".format(vectors))
+    logger.log(level=20, msg="The resulting bottom right and middle well coordinates: {}".format([vectors[int((c_n*r_n)/2)],
+                                                                                                 vectors[-1]]))
 
-    wellcoords_key = sum([[str(r) + "-" + str(c + 1) for c in range(c_n)] for r in range(r_n)], [])
+    wellcoords_key = sum([[str(r+1) + "-" + str(c + 1) for c in range(c_n)] for r in range(r_n)], [])
 
     x_spacing = np.abs(vectors[int(c_n / 2)][0] - vectors[int(c_n / 2) + 1][0])
     y_spacing = np.abs(vectors[c_n * 2][1] - vectors[(c_n * 2) + 1][1])
@@ -77,21 +78,30 @@ def homography_matrix_estimation(method, vectors, wellcoords_key):
           "to xzy-stage coordinate space".format(method))
 
     # Define source and destination coordinates
-    wellcoords = [[int(x.split("-")[0]), int(x.split("-")[1])] for x in wellcoords_key]
 
-    pts_src = np.array(wellcoords, dtype=np.float32)
-    pts_dst = np.array(vectors, dtype=np.float32)
+    wellcoords = [np.flip([int(x.split("-")[0]), int(x.split("-")[1])]) for x in wellcoords_key]
+
+    pts_src = np.array(wellcoords, dtype=np.float32)[:4]
+    if len(pts_src[0]) < 3:
+        pts_src = np.hstack((np.array(wellcoords, dtype=np.float32), np.ones((len(vectors),1))))[:4]
+    logger.log(level=20, msg="The chosen well coords {}".format(pts_src))
+
+    pts_dst = np.array(vectors, dtype=np.float32)[:4]
+    if len(vectors[0]) < 3:
+        pts_dst = np.hstack((np.array(vectors, dtype=np.float32), np.ones((len(vectors),1))))[:4]
+    logger.log(level=20, msg="The corresponding xyz coordinates {}".format(pts_dst))
 
     if method == "Levenberg-Marquardt":
-
+        logger.log(level=20, msg="Homography estimation method: {}".format(method))
         H = cv.findHomography(pts_src, pts_dst)[0]
 
     elif method == "SVD":
+        logger.log(level=20, msg="Homography estimation method: {}".format("SVD"))
         # Construct matrix A
         A = []
         for i in range(len(pts_src)):
-            x, y = pts_src[i]
-            u, v = pts_dst[i]
+            x, y, z = pts_src[i]
+            u, v, z = pts_dst[i]
             A.append([-x, -y, -1, 0, 0, 0, x * u, y * u, u])
             A.append([0, 0, 0, -x, -y, -1, x * v, y * v, v])
 
@@ -104,11 +114,56 @@ def homography_matrix_estimation(method, vectors, wellcoords_key):
         # Normalize the matrix (optional)
         H /= H[2, 2]
 
+    else:
+
+        logger.log(level=20, msg="Homography estimation method: {}".format("Eigenvectors"))
+        # Construct matrix A
+        A = [] #3,9
+        for i in range(len(pts_src)):
+            x, y, z = pts_src[i]
+            u, v, z = pts_dst[i]
+            A.append([-x, -y, -1, 0, 0, 0, x * u, y * u, u])
+            A.append([0, 0, 0, -x, -y, -1, x * v, y * v, v])
+
+        A = np.array(A)
+
+        # 9,3 @ 3,9
+        eigenvalues, eigenvectors = np.linalg.eig(A.T @ A)
+        # Find the smallest eigenvalue and its index
+        smallest_eigenvalue_index = np.argmin(eigenvalues)
+
+        # Extract the eigenvector corresponding to the smallest eigenvalue
+        homography_candidate = eigenvectors[:, smallest_eigenvalue_index]
+
+        # Reshape and normalize the homography matrix
+        homography = homography_candidate.reshape((3, 3))
+        H = homography / homography[2, 2]
+
     return H
 
 
-def homography_application(homography, c, r):
-    return np.dot(homography, np.array(np.array((c, r, 0))))
+def homography_application(homography, c_n, r_n):
+    # The Hi3 cooefficient is very important !!!
+    vectors, wellnames, wellcoords = list(zip(*sum(
+        [[(np.dot(homography, np.array(np.array((c +1,  r +1, 1)))), str(r + 1) + "-" + str(c + 1), [r +1,  c +1]) for c in
+          range(c_n)] for r in range(r_n)], [])))
+
+    # vectors = []
+    # # for wellcoord in wellcoords:
+    # #     h_11, h_12, h_13 = homography[0]
+    # #     h_21, h_22, h_23 = homography[1]
+    # #     h_31, h_32, h_33 = homography[2]
+    # #     r,c = wellcoord
+    # #     vector = [(c*h_11 + r*h_12 + h_13),
+    # #               (c*h_21 + r*h_22 + h_23)]
+    # #     vectors += [vector]
+
+   # fixit = (np.array([-47.7, 32]) - np.array(vectors[0]))
+
+    #vectors = np.array(vectors) + fixit
+    logger.log(level=20, msg="Outputted vectors: {}".format(vectors))
+    logger.log(level=20, msg="Outputted well names: {}".format(wellnames))
+    return vectors, wellnames
 
 
 def homography_fixit_calibration(blpred, bl, homography, c, r, c_n, r_n):

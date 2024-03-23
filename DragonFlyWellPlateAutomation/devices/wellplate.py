@@ -65,14 +65,14 @@ class WellPlate(XYZStage):
         return {self.path_options[0]: {self.value_key: vector[0]}, self.path_options[1]: {self.value_key: vector[1]},
                 self.path_options[-1]: {self.value_key: False}}
 
-    def get_corner_as_vectors(self):
+    def get_corner_as_vectors(self, well_plate_req_coords):
 
         print("1. Getting all four corner wells coordinates as vectors")
 
         try:
-            specified_vectors = [self.state_dict_2_vector(self.well_plate_req_coords["Top right well"]),
-                                 self.state_dict_2_vector(self.well_plate_req_coords["Top left well"]),
-                                 self.state_dict_2_vector(self.well_plate_req_coords["Bottom left well"])]
+            specified_vectors = [self.state_dict_2_vector(well_plate_req_coords["Top right well"]),
+                                 self.state_dict_2_vector(well_plate_req_coords["Top left well"]),
+                                 self.state_dict_2_vector(well_plate_req_coords["Bottom left well"])]
 
             # Top right, Bottom left = Bottom right
             specified_vectors = specified_vectors + [np.array([specified_vectors[-3][0], specified_vectors[-1][1]])]
@@ -103,20 +103,20 @@ class WellPlate(XYZStage):
 
         print("Saving all variables associated to the coordinate system.")
 
-        H = CT.homography_matrix_estimation(algorithm_H, vectors, well_names)
-
         self.coordinate_frame_algorithm = algorithm_CF
         self.homography_matrix_algorithm = algorithm_H
         self.r_n = r_n
         self.c_n = c_n
         self.all_well_dicts = self.createwellplatestatedict(well_names, vectors)
+        self.all_well_keycoords = [[int(x.split("-")[0]), int(x.split("-")[1])] for x in well_names]
         self.length = length
         self.height = height
         self.xspacing = x_spacing
         self.yspacing = y_spacing
         self.corners_coords = [vectors[x] for x in [0, c_n - 1, (r_n * c_n) - c_n,
                                                     (r_n * c_n) - 1]]  # Top left, Top right, Bottom left
-        self.homography_matrix = H
+        self.corner_wells = [well_names[x] for x in [0, c_n - 1, (r_n * c_n) - c_n,
+                                                     (r_n * c_n) - 1]]  # Top left, Top right, Bottom left
 
         logger.log(level=20, msg="Well plate matrix dimension: rows: {}, columns: {}".format(r_n, c_n))
         logger.log(level=20, msg="Well plate corner coordinates: {}".format(self.corners_coords))
@@ -124,9 +124,20 @@ class WellPlate(XYZStage):
         logger.log(level=20, msg="Computed well spacing: x:spacing = {} and y_spacing = {}".format(
             x_spacing, y_spacing))
 
-    def predict_well_coords(self, c_n, r_n, algorithm="linear spacing", algorithm_H="non-linear"):
+    def predict_well_coords(self, c_n, r_n, algorithm="Linear spacing", algorithm_H="non-linear",
+                            well_plate_req_coords=None,
+                            ):
 
-        topleft, bottomleft, topright, bottomright = self.get_corner_as_vectors()
+        topleft, bottomleft, topright, bottomright = self.get_corner_as_vectors(well_plate_req_coords)
+        wellcoords_key = sum([[str(r + 1) + "-" + str(c + 1) for c in range(c_n)] for r in range(r_n)], [])
+        topleft_wn, topright_wn, bottomleft_wn, bottomright_wn, middle_wn = [wellcoords_key[x] for x in
+                                                                             [0, c_n - 1, (r_n * c_n) - c_n,
+                                                                              (r_n * c_n) - 1,
+                                                                              int((((r_n / 2) * c_n)) - ((c_n/2) + 1))]]
+        # TODO Temporary
+        middle = [r_n/2, c_n/2]
+        middle = [np.linspace(topleft[0], topright[0], c_n)[int(middle[-1]-1)],
+                  np.linspace(topleft[1], bottomleft[1], r_n)[int(middle[0]-1)]]
 
         print("2. Computing coordinate space from well corners using {}".format(algorithm))
 
@@ -135,13 +146,28 @@ class WellPlate(XYZStage):
                                                                                          bottomright,
                                                                                          bottomleft, c_n=c_n,
                                                                                          r_n=r_n)
-        else:
+        elif algorithm == self.coordinate_frame_algorithms[1]:
             vectors, well_names, length, height, x_spacing, y_spacing = CT.linearcorrectionmatrix(topright, topleft,
                                                                                                   bottomright,
                                                                                                   bottomleft,
                                                                                                   c_n=c_n,
                                                                                                   r_n=r_n)
-            algorithm = self.coordinate_frame_algorithms[1]
+
+        else:
+            self.homography_matrix = CT.homography_matrix_estimation(algorithm_H,
+                                                                     [topleft, bottomleft, topright, bottomright, middle],
+                                                                     wellcoords_key=[topleft_wn, bottomleft_wn, topright_wn, bottomright_wn, middle_wn])
+
+            vectors, well_names = CT.homography_application(self.homography_matrix, c_n, r_n)
+
+
+
+            x_spacing = np.abs(vectors[int(c_n / 2)][0] - vectors[int(c_n / 2) + 1][0])
+            y_spacing = np.abs(vectors[c_n * 2][1] - vectors[(c_n * 2) + 1][1])
+
+            length = np.linalg.norm(topleft - topright)
+            height = np.linalg.norm(topleft - bottomleft)
+
 
         # Save all variables as parameters
         self.set_parameters(well_names, vectors,
@@ -154,7 +180,7 @@ class WellPlate(XYZStage):
     def mapwellintegercoords2alphabet(self, wellcoords_key):
         r_str, c_str = wellcoords_key.split("-")
         r, c = int(r_str), int(c_str)
-        label = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".upper()[r-1] + c_str
+        label = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".upper()[r - 1] + c_str
         return label, r_str, c_str, r, c
 
     # TODO Include widget for mandatory calibration in protocol window
@@ -189,7 +215,7 @@ class WellPlate(XYZStage):
                     count += 1
                     sleep(1)
             else:
-                #length = np.linalg.norm(np.array([0, 0]) - np.array(self.state_dict_2_vector(state_dict)))
+                # length = np.linalg.norm(np.array([0, 0]) - np.array(self.state_dict_2_vector(state_dict)))
                 logger.log(level=20, msg="Stage is moving to new position")
                 sleep(10)
 

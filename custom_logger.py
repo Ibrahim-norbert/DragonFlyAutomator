@@ -1,7 +1,6 @@
 import logging
 import os
-from ProjectRoot import change_wd_to_project_root
-change_wd_to_project_root()
+
 
 
 # Custom logging handler to store log messages

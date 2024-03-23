@@ -36,6 +36,48 @@ class MplCanvas(FigureCanvas):
         self.state_dict = None
 
 
+def setplotlimits(xmin, xmax, ymin, ymax, axis):
+    axis.set_xlim(xmin, xmax)
+    axis.set_ylim(ymin, ymax)
+
+    return axis
+
+def setticks(x_coords, x_values, ycoords, y_values, axis):
+    axis.set_xticks(x_coords)
+    axis.set_xticklabels(x_values)
+    axis.tick_params(axis='x', labelsize='x-small')
+
+    # Set y-axis ticks from P to A
+    axis.set_yticks(ycoords)
+    axis.set_yticklabels(reversed(y_values))
+    axis.tick_params(axis='y', labelsize='medium')
+
+    return axis
+
+def createplot(tr, tl, bl, c_n, r_n, axis
+               ):
+    # Coordinate plot
+    ## Set limits
+    x_offset = (tr[0] - tl[0]) * 0.1
+    y_offset = (tl[1] - bl[1]) * 0.1
+    axis = setplotlimits(xmin=tl[0] - x_offset, xmax=tr[0] + x_offset,
+                  ymin=bl[1] - y_offset, ymax=tl[1] + y_offset, axis=axis)
+
+    x_values = list(range(1, c_n+1))
+    y_values = [x for x in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[:r_n]]
+
+    axis = setticks(x_coords=np.linspace(tl[0], tr[0], len(x_values)),
+            ycoords=np.linspace(bl[1], tl[1], len(y_values)),
+            x_values=x_values, y_values=y_values, axis=axis)
+
+    axis.set_title('Real-Time {} well plate positioning'.format(c_n * r_n))
+
+    axis.grid(which='both')
+
+    # Image display plot
+    axis.set_axis_off()
+
+
 class CustomLogger(QObject, logging.Handler):
     new_record = pyqtSignal(object)
 
@@ -116,30 +158,7 @@ class CoordinatePlotAndImgDisplay(QWidget):
         tl, tr, bl, _ = well_plate.corners_coords  # Top left, Top right, Bottom left
         r_n, c_n = well_plate.r_n, well_plate.c_n
 
-        # Coordinate plot
-        x_offset = (tr[0] - tl[0]) * 0.1
-        self.canvas.axes[0].set_xlim(tl[0] - x_offset, tr[0] + x_offset)
-        y_offset = (tl[1] - bl[1]) * 0.1
-        self.canvas.axes[0].set_ylim(bl[1] - y_offset, tl[1] + y_offset)
-
-        x_values = list(range(1, c_n))
-        y_values = [x for x in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[:r_n]]
-
-        self.canvas.axes[0].set_xticks(np.linspace(tl[0], tr[0], len(x_values)))
-        self.canvas.axes[0].set_xticklabels(x_values)
-        self.canvas.axes[0].tick_params(axis='x', labelsize='x-small')
-
-        # Set y-axis ticks from P to A
-        self.canvas.axes[0].set_yticks(np.linspace(bl[1], tl[1], len(y_values)))
-        self.canvas.axes[0].set_yticklabels(reversed(y_values))
-        self.canvas.axes[0].tick_params(axis='y', labelsize='medium')
-
-        self.canvas.axes[0].set_title('Real-Time {} well plate positioning'.format(c_n * r_n))
-
-        self.canvas.axes[0].grid(which='both')
-
-        # Image display plot
-        self.canvas.axes[1].set_axis_off()
+        # Create the coordinate plot
 
         # Start data generation
         self.startprocess(well_plate, protocol)
