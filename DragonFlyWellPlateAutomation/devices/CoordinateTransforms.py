@@ -54,7 +54,7 @@ def linearcorrectionmatrix(topright, topleft, bottomright, bottomleft, c_n, r_n)
     # x = numbers i.e. columns
     # y = letters i.e. rows
     vectors = sum(
-        [[(np.dot(cor, np.array(np.array((c, r, 0)))) + fixit * (c * r)) for c in
+        [[(np.dot(cor, np.array(np.array((c, r, 1)))) + fixit * (c * r)) for c in
           range(1, (c_n+1))] for r in range(1, (r_n+1))], [])
 
     logger.log(level=20, msg="The resulting bottom right and middle well coordinates: {}".format([vectors[int((c_n*r_n)/2)],
@@ -142,7 +142,7 @@ def homography_matrix_estimation(method, vectors, wellcoords_key):
     return H
 
 
-def homography_application(homography, c_n, r_n):
+def homography_application(homography, c_n, r_n, blpred=np.array([-47.7, 37, 0])):
     # The Hi3 cooefficient is very important !!!
     vectors, wellnames, wellcoords = list(zip(*sum(
         [[(np.dot(homography, np.array(np.array((c +1,  r +1, 1)))), str(r + 1) + "-" + str(c + 1), [r +1,  c +1]) for c in
@@ -157,13 +157,17 @@ def homography_application(homography, c_n, r_n):
     # #     vector = [(c*h_11 + r*h_12 + h_13),
     # #               (c*h_21 + r*h_22 + h_23)]
     # #     vectors += [vector]
-
-   # fixit = (np.array([-47.7, 32]) - np.array(vectors[0]))
-
-    #vectors = np.array(vectors) + fixit
+    print(vectors[(r_n * c_n) - c_n])
+    fixit = (np.array([-47.7, -37, 0]) - np.array(vectors[(r_n * c_n) - c_n]))
+    vectors_corr = []
+    for indx,vector in enumerate(vectors):
+        vector = np.array(vector)
+        # if indx > ((r_n/2)*c_n)-1:
+        #     vector =  vector + fixit
+        vectors_corr += [vector + fixit]
     logger.log(level=20, msg="Outputted vectors: {}".format(vectors))
     logger.log(level=20, msg="Outputted well names: {}".format(wellnames))
-    return vectors, wellnames
+    return vectors_corr, wellnames
 
 
 def homography_fixit_calibration(blpred, bl, homography, c, r, c_n, r_n):
