@@ -1,5 +1,7 @@
 import logging
+
 from PyQt6.QtWidgets import QStackedWidget
+
 import GUI_Protocol as GUIP
 import GUI_WellPlate as GUIWP
 import SaveDirectory

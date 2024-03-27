@@ -76,7 +76,6 @@ class UsernamePath(QWidget):
             self.addwell_button.setChecked(False)
 
     def input_text_error_handler(self, path):
-        # TODO confirm if this works
         try:
             if not os.path.exists(path) and os.path.isdir(os.path.dirname(path)):
                 os.makedirs(path)
@@ -94,7 +93,21 @@ class UsernamePath(QWidget):
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
             logger.exception("What happened here: ", exc_info=True)
+    def handleEnterPressed(self):
+        # This method will be called when the user presses Enter in the line edit widgets
 
+        # Check if both username and path are not empty
+        if self.username.text() and self.save_directory.text():
+            # Perform the necessary checks and switch to CreateNewWellPlateTemplate
+            path = self.save_directory.text()
+
+            self.input_text_error_handler(path)
+
+            self.frameswitcher(path)
+
+    def handlePathChanged(self):
+        # Reset the text color and placeholder text when the user starts typing
+        self.save_directory.setStyleSheet(self.default_stylesheet)
     def frameswitcher(self, path):
         # TODO confirm if this works
         try:
@@ -115,18 +128,4 @@ class UsernamePath(QWidget):
             print(f"An unexpected error occurred: {e}")
             logger.exception("What happened here: ", exc_info=True)
 
-    def handleEnterPressed(self):
-        # This method will be called when the user presses Enter in the line edit widgets
 
-        # Check if both username and path are not empty
-        if self.username.text() and self.save_directory.text():
-            # Perform the necessary checks and switch to CreateNewWellPlateTemplate
-            path = self.save_directory.text()
-
-            self.input_text_error_handler(path)
-
-            self.frameswitcher(path)
-
-    def handlePathChanged(self):
-        # Reset the text color and placeholder text when the user starts typing
-        self.save_directory.setStyleSheet(self.default_stylesheet)

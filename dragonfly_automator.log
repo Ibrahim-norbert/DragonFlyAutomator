@@ -1,6 +1,32 @@
-fusionrest.py - 2024-03-27 08:51:59,401 - INFO - This log message is from DragonFlyWellPlateAutomation.RestAPI.fusionrest
-utils.py - 2024-03-27 08:51:59,447 - INFO - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
-utils.py - 2024-03-27 08:51:59,447 - INFO - NumExpr defaulting to 8 threads.
-xyzstage.py - 2024-03-27 08:51:59,521 - INFO - This log message is from xyzstage.py
-micrscope.py - 2024-03-27 08:51:59,521 - INFO - This log message is from micrscope.py
-protocol.py - 2024-03-27 08:51:59,521 - INFO - This log message is from __main__.py
+fusionrest.py - 2024-03-27 16:33:23,903 - INFO - This log message is from DragonFlyWellPlateAutomation.RestAPI.fusionrest
+xyzstage.py - 2024-03-27 16:33:24,069 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.xyzstage.py
+micrscope.py - 2024-03-27 16:33:24,069 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.micrscope.py
+protocol.py - 2024-03-27 16:33:24,069 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.protocol.py
+helperfunctions.py - 2024-03-27 16:33:24,069 - INFO - This log message is from helperfunctions.py
+CoordinateTransforms.py - 2024-03-27 16:33:24,204 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.CoordinateTransforms.py
+wellplate.py - 2024-03-27 16:33:24,204 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.wellplate.py
+GUI_WellPlate.py - 2024-03-27 16:33:24,205 - INFO - This log message is from GUI_WellPlate.py
+SaveDirectory.py - 2024-03-27 16:33:24,205 - INFO - This log message is from SaveDirectory.py
+Visualisation.py - 2024-03-27 16:33:24,218 - INFO - This log message is from Visualisation.py
+FrameSwitcher.py - 2024-03-27 16:33:24,218 - INFO - This log message is from FrameSwitcher.py
+MainWindow.py - 2024-03-27 16:33:24,218 - INFO - This log message is from __main__.py
+MainWindow.py - 2024-03-27 16:33:24,218 - INFO - Directory: C:\Schapiro Lab\ibrahim_hiwi\348_wellplate_automation
+micrscope.py - 2024-03-27 16:33:24,245 - INFO - Current Z: 487.42
+SaveDirectory.py - 2024-03-27 16:33:58,155 - INFO - Selected to create new well-plate dimension
+SaveDirectory.py - 2024-03-27 16:33:58,155 - INFO - Username: ibrahim
+wellplate.py - 2024-03-27 16:34:15,475 - INFO - Well plate dimension: state dict as vectors [array(['59.4', '33.8'], dtype='<U4'), array(['-47.7', '33.1'], dtype='<U5'), array(['-47.7', '-38.6'], dtype='<U5'), array(['4.5', '-2.2'], dtype='<U4'), array(['59.4', '-38.6'], dtype='<U5')]
+CoordinateTransforms.py - 2024-03-27 16:34:15,476 - INFO - The chosen well coords [[ 1.  1.  1.]
+ [ 1. 16.  1.]
+ [24.  1.  1.]
+ [12.  8.  1.]]
+CoordinateTransforms.py - 2024-03-27 16:34:15,476 - INFO - The corresponding xyz coordinates [[-47.70000076  33.09999847   1.        ]
+ [-47.70000076 -38.59999847   1.        ]
+ [ 59.40000153  33.79999924   1.        ]
+ [  4.5         -2.20000005   1.        ]]
+CoordinateTransforms.py - 2024-03-27 16:34:15,476 - INFO - Homography estimation method: Levenberg-Marquardt
+CoordinateTransforms.py - 2024-03-27 16:34:15,476 - INFO - Well plate dimension: length - 107.10228755726928, height - 71.7
+CoordinateTransforms.py - 2024-03-27 16:34:15,476 - INFO - Computed well spacing: x:spacing = 4.656521739130435 and y_spacing = -4.78
+wellplate.py - 2024-03-27 16:34:15,476 - INFO - Well plate matrix dimension: rows: 16, columns: 24
+wellplate.py - 2024-03-27 16:34:15,476 - INFO - Well plate dimension: length - 107.10228755726928, height - 71.7
+wellplate.py - 2024-03-27 16:34:15,476 - INFO - Computed well spacing: x:spacing = 4.656521739130435 and y_spacing = -4.78
+GUI_WellPlate.py - 2024-03-27 16:34:56,236 - INFO - Wells that have been selected: ['A1', 'A23', 'A24', 'B23', 'B24', 'F17', 'G17', 'I8', 'I9', 'P1', 'P2', 'P3', 'P24']

@@ -5,7 +5,7 @@ import os
 import sys
 from time import sleep
 
-from xyzstage import get_output, update, FusionApi
+from .xyzstage import get_output, update, FusionApi
 
 logger = logging.getLogger("DragonFlyWellPlateAutomation.RestAPI.fusionrest")
 logger.info("This log message is from {}.py".format(__name__))

@@ -2,10 +2,12 @@ import glob
 import logging
 import os
 from time import sleep
+
 import numpy as np
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QGridLayout, QPushButton, QWidget, QLineEdit, QVBoxLayout, QComboBox, QHBoxLayout
 from matplotlib import pyplot as plt
+
 from DragonFlyWellPlateAutomation.devices.wellplate import WellPlate
 from helperfunctions import create_colored_label
 
@@ -36,12 +38,10 @@ class CreateNewWellPlateTemplate(QWidget):
         self.row_n.setPlaceholderText("Row number")
         horizonti_tl.addWidget(self.row_n)
 
-
         stackie_tl = QVBoxLayout()
         stackie_tl.addWidget(
             create_colored_label("Please confirm the number of columns and rows\nin the well plate: ", self))
         stackie_tl.addLayout(horizonti_tl)
-
 
         stackie_tm = QVBoxLayout()
         stackie_tm.addWidget(create_colored_label("Select type of coordinate frame prediction: ", self))
@@ -71,7 +71,7 @@ class CreateNewWellPlateTemplate(QWidget):
 
         horizonti_ml = QHBoxLayout()
         self.dropdown = QComboBox(self)
-        options = list(self.well_plate.well_plate_req_coords.keys())
+        options = list(self.well_plate.homography_source_coordinates.keys())
         for x in options:
             self.dropdown.addItem(x)
         horizonti_ml.addWidget(self.dropdown)
@@ -109,12 +109,12 @@ class CreateNewWellPlateTemplate(QWidget):
 
         try:
             # Read and save well plate corners
-            self.well_plate.well_plate_req_coords[self.dropdown.currentText()] = self.well_plate.get_state(
+            self.well_plate.homography_source_coordinates[self.dropdown.currentText()] = self.well_plate.get_state(
                 test_key=self.dropdown.currentText())
 
             # Return them as vectors
             vector = self.well_plate.state_dict_2_vector(
-                self.well_plate.well_plate_req_coords[self.dropdown.currentText()])
+                self.well_plate.homography_source_coordinates[self.dropdown.currentText()])
 
             # Display them in GUI
             self.placeholder_coordinates.setText(str(vector))
@@ -122,8 +122,8 @@ class CreateNewWellPlateTemplate(QWidget):
             logger.log(level=10, msg="Well: " + self.dropdown.currentText() + " - " + str(vector))
 
             # Once all corners are read, log the values
-            if None not in self.well_plate.well_plate_req_coords.values():
-                final = self.well_plate.well_plate_req_coords.items()
+            if None not in self.well_plate.homography_source_coordinates.values():
+                final = self.well_plate.homography_source_coordinates.items()
                 logger.log(level=10, msg="Final coordinates: " + str(final))
 
         except Exception as e:
@@ -133,16 +133,17 @@ class CreateNewWellPlateTemplate(QWidget):
     def enter_button_click(self):
 
         try:
-            if None not in self.well_plate.well_plate_req_coords.values():
+            if None not in self.well_plate.homography_source_coordinates.values():
+
+                # Compute the wellplate grid
+                vectors, well_names, length, height, x_spacing = self.well_plate.predict_well_coords(
+                    int(self.column_n.text()), int(self.row_n.text()), self.well_plate.homography_source_coordinates,
+                    self.typegridpred.currentText(), self.typehomopred.currentText())
 
                 # Save well plate template
                 if self.partnumber.text() and self.manufacturer.text():
                     self.well_plate.save_attributes2json(self.manufacturer.text(), self.partnumber.text())
                     logger.log(level=10, msg="Saved new well plate template")
-
-                # Compute the wellplate grid
-                self.well_plate.predict_well_coords(int(self.column_n.text()), int(self.row_n.text()),
-                                                    self.typegridpred.currentText(), self.typehomopred.currentText())
 
                 # Switch to frame three
                 self.stacked_widget.switch2WPbuttongrid()
@@ -150,6 +151,42 @@ class CreateNewWellPlateTemplate(QWidget):
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
             logger.exception("What happened here ", exc_info=True)
+
+
+class Calibration(QWidget):
+    def __init__(self, wellplate, buttons, parent=None):
+        super().__init__(parent=parent)
+
+        self.wellplate = wellplate
+
+        main_layout = QVBoxLayout(self)
+        self.calibrationdisplay = create_colored_label(parent=self, text="")
+        main_layout.addWidget(self.calibrationdisplay)
+
+        horizonti_ml = QHBoxLayout()
+        self.placeholder_coordinates = create_colored_label("", self)
+        horizonti_ml.addWidget(self.placeholder_coordinates)
+        self.read_button = QPushButton("Read", self)
+        self.read_button.clicked.connect(self.read_calibration_well)
+        horizonti_ml.addWidget(self.read_button)
+
+        main_layout.addLayout(horizonti_ml)
+        self.setLayout(main_layout)
+        self.buttons = buttons
+
+    def move2calibration_well(self, wellname):
+        self.wellplate.automated_wp_movement(wellname)  # Delay
+
+        self.calibrationdisplay.setText("Have we arrived on mid-point of well {} ?"
+                                        "If not, please move stage accordingly, then press read and "
+                                        "afterwards enter.").format(wellname)
+        self.calibrationdisplay.setWordWrap(True)
+
+    def read_calibration_well(self):
+        state = self.wellplate.get_state(test_key="Bottom right well")
+        self.wellplate.bottomright_calibration = self.wellplate.state_dict_2_vector(state)
+        self.placeholder_coordinates.setText("Current coordinates: {}".format(self.wellplate.bottomright_calibration))
+        [button.setEnabled(True) for button in self.buttons]
 
 
 class WellAsButton(QPushButton):
@@ -161,6 +198,7 @@ class WellAsButton(QPushButton):
         self.color = "#00aa00"
         self.setStyleSheet("background-color: {}; color: #ffffff;".format(self.color))
         self.setCheckable(True)
+        self.setEnabled(False)
         self.well_state_dict = xyz_stage_state
 
     def handleButtonClick(self):
@@ -181,11 +219,17 @@ class CustomButtonGroup(QWidget):
     def __init__(self, stacked_widget, well_plate):
         super().__init__()
 
+        self.main_layout = QHBoxLayout(self)
         self.buttons = None
         self.enter_button = None
         self.checked_buttons = None
         self.stacked_widget = stacked_widget
         self.well_plate = well_plate
+
+    def createcalibrationwidget(self, well_plate, buttons):
+
+        self.calibration_widget = Calibration(well_plate, buttons, parent=self)
+        self.main_layout.addWidget(self.calibration_widget)
 
     def creatbuttongrid(self):
 
@@ -193,36 +237,37 @@ class CustomButtonGroup(QWidget):
 
         self.buttons = []
 
-        for well_key, state_dict in self.well_plate.all_well_dicts.items():
+        for well_key in self.well_plate.wellnames:
             wellname, r_str, c_str, r, c = self.well_plate.mapwellintegercoords2alphabet(well_key)
-            button = WellAsButton(text=wellname, parent=self, coordinates=(r, c), xyz_stage_state=state_dict)
+            button = WellAsButton(text=wellname, parent=self, coordinates=(r, c))
             button.clicked.connect(button.handleButtonClick)
             self.buttons.append(button)
             layout.addWidget(button, button.coordinates[0], button.coordinates[1])
             button.setFixedSize(25, 15)
 
-        main_layout = QVBoxLayout(self)
+        main_layout = QVBoxLayout()
         main_layout.addLayout(layout)
         self.enter_button = QPushButton("Enter", parent=self)
         self.enter_button.clicked.connect(self.handleEnterPressed)
         main_layout.addWidget(self.enter_button)
 
-        self.setLayout(main_layout)
+        self.createcalibrationwidget(self.well_plate, self.buttons)
+        self.main_layout.addLayout(main_layout)
+        self.setLayout(self.main_layout)
 
     def handleEnterPressed(self):
         try:
 
             # Add to well plate instance
-            self.well_plate.selected_wells = [(button.well_state_dict, button.coordinates, button.wellname) for button in
-                                    self.buttons if
-                                    button.isChecked()]
+            self.well_plate.selected_wells = [(button.well_state_dict, button.coordinates, button.wellname) for button
+                                              in
+                                              self.buttons if
+                                              button.isChecked()]
             logger.log(level=20, msg="Wells that have been selected: {}".format([x[-1] for x in
                                                                                  self.well_plate.selected_wells]))
 
             # Automatic updater -> threading ?
             self.stacked_widget.switch2Protocol()  # -> Underneath for loop or in parallel to
-
-            # And with for loop -> multithreading?
 
         except Exception as e:
             print(f"An unexpected error occurred: {e}")

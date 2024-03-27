@@ -7,7 +7,7 @@ logger = logging.getLogger("DragonFlyWellPlateAutomation.RestAPI.fusionrest")
 logger.info("This log message is from {}.py".format(__name__))
 
 
-def linearspacing(topright, topleft, bottomleft, P24_coords, c_n, r_n):
+def linearspacing(topright, topleft, bottomleft, c_n, r_n):
     length = np.linalg.norm(topleft - topright)
     height = np.linalg.norm(topleft - bottomleft)
 
@@ -20,15 +20,11 @@ def linearspacing(topright, topleft, bottomleft, P24_coords, c_n, r_n):
 
     xv, yv = np.meshgrid(x_coord, y_coord)
 
-    vectors = np.stack([xv, yv], axis=-1)  # rows,columns,coordinate i.e. [x,y] in column direction
+    vectors = np.stack([xv, yv, np.ones(yv.shape)], axis=-1)  # rows,columns,coordinate i.e. [x,y] in column direction
 
-    vectors = vectors.reshape(r_n * c_n, 2)  # rows,columns,coordinate i.e. [x,y] in column direction
-
-    vectors = [x.tolist() + [0] for x in vectors]
+    vectors = vectors.reshape(r_n * c_n, 3)  # rows,columns,coordinate i.e. [x,y] in column direction
 
     wellcoords_key = sum([[str(r + 1) + "-" + str(c + 1) for c in range(c_n)] for r in range(r_n)], [])
-
-    homography_fixit_calibration(P24_coords, vectors, r_n, c_n)
 
     return vectors, wellcoords_key, length, height, x_spacing, y_spacing
 
@@ -88,14 +84,14 @@ def homography_matrix_estimation(method, vectors, wellcoords_key):
 
     wellcoords = [np.flip([int(x.split("-")[0]), int(x.split("-")[1])]) for x in wellcoords_key]
 
-    pts_src = np.array(wellcoords, dtype=np.float32)[:4]
+    pts_src = np.array(wellcoords, dtype=np.float32)
     if len(pts_src[0]) < 3:
-        pts_src = np.hstack((np.array(wellcoords, dtype=np.float32), np.ones((len(vectors), 1))))[:4]
+        pts_src = np.hstack((np.array(wellcoords, dtype=np.float32), np.ones((len(vectors), 1))))
     logger.log(level=20, msg="The chosen well coords {}".format(pts_src))
 
-    pts_dst = np.array(vectors, dtype=np.float32)[:4]
+    pts_dst = np.array(vectors, dtype=np.float32)
     if len(vectors[0]) < 3:
-        pts_dst = np.hstack((np.array(vectors, dtype=np.float32), np.ones((len(vectors), 1))))[:4]
+        pts_dst = np.hstack((np.array(vectors, dtype=np.float32), np.ones((len(vectors), 1))))
     logger.log(level=20, msg="The corresponding xyz coordinates {}".format(pts_dst))
 
     if method == "Levenberg-Marquardt":
@@ -181,21 +177,19 @@ def homography_fixit(P24_coords, pred, vectors):
     return vectors + fixit
 
 
-def homography_application(homography, c_n, r_n, P24_coords):
+def homography_application(homography, c_n, r_n):
+
     # The Hi3 cooefficient is very important !!!
     vectors, wellnames, wellcoords = list(zip(*sum(
         [[(np.dot(homography, np.array([c + 1, r + 1, 1])), str(r + 1) + "-" + str(c + 1), [r + 1, c + 1]) for c in
           range(c_n)] for r in range(r_n)], [])))
     vectors = np.array(list(vectors))
 
-    # Calibrate
-    vectors = homography_fixit_calibration(P24_coords, vectors, r_n, c_n)
+    x_spacing = np.abs(vectors[0][0] - vectors[1][0])
+    y_spacing = np.abs(vectors[0][1] - vectors[c_n][1])
 
-    x_spacing = np.abs(vectors[int(c_n / 2)][0] - vectors[int(c_n / 2) + 1][0])
-    y_spacing = np.abs(vectors[c_n * 2][1] - vectors[(c_n * 2) + 1][1])
-
-    length = np.linalg.norm(topleft - topright)
-    height = np.linalg.norm(topleft - bottomleft)
+    length = np.linalg.norm(vectors[0] - vectors[c_n-1])
+    height = np.linalg.norm(vectors[0] - vectors[r_n*(c_n-1)])
 
     logger.log(level=20, msg="Outputted vectors: {}".format(vectors))
     logger.log(level=20, msg="Outputted well names: {}".format(wellnames))

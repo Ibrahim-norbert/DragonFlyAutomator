@@ -91,7 +91,8 @@ class GUIProtocol(QWidget):
             self.protocol.z_increment = z_increment
 
         else:
-            self.z_height_travelled.setText("<font color='red'>Both entries must be integers or floats.</font>")
+            self.z_height_travelled.setText("Both entries must be integers or floats")
+            self.z_height_travelled.setStyleSheet("color: red;")
 
     def run_automated_acquisition(self):
 

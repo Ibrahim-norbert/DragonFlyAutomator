@@ -38,6 +38,11 @@ class AutoFocus:
         self.metrics = [func for func in dir(self) if callable(getattr(self, func)) and
                         func not in ["calculate_summed_power", "power_spectrum", "combinatorial"] and "__" not in func]
 
+    def refresh(self):
+        self.variables = {
+            "Img_ID": [], "Z plane": [], "Well coords": [], "Acquisition number": [], "Metrics": [], "Value": []}
+
+
     def savestats2dict(self, key, res, img_name):
         self.variables["Metrics"] += [key]
         self.variables["Value"] += [res]  # self.collector

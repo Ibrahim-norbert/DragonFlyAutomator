@@ -20,8 +20,8 @@ class WellPlate(XYZStage):
         super().__init__()
         self.bottomright_calibration = None
         self.selected_wells = None
-        self.well_plate_req_coords = {"Top left well": {}, "Bottom left well": {}, "Top right well": {},
-                                      "Mid-well": {}}
+        self.homography_source_coordinates = {"Bottom left well": {}, "Top left well": {}, "Top right well": {},
+                                              "Middle well": {}}
         self.corners_coords = None
         self.yspacing = None
         self.xspacing = None
@@ -32,7 +32,7 @@ class WellPlate(XYZStage):
         self.c_n = None
         self.r_n = None
         self.homography_matrix_algorithm = None
-        # TODO Add to protocol window
+
         self.homography_matrix_algorithms = ["Levenberg-Marquardt", "SVD", "Eigen-decomposition"]
         self.coordinate_frame_algorithm = None
         self.coordinate_frame_algorithms = ["Linear spacing"]
@@ -76,21 +76,22 @@ class WellPlate(XYZStage):
         try:
             specified_vectors = [self.state_dict_2_vector(homography_source_coordinates["Top right well"]),
                                  self.state_dict_2_vector(homography_source_coordinates["Top left well"]),
-                                 self.state_dict_2_vector(homography_source_coordinates["Bottom left well"])]
+                                 self.state_dict_2_vector(homography_source_coordinates["Bottom left well"]),
+                                 self.state_dict_2_vector(homography_source_coordinates["Middle well"])]
 
             # Top right, Bottom left = Bottom right
-            specified_vectors = specified_vectors + [np.array([specified_vectors[-3][0], specified_vectors[-1][1]])]
+            specified_vectors = specified_vectors + [np.array([specified_vectors[0][0], specified_vectors[2][1]])]
 
             # Add bottom left well
-
             topleft = specified_vectors[1].astype(float)
             bottomleft = specified_vectors[2].astype(float)
             topright = specified_vectors[0].astype(float)
-            bottomright = specified_vectors[3].astype(float)
+            bottomright = specified_vectors[-1].astype(float)
+            middle = specified_vectors[3].astype(float)
 
             logger.log(level=20, msg="Well plate dimension: state dict as vectors {}".format(specified_vectors))
 
-            return topleft, bottomleft, topright, bottomright
+            return topleft, bottomleft, topright, middle, bottomright
 
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
@@ -102,7 +103,16 @@ class WellPlate(XYZStage):
         vector in zip(wellcoords_key, vectors)}
         return all_well_dicts
 
-    def set_parameters(self, well_names, vectors,
+    def set_xyzstagecoords(self, vectors, well_names, r_n, c_n, ):
+
+        self.all_well_dicts = self.createwellplatestatedict(well_names, vectors)
+        self.corners_coords = [vectors[x].tolist() for x in [0, c_n - 1, (r_n * c_n) - c_n,
+                                                             (r_n * c_n) - 1]]  # Top left, Top right, Bottom left
+        self.corner_wells = [well_names[x] for x in [0, c_n - 1, (r_n * c_n) - c_n,
+                                                     (r_n * c_n) - 1]]  # Top left, Top right, Bottom left
+        logger.log(level=20, msg="Well plate corner coordinates: {}".format(self.corners_coords))
+
+    def set_parameters(self, well_names,
                        r_n, c_n, length, height, x_spacing, y_spacing, algorithm_CF, algorithm_H):
 
         print("Saving all variables associated to the coordinate system.")
@@ -111,96 +121,83 @@ class WellPlate(XYZStage):
         self.homography_matrix_algorithm = algorithm_H
         self.r_n = r_n
         self.c_n = c_n
-        self.all_well_dicts = self.createwellplatestatedict(well_names, vectors)
-        self.all_well_keycoords = [[int(x.split("-")[0]), int(x.split("-")[1])] for x in well_names]
+        self.wellnames = well_names
         self.length = length
         self.height = height
         self.xspacing = x_spacing
         self.yspacing = y_spacing
-        self.corners_coords = [vectors[x] for x in [0, c_n - 1, (r_n * c_n) - c_n,
-                                                    (r_n * c_n) - 1]]  # Top left, Top right, Bottom left
-        self.corner_wells = [well_names[x] for x in [0, c_n - 1, (r_n * c_n) - c_n,
-                                                     (r_n * c_n) - 1]]  # Top left, Top right, Bottom left
 
         logger.log(level=20, msg="Well plate matrix dimension: rows: {}, columns: {}".format(r_n, c_n))
-        logger.log(level=20, msg="Well plate corner coordinates: {}".format(self.corners_coords))
         logger.log(level=20, msg="Well plate dimension: length - {}, height - {}".format(length, height))
         logger.log(level=20, msg="Computed well spacing: x:spacing = {} and y_spacing = {}".format(
             x_spacing, y_spacing))
 
-    def predict_well_coords(self, c_n, r_n, algorithm="Linear spacing", algorithm_H="non-linear",
-                            well_plate_req_coords=None,
-                            ):
+    def predict_well_coords(self, c_n, r_n, homography_source_coordinates, algorithm="Linear spacing",
+                            algorithm_H="non-linear"):
 
-        bottomleft, topleft, middle, topright = self.get_source_coordinates(well_plate_req_coords)
+        topleft, bottomleft, topright, middle, bottomright = self.get_source_coordinates(homography_source_coordinates)
 
         wellcoords_key = sum([[str(r + 1) + "-" + str(c + 1) for c in range(c_n)] for r in range(r_n)], [])
         topleft_wn, topright_wn, bottomleft_wn, bottomright_wn, middle_wn = [wellcoords_key[x] for x in
                                                                              [0, c_n - 1, (r_n * c_n) - c_n,
                                                                               (r_n * c_n) - 1,
-                                                                              int((((r_n / 2) * c_n)) - (
+                                                                              int(((r_n / 2) * c_n) - (
                                                                                       (c_n / 2) + 1))]]
 
         self.homography_matrix = CT.homography_matrix_estimation(algorithm_H,
-                                                                 [topleft, bottomleft, topright,
-                                                                  self.bottomright_calibration, middle],
-                                                                 wellcoords_key=[topleft_wn, bottomleft_wn, topright_wn,
-                                                                                 bottomright_wn, middle_wn])
+                                                                 [topleft, bottomleft, topright, middle],
+                                                                 wellcoords_key=[topleft_wn, bottomleft_wn,
+                                                                                 topright_wn, middle_wn])
 
         print("2. Computing coordinate space from well corners using {}".format(algorithm))
 
         if algorithm == self.coordinate_frame_algorithms[0]:
             vectors, well_names, length, height, x_spacing, y_spacing = CT.linearspacing(topright, topleft,
-                                                                                         bottomleft,
-                                                                                         self.bottomright_calibration,
-                                                                                         c_n=c_n, r_n=r_n)
-
-        # # TODO apply fixit calibration seperately. Provide calibration step
-        # elif algorithm == self.coordinate_frame_algorithms[1]:
-        #     vectors, well_names, length, height, x_spacing, y_spacing = CT.linearcorrectionmatrix(topright, topleft,
-        #                                                                                           bottomright,
-        #                                                                                           bottomleft,
-        #                                                                                           c_n=c_n,
-        #                                                                                           r_n=r_n)
+                                                                                         bottomleft, c_n=c_n, r_n=r_n)
 
         else:
             vectors, well_names, length, height, x_spacing, y_spacing = CT.homography_application(
-                self.homography_matrix, c_n, r_n,
-                self.bottomright_calibration)
+                self.homography_matrix, c_n, r_n)
 
         # Save all variables as parameters
-        self.set_parameters(well_names, vectors,
+        self.set_parameters(well_names,
                             r_n, c_n, length, height, x_spacing, y_spacing,
                             algorithm_CF=algorithm, algorithm_H=algorithm_H)
 
         return vectors, well_names, length, height, x_spacing
 
-    # TODO Create widget that gives option for mapping
     def mapwellintegercoords2alphabet(self, wellcoords_key):
         r_str, c_str = wellcoords_key.split("-")
         r, c = int(r_str), int(c_str)
         label = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".upper()[r - 1] + c_str
         return label, r_str, c_str, r, c
 
-    # TODO Include widget for mandatory calibration in protocol window
-    def mapwell2xyzstagecoords(self, c_n, r_n, calibrator_well):
-        return CT.homography_application(self.homography_matrix, c_n, r_n, calibrator_well)
+    def mapwell2xyzstagecoords(self, c_n, r_n):
+        return CT.homography_application(self.homography_matrix, c_n, r_n)
+
+    def calibrate_xyzstagecoords(self, P24_coords, vectors, well_names, r_n, c_n):
+        vectors = CT.homography_fixit_calibration(P24_coords, vectors, r_n, c_n)
+        self.set_xyzstagecoords(vectors, well_names, r_n, c_n)
+        return vectors
+
+    def fixit_xyzstagecoords(self, P24_coords, vectors, well_names, r_n, c_n):
+        vectors = CT.homography_fixit(P24_coords, vectors[-1], vectors)
+        self.set_xyzstagecoords(vectors, well_names, r_n, c_n)
+        return vectors, well_names
 
     def move2coord(self, state_dict):
 
         # Configure drawer
 
         try:
-            # Move stage to well
-            #
-            logger.log(level=20, msg="Stage has its position updated")
-
             # Wait until we reach well position
             if self.test is False:
+                logger.log(level=20,
+                           msg="Stage is moving from {} to new position {}".format(self.get_state(), state_dict))
                 self.update_state(state_dict, analoguecontrol_bool=False)
                 count = 0
                 while self.state_dict_2_vector(self.get_state()) != self.state_dict_2_vector(state_dict):
-                    logger.log(level=20, msg="Stage is moving to new position")
+                    logger.log(level=20, msg="Stage is moving...")
                     if count == 60:
                         sys.exit("XYZ-stage failed to reach well position. Current {} and target {}. Please look at"
                                  "log file to find any errors".format(self.state_dict_2_vector(state_dict),
@@ -209,7 +206,7 @@ class WellPlate(XYZStage):
                     sleep(1)
             else:
                 # length = np.linalg.norm(np.array([0, 0]) - np.array(self.state_dict_2_vector(state_dict)))
-                logger.log(level=20, msg="Stage is moving to new position")
+                logger.log(level=20, msg="Stage is moving from {} to new position {}".format("Here", state_dict))
                 sleep(10)
 
             logger.log(level=20, msg="Stage has arrived at target position")
@@ -218,6 +215,8 @@ class WellPlate(XYZStage):
             logger.exception("What happened here ", exc_info=True)
 
     def save_attributes2json(self, partnumber, manufacturer):
+
+        # Turn all vectors to list
 
         # Create a dictionary with attribute names and values
         attributes = {key: attr for key, attr in self.__dict__.items() if
@@ -237,15 +236,12 @@ class WellPlate(XYZStage):
         self.__dict__.update(attributes)
         self.wellbywell = True
 
-    def automated_wp_movement(self, selected_wellbuttons):
-        state_dict, coords, wellname = selected_wellbuttons
+    def automated_wp_movement(self, wellname):
+
+        state_dict = self.all_well_dicts[wellname]
 
         # Draw graph only when xyz-stage has arrived at well
         self.move2coord(state_dict)  # Delay
-
-        # TODO a) To check quality of current session: compare linearspacing coordinates to linear correction matrix
-        # TODO b) To check quality between current and subsequent session: compare current session to homography prediction
-        # TODO c) To check quality of subsequent session: compare Homography with nonlinear correction and Homography calibration
 
         vector = self.state_dict_2_vector(state_dict)
 
@@ -259,11 +255,9 @@ def main():
     parser.add_argument("--rows", type=int, required=False, help="Enter number of rows", default=16)
     parser.add_argument("--columns", type=int, required=False, help="Enter number of columns", default=24)
 
-    keys = ["Top right well", "Top left well", "Bottom left well"]
-
     wellplate = WellPlate()
-
-    for test_key in keys:
+    print("Before update: " + str(wellplate.__dict__))
+    for test_key in wellplate.homography_source_coordinates.keys():
         # Opening JSON file
         file = os.path.join(os.getcwd(), r"endpoint_outputs", "{}xposition.json".format(test_key.replace(" well", "_")))
         f = open(file)
@@ -273,17 +267,21 @@ def main():
         f = open(file)
         y = json.load(f)
 
-        wellplate.well_plate_req_coords[test_key] = {x: [x_, y, None][id] for id,
+        wellplate.homography_source_coordinates[test_key] = {x: [x_, y, None][id] for id,
         x in enumerate(["xposition", "yposition"])}
-
-    print("Before update: " + str(wellplate.__dict__))
 
     args = parser.parse_args()
 
     # Predict well cords from corners
-    wellplate.predict_well_coords(args.columns, args.rows)
+    vectors, well_names, length, height, x_spacing = wellplate.predict_well_coords(args.columns, args.rows,
+                                                                                   wellplate.homography_source_coordinates)
 
     print("After update: " + str(wellplate.__dict__))
+
+    vectors = wellplate.calibrate_xyzstagecoords([60, -38.9], vectors, well_names, args.rows, args.columns)
+
+    print("With calibrated vectors: " + str(wellplate.__dict__))
+    print(wellplate.all_well_dicts)
 
     # Save the attributes
     wellplate.save_attributes2json(partnumber="12345", manufacturer="Falcon")
@@ -298,12 +296,12 @@ def main():
 
     print("-----------------------------------------------------")
 
-    print("Testing well plate row and column arrangement mapping to xyz-stage coordinate system: ")
-    print(" ")
-    print(" ")
-    print(" ")
+    vectors, well_names = wellplate.fixit_xyzstagecoords([65, -38.9], vectors, well_names, args.rows, args.columns)
 
-    wellplate2.predict_well_coords(args.columns, args.rows)
+    print("With fixit vectors: " + str(wellplate.__dict__))
+    print(wellplate.all_well_dicts)
+
+    wellplate.automated_wp_movement(well_names[0])
 
 
 if __name__ == '__main__':

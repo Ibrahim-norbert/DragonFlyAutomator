@@ -1,20 +1,14 @@
-import copy
-import traceback
+import logging
+import sys
 
 import matplotlib
 import numpy as np
 from PyQt6.QtCore import *
-from PyQt6.QtGui import QPixmap, QImage
-from PyQt6.QtWidgets import QApplication, QVBoxLayout, QWidget, QHBoxLayout, QPushButton, QLabel, QSizePolicy, \
+from PyQt6.QtWidgets import QApplication, QVBoxLayout, QWidget, QSizePolicy, \
     QPlainTextEdit
-import logging
-import sys
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib import pyplot as plt
-from matplotlib.figure import Figure
-
 from imaris_ims_file_reader.ims import ims
-from DragonFlyWellPlateAutomation.gui.helperfunctions import create_colored_label
+from matplotlib import pyplot as plt
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
 matplotlib.use("QtAgg")
 logger = logging.getLogger("DragonFlyWellPlateAutomation.RestAPI.fusionrest")
@@ -112,11 +106,8 @@ class Automation(QRunnable):
     def run(self):
         with QMutexLocker(self.mutex):
             for state_dict, coords, wellname in self.well_plate.selected_wells:
+
                 vector = self.well_plate.state_dict_2_vector(state_dict)
-                if self.well_plate.wellbywell:
-                    vector = self.well_plate.mapwell2xyzstagecoords(coords[1], coords[0],
-                                                                    non_linear_correction=self.protocol.non_linear_correction)
-                    state_dict = self.well_plate.vector_2_state_dict(vector)
 
                 # Emit the result from the thread
                 self.signals_coords.result.emit((vector, wellname))

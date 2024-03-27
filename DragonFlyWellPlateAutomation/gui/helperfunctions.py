@@ -1,4 +1,5 @@
 import logging
+
 from PyQt6.QtWidgets import QLabel
 
 logger = logging.getLogger("DragonFlyWellPlateAutomation.RestAPI.fusionrest")
