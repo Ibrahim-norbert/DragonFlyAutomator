@@ -53,7 +53,7 @@ class AutoFocus:
         return res
 
     def Brenner(self, img_unformated, img_name=None):
-        img = img_unformated[0,0,0]
+        img = img_unformated[0, 0, 0]
         temp = ((img[:, 0:-2] - img[:, 2:]) ** 2)
         res = temp.sum()
         key = "Brenner"
@@ -151,8 +151,6 @@ class AutoFocus:
 
     def turn2dt(self):
         return pd.DataFrame(self.variables)
-
-
 
     def save2DT_excel(self, directory, dt):
         dt.to_csv(os.path.join(directory, "well_plate_data.csv"))

@@ -7,11 +7,10 @@ logger = logging.getLogger("DragonFlyWellPlateAutomation.RestAPI.fusionrest")
 logger.info("This log message is from {}.py".format(__name__))
 
 
-def linearspacing(topright, topleft, bottomright, bottomleft, c_n, r_n):
+def linearspacing(topright, topleft, bottomleft, P24_coords, c_n, r_n):
     length = np.linalg.norm(topleft - topright)
     height = np.linalg.norm(topleft - bottomleft)
 
-    # There has to be regular spacing between cells
     x_coord, x_spacing = np.linspace(topleft[0], topright[0], c_n, retstep=True)
     y_coord, y_spacing = np.linspace(topleft[1], bottomleft[1], r_n, retstep=True)
 
@@ -25,9 +24,11 @@ def linearspacing(topright, topleft, bottomright, bottomleft, c_n, r_n):
 
     vectors = vectors.reshape(r_n * c_n, 2)  # rows,columns,coordinate i.e. [x,y] in column direction
 
-    vectors = [x.tolist() for x in vectors]
+    vectors = [x.tolist() + [0] for x in vectors]
 
     wellcoords_key = sum([[str(r + 1) + "-" + str(c + 1) for c in range(c_n)] for r in range(r_n)], [])
+
+    homography_fixit_calibration(P24_coords, vectors, r_n, c_n)
 
     return vectors, wellcoords_key, length, height, x_spacing, y_spacing
 
@@ -35,6 +36,10 @@ def linearspacing(topright, topleft, bottomright, bottomleft, c_n, r_n):
 def linearcorrectionmatrix(topright, topleft, bottomright, bottomleft, c_n, r_n):
     """correction matrix obtained from:
         https://scripts.iucr.org/cgi-bin/paper?S2053230X18016515"""
+
+    raise NotImplemented
+
+    # topright, topleft, bottomright, bottomleft = np.array([topright, topleft, bottomright, bottomleft]) + 100
 
     corx = topright / float(c_n)
     cory = bottomleft / float(r_n)
@@ -55,12 +60,14 @@ def linearcorrectionmatrix(topright, topleft, bottomright, bottomleft, c_n, r_n)
     # y = letters i.e. rows
     vectors = sum(
         [[(np.dot(cor, np.array(np.array((c, r, 1)))) + fixit * (c * r)) for c in
-          range(1, (c_n+1))] for r in range(1, (r_n+1))], [])
+          range(1, (c_n + 1))] for r in range(1, (r_n + 1))], [])
 
-    logger.log(level=20, msg="The resulting bottom right and middle well coordinates: {}".format([vectors[int((c_n*r_n)/2)],
-                                                                                                 vectors[-1]]))
+    # vectors = np.array(vectors)-100
+    logger.log(level=20,
+               msg="The resulting bottom right and middle well coordinates: {}".format([vectors[int((c_n * r_n) / 2)],
+                                                                                        vectors[-1]]))
 
-    wellcoords_key = sum([[str(r+1) + "-" + str(c + 1) for c in range(c_n)] for r in range(r_n)], [])
+    wellcoords_key = sum([[str(r + 1) + "-" + str(c + 1) for c in range(c_n)] for r in range(r_n)], [])
 
     x_spacing = np.abs(vectors[int(c_n / 2)][0] - vectors[int(c_n / 2) + 1][0])
     y_spacing = np.abs(vectors[c_n * 2][1] - vectors[(c_n * 2) + 1][1])
@@ -83,12 +90,12 @@ def homography_matrix_estimation(method, vectors, wellcoords_key):
 
     pts_src = np.array(wellcoords, dtype=np.float32)[:4]
     if len(pts_src[0]) < 3:
-        pts_src = np.hstack((np.array(wellcoords, dtype=np.float32), np.ones((len(vectors),1))))[:4]
+        pts_src = np.hstack((np.array(wellcoords, dtype=np.float32), np.ones((len(vectors), 1))))[:4]
     logger.log(level=20, msg="The chosen well coords {}".format(pts_src))
 
     pts_dst = np.array(vectors, dtype=np.float32)[:4]
     if len(vectors[0]) < 3:
-        pts_dst = np.hstack((np.array(vectors, dtype=np.float32), np.ones((len(vectors),1))))[:4]
+        pts_dst = np.hstack((np.array(vectors, dtype=np.float32), np.ones((len(vectors), 1))))[:4]
     logger.log(level=20, msg="The corresponding xyz coordinates {}".format(pts_dst))
 
     if method == "Levenberg-Marquardt":
@@ -118,7 +125,7 @@ def homography_matrix_estimation(method, vectors, wellcoords_key):
 
         logger.log(level=20, msg="Homography estimation method: {}".format("Eigenvectors"))
         # Construct matrix A
-        A = [] #3,9
+        A = []  # 3,9
         for i in range(len(pts_src)):
             x, y, z = pts_src[i]
             u, v, z = pts_dst[i]
@@ -142,34 +149,54 @@ def homography_matrix_estimation(method, vectors, wellcoords_key):
     return H
 
 
-def homography_application(homography, c_n, r_n, blpred=np.array([-47.7, 37, 0])):
+def homography_fixit_calibration(P24_coords, vectors, r_n, c_n):
+    if not isinstance(vectors, np.ndarray):
+        vectors = np.array(vectors)
+
+    pred = vectors[-1]
+
+    fixit = (np.append(P24_coords, 0) - pred)
+    logger.log(level=20, msg="We have the following difference in prediction: {}".format(fixit))
+
+    vector_f, vector_l = np.vsplit(vectors.reshape(r_n, c_n, 3),
+                                   2)
+    vector_l = np.array(sum(
+        [[vector_l[r, c] + np.array([(fixit[0] / c_n) * c, (fixit[1] / r_n) * r, fixit[-1]]) for c in
+          range(vector_l.shape[1])] for r in range(vector_l.shape[0])], [])).reshape(vector_l.shape)
+
+    vector_ff, vector_fl = np.hsplit(vector_f, 2)
+
+    vector_f = np.hstack((vector_ff, np.array(sum(
+        [[vector_fl[r, c] + np.array([(fixit[0] / c_n) * c, (fixit[1] / r_n) * r, fixit[-1]]) for c in
+          range(vector_fl.shape[1])] for r in range(vector_fl.shape[0])], [])).reshape(vector_fl.shape)))
+
+    return np.vstack((vector_f, vector_l)).reshape(r_n * c_n, 3)
+
+
+def homography_fixit(P24_coords, pred, vectors):
+    if pred is None:
+        pred = vectors[-1]
+    fixit = (np.append(P24_coords, 0) - pred)
+    logger.log(level=20, msg="We have the following difference in prediction: {}".format(fixit))
+    return vectors + fixit
+
+
+def homography_application(homography, c_n, r_n, P24_coords):
     # The Hi3 cooefficient is very important !!!
     vectors, wellnames, wellcoords = list(zip(*sum(
-        [[(np.dot(homography, np.array(np.array((c +1,  r +1, 1)))), str(r + 1) + "-" + str(c + 1), [r +1,  c +1]) for c in
+        [[(np.dot(homography, np.array([c + 1, r + 1, 1])), str(r + 1) + "-" + str(c + 1), [r + 1, c + 1]) for c in
           range(c_n)] for r in range(r_n)], [])))
+    vectors = np.array(list(vectors))
 
-    # vectors = []
-    # # for wellcoord in wellcoords:
-    # #     h_11, h_12, h_13 = homography[0]
-    # #     h_21, h_22, h_23 = homography[1]
-    # #     h_31, h_32, h_33 = homography[2]
-    # #     r,c = wellcoord
-    # #     vector = [(c*h_11 + r*h_12 + h_13),
-    # #               (c*h_21 + r*h_22 + h_23)]
-    # #     vectors += [vector]
-    print(vectors[(r_n * c_n) - c_n])
-    fixit = (np.array([-47.7, -37, 0]) - np.array(vectors[(r_n * c_n) - c_n]))
-    vectors_corr = []
-    for indx,vector in enumerate(vectors):
-        vector = np.array(vector)
-        # if indx > ((r_n/2)*c_n)-1:
-        #     vector =  vector + fixit
-        vectors_corr += [vector + fixit]
+    # Calibrate
+    vectors = homography_fixit_calibration(P24_coords, vectors, r_n, c_n)
+
+    x_spacing = np.abs(vectors[int(c_n / 2)][0] - vectors[int(c_n / 2) + 1][0])
+    y_spacing = np.abs(vectors[c_n * 2][1] - vectors[(c_n * 2) + 1][1])
+
+    length = np.linalg.norm(topleft - topright)
+    height = np.linalg.norm(topleft - bottomleft)
+
     logger.log(level=20, msg="Outputted vectors: {}".format(vectors))
     logger.log(level=20, msg="Outputted well names: {}".format(wellnames))
-    return vectors_corr, wellnames
-
-
-def homography_fixit_calibration(blpred, bl, homography, c, r, c_n, r_n):
-    fixit = (np.append(bl, 0) - np.append(blpred, 0)) / float((c_n - 1) * (r_n - 1))
-    return homography_application(homography, c, r) + fixit
+    return vectors, wellnames, length, height, x_spacing, y_spacing

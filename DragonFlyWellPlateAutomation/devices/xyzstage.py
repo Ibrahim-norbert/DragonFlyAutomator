@@ -1,7 +1,9 @@
 import json
 import logging
 import os
+
 import numpy as np
+
 from DragonFlyWellPlateAutomation.RestAPI import fusionrest
 
 logger = logging.getLogger("DragonFlyWellPlateAutomation.RestAPI.fusionrest")

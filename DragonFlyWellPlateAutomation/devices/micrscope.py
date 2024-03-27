@@ -3,9 +3,9 @@ import json
 import logging
 import os
 import sys
-import time
 from time import sleep
-from .xyzstage import get_output, update, FusionApi
+
+from xyzstage import get_output, update, FusionApi
 
 logger = logging.getLogger("DragonFlyWellPlateAutomation.RestAPI.fusionrest")
 logger.info("This log message is from {}.py".format(__name__))
@@ -56,15 +56,19 @@ class Microscope(FusionApi):
         logger.log(level=20, msg="Current Z: {}".format(z))
         return state, z
 
-    def move_z_axis(self, z_increment=None, new_z_height=None):
+    def move_z_axis(self, z_increment={"up": True, "Value": 5}, new_z_height=None):
         logger.log(level=20, msg="Moving z axis")
 
         state, z = self.get_current_z()
 
         if state["driftstabilisationactive"]["Value"] == "False":
             current = state["referencezposition"]["Value"]
-            if z_increment is not None:
-                state["referencezposition"]["Value"] -= z_increment
+            if new_z_height is None:
+                increment = z_increment["Value"]
+                if z_increment["up"] == True:
+                    state["referencezposition"]["Value"] += increment
+                else:
+                    state["referencezposition"]["Value"] -= increment
             elif new_z_height is not None:
                 state["referencezposition"]["Value"] = float(new_z_height)
 
