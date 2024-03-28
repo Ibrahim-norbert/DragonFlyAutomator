@@ -23,7 +23,7 @@ class FrameManager(QStackedWidget):
         self.frame2 = GUIWP.CustomButtonGroup(stacked_widget=self, well_plate=self.frame1.well_plate)
 
         # Protocol related
-        self.frame3 = GUIP.GUIProtocol(stacked_widget=self, img_dir=self.frame0.save_directory.text())
+        self.frame3 = GUIP.GUIProtocol(stacked_widget=self)
         self.frame4 = VIZ.CoordinatePlotAndImgDisplay(stacked_widget=self)
 
         self.addWidget(self.frame0)

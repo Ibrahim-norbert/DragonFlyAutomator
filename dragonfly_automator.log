@@ -1,32 +1,60 @@
-fusionrest.py - 2024-03-27 16:33:23,903 - INFO - This log message is from DragonFlyWellPlateAutomation.RestAPI.fusionrest
-xyzstage.py - 2024-03-27 16:33:24,069 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.xyzstage.py
-micrscope.py - 2024-03-27 16:33:24,069 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.micrscope.py
-protocol.py - 2024-03-27 16:33:24,069 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.protocol.py
-helperfunctions.py - 2024-03-27 16:33:24,069 - INFO - This log message is from helperfunctions.py
-CoordinateTransforms.py - 2024-03-27 16:33:24,204 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.CoordinateTransforms.py
-wellplate.py - 2024-03-27 16:33:24,204 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.wellplate.py
-GUI_WellPlate.py - 2024-03-27 16:33:24,205 - INFO - This log message is from GUI_WellPlate.py
-SaveDirectory.py - 2024-03-27 16:33:24,205 - INFO - This log message is from SaveDirectory.py
-Visualisation.py - 2024-03-27 16:33:24,218 - INFO - This log message is from Visualisation.py
-FrameSwitcher.py - 2024-03-27 16:33:24,218 - INFO - This log message is from FrameSwitcher.py
-MainWindow.py - 2024-03-27 16:33:24,218 - INFO - This log message is from __main__.py
-MainWindow.py - 2024-03-27 16:33:24,218 - INFO - Directory: C:\Schapiro Lab\ibrahim_hiwi\348_wellplate_automation
-micrscope.py - 2024-03-27 16:33:24,245 - INFO - Current Z: 487.42
-SaveDirectory.py - 2024-03-27 16:33:58,155 - INFO - Selected to create new well-plate dimension
-SaveDirectory.py - 2024-03-27 16:33:58,155 - INFO - Username: ibrahim
-wellplate.py - 2024-03-27 16:34:15,475 - INFO - Well plate dimension: state dict as vectors [array(['59.4', '33.8'], dtype='<U4'), array(['-47.7', '33.1'], dtype='<U5'), array(['-47.7', '-38.6'], dtype='<U5'), array(['4.5', '-2.2'], dtype='<U4'), array(['59.4', '-38.6'], dtype='<U5')]
-CoordinateTransforms.py - 2024-03-27 16:34:15,476 - INFO - The chosen well coords [[ 1.  1.  1.]
- [ 1. 16.  1.]
- [24.  1.  1.]
- [12.  8.  1.]]
-CoordinateTransforms.py - 2024-03-27 16:34:15,476 - INFO - The corresponding xyz coordinates [[-47.70000076  33.09999847   1.        ]
- [-47.70000076 -38.59999847   1.        ]
- [ 59.40000153  33.79999924   1.        ]
- [  4.5         -2.20000005   1.        ]]
-CoordinateTransforms.py - 2024-03-27 16:34:15,476 - INFO - Homography estimation method: Levenberg-Marquardt
-CoordinateTransforms.py - 2024-03-27 16:34:15,476 - INFO - Well plate dimension: length - 107.10228755726928, height - 71.7
-CoordinateTransforms.py - 2024-03-27 16:34:15,476 - INFO - Computed well spacing: x:spacing = 4.656521739130435 and y_spacing = -4.78
-wellplate.py - 2024-03-27 16:34:15,476 - INFO - Well plate matrix dimension: rows: 16, columns: 24
-wellplate.py - 2024-03-27 16:34:15,476 - INFO - Well plate dimension: length - 107.10228755726928, height - 71.7
-wellplate.py - 2024-03-27 16:34:15,476 - INFO - Computed well spacing: x:spacing = 4.656521739130435 and y_spacing = -4.78
-GUI_WellPlate.py - 2024-03-27 16:34:56,236 - INFO - Wells that have been selected: ['A1', 'A23', 'A24', 'B23', 'B24', 'F17', 'G17', 'I8', 'I9', 'P1', 'P2', 'P3', 'P24']
+fusionrest.py - 2024-03-28 22:37:27,425 - INFO - This log message is from DragonFlyWellPlateAutomation.RestAPI.fusionrest
+utils.py - 2024-03-28 22:37:27,576 - INFO - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+utils.py - 2024-03-28 22:37:27,576 - INFO - NumExpr defaulting to 8 threads.
+xyzstage.py - 2024-03-28 22:37:27,847 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.xyzstage.py
+micrscope.py - 2024-03-28 22:37:27,847 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.micrscope.py
+protocol.py - 2024-03-28 22:37:27,847 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.protocol.py
+helperfunctions.py - 2024-03-28 22:37:27,847 - INFO - This log message is from helperfunctions.py
+CoordinateTransforms.py - 2024-03-28 22:37:28,425 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.CoordinateTransforms.py
+wellplate.py - 2024-03-28 22:37:28,425 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.wellplate.py
+GUI_WellPlate.py - 2024-03-28 22:37:28,438 - INFO - This log message is from GUI_WellPlate.py
+SaveDirectory.py - 2024-03-28 22:37:28,453 - INFO - This log message is from SaveDirectory.py
+Visualisation.py - 2024-03-28 22:37:28,578 - INFO - This log message is from Visualisation.py
+FrameSwitcher.py - 2024-03-28 22:37:28,578 - INFO - This log message is from FrameSwitcher.py
+MainWindow.py - 2024-03-28 22:37:28,579 - INFO - This log message is from __main__.py
+MainWindow.py - 2024-03-28 22:37:28,579 - INFO - Directory: /media/ibrahim/Extended Storage/cloud/Internship/bioquant/348_wellplate_automation
+micrscope.py - 2024-03-28 22:37:28,807 - INFO - Current Z: 487.42
+SaveDirectory.py - 2024-03-28 22:38:37,457 - INFO - Selected saved well-plate dimension
+SaveDirectory.py - 2024-03-28 22:38:37,457 - INFO - Username: ibrahim
+SaveDirectory.py - 2024-03-28 22:38:37,457 - INFO - Image directory: /media/ibrahim/Extended Storage/cloud/Internship/bioquant/figures/test
+wellplate.py - 2024-03-28 22:38:37,481 - INFO - Stage is moving from Here to new position {'xposition': {'Value': 59.4}, 'yposition': {'Value': -38.6}, 'analoguecontrol': {'Value': False}}
+wellplate.py - 2024-03-28 22:38:47,491 - INFO - Stage has arrived at target position
+GUI_WellPlate.py - 2024-03-28 22:39:05,764 - INFO - Wells that have been selected: ['A1', 'A2', 'F5', 'F6', 'P1', 'P2', 'P23', 'P24']
+wellplate.py - 2024-03-28 22:39:35,221 - INFO - Stage is moving from Here to new position {'xposition': {'Value': -47.7}, 'yposition': {'Value': 33.1}, 'analoguecontrol': {'Value': False}}
+Visualisation.py - 2024-03-28 22:39:35,275 - INFO - Wells that have been selected: A1 and their coordinates [-47.7  33.1]
+Visualisation.py - 2024-03-28 22:39:35,278 - INFO - Create the following coordinate plot of well: A1 and their coordinates [-47.7, 33.1]
+wellplate.py - 2024-03-28 22:39:45,230 - INFO - Stage has arrived at target position
+protocol.py - 2024-03-28 22:39:45,230 - INFO - Autofocus begins for well: 1-1
+protocol.py - 2024-03-28 22:39:45,230 - INFO - Z stack begins for well: 1-1
+protocol.py - 2024-03-28 22:39:45,230 - INFO - Total height to travel 4 mm. Please determine from current position that this is safe
+micrscope.py - 2024-03-28 22:39:45,254 - INFO - Current Z: 487.42
+micrscope.py - 2024-03-28 22:39:45,255 - INFO - Moving z axis
+micrscope.py - 2024-03-28 22:39:45,255 - INFO - Current Z: 487.42
+micrscope.py - 2024-03-28 22:39:55,256 - INFO - Updated referencezposition from 487.42 to 489.42
+micrscope.py - 2024-03-28 22:39:55,256 - INFO - Current Z: 489.42
+micrscope.py - 2024-03-28 22:39:55,289 - INFO - Current Z: 489.42
+micrscope.py - 2024-03-28 22:39:55,289 - INFO - Moving z axis
+micrscope.py - 2024-03-28 22:39:55,289 - INFO - Current Z: 489.42
+micrscope.py - 2024-03-28 22:40:05,299 - INFO - Updated referencezposition from 489.42 to 491.42
+micrscope.py - 2024-03-28 22:40:05,300 - INFO - Current Z: 491.42
+micrscope.py - 2024-03-28 22:40:05,305 - INFO - Moving z axis
+micrscope.py - 2024-03-28 22:40:05,306 - INFO - Current Z: 491.42
+micrscope.py - 2024-03-28 22:40:15,314 - INFO - Updated referencezposition from 491.42 to 487.42
+micrscope.py - 2024-03-28 22:40:15,314 - INFO - Current Z: 487.42
+micrscope.py - 2024-03-28 22:40:15,315 - INFO - Current Z: 487.42
+micrscope.py - 2024-03-28 22:40:15,315 - INFO - Moving z axis
+micrscope.py - 2024-03-28 22:40:15,315 - INFO - Current Z: 487.42
+micrscope.py - 2024-03-28 22:40:25,322 - INFO - Updated referencezposition from 487.42 to 485.42
+micrscope.py - 2024-03-28 22:40:25,323 - INFO - Current Z: 485.42
+micrscope.py - 2024-03-28 22:40:25,328 - INFO - Current Z: 485.42
+micrscope.py - 2024-03-28 22:40:25,328 - INFO - Moving z axis
+micrscope.py - 2024-03-28 22:40:25,328 - INFO - Current Z: 485.42
+micrscope.py - 2024-03-28 22:40:35,338 - INFO - Updated referencezposition from 485.42 to 483.42
+micrscope.py - 2024-03-28 22:40:35,338 - INFO - Current Z: 483.42
+micrscope.py - 2024-03-28 22:40:35,342 - INFO - Moving z axis
+micrscope.py - 2024-03-28 22:40:35,343 - INFO - Current Z: 483.42
+micrscope.py - 2024-03-28 22:40:45,343 - INFO - Updated referencezposition from 483.42 to 487.42
+micrscope.py - 2024-03-28 22:40:45,343 - INFO - Current Z: 487.42
+protocol.py - 2024-03-28 22:40:45,344 - INFO - Z stack done for well 1-1
+protocol.py - 2024-03-28 22:40:45,344 - INFO - The affected images are: ['/media/ibrahim/Extended Storage/cloud/Internship/bioquant/figures/test/well_1-1/rawtake_n2_well1-1_zheigth491.ims', '/media/ibrahim/Extended Storage/cloud/Internship/bioquant/figures/test/well_1-1/rawtake_n2_well1-1_zheigth483.ims', '/media/ibrahim/Extended Storage/cloud/Internship/bioquant/figures/test/well_1-1/rawtake_n1_well1-1_zheigth489.ims', '/media/ibrahim/Extended Storage/cloud/Internship/bioquant/figures/test/well_1-1/rawtake_n1_well1-1_zheigth485.ims']
+protocol.py - 2024-03-28 22:40:45,594 - INFO - Image quality metric applied to all z-stack images

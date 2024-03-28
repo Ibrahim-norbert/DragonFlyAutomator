@@ -18,9 +18,10 @@ logger.info("This log message is from {}.py".format(__name__))
 
 # TODO Need to move all files to the discarded folder and perform the focal plane acquisition in the root directory
 class Protocol(FusionApi):
-    def __init__(self, img_dir):
+    def __init__(self):
         super().__init__()  # inherits
 
+        self.image_dir = None
         self.autofocus = AutoFocus()
         self.variables = None
         self.image_array = None
@@ -39,7 +40,6 @@ class Protocol(FusionApi):
         # For z-stack algorithm
         self.z_increment = None
         self.n_acquisitions = None
-        self.image_dir = img_dir  # os.path.join(os.getcwd(), "test_rn")
         self.img_name_dict = self.get_image_dir()
 
         # Only for live image acquisition method
@@ -126,7 +126,6 @@ class Protocol(FusionApi):
 
                 self.microscope.return2start_z()
         else:
-            paths = glob.glob(os.path.join(os.getcwd(), "test_rn", "2024-03-05", "*.ims"))
             for direction in [True, False]:
                 for i in range(n_acquisitions):
                     state, _ = self.microscope.get_current_z()
@@ -146,14 +145,15 @@ class Protocol(FusionApi):
 
         return well_dir, wellname
 
+
+    def load_ims_imgs(self, img_path):
+        img = ims(img_path, squeeze_output=True)
+        return img[0, :, 0].astype(float)
     def autofocusing(self, wellname, z_increment, n_acquisitions):
 
         start = time.time()
 
         logger.log(level=20, msg="Autofocus begins for well: {}".format(wellname))
-
-        # Refresh the autofocus variable
-        self.autofocus.refresh()
 
         # Get well folder
         well_dir, wellname = self.z_stack(wellname, z_increment, n_acquisitions)
@@ -166,9 +166,12 @@ class Protocol(FusionApi):
         # Get autofocus algorithm
         func = getattr(self.autofocus, self.autofocus_algorithm)
 
+        # Refresh the autofocus variable
+        self.autofocus.refresh()
+
         # Read .ims images
         if func is not None and callable(func):
-            [func(ims(img_path, squeeze_output=True), os.path.basename(img_path)) for img_path in
+            [func(self.load_ims_imgs(img_path), os.path.basename(img_path)) for img_path in
              img_paths]  # Time point 0, Channel 0, z-layer 5
             logger.log(level=20, msg="Image quality metric applied to all z-stack images")
         else:
@@ -211,9 +214,9 @@ class Protocol(FusionApi):
             self.run_protocol(protocol_name)
         else:
             img = os.path.join(os.getcwd(), "test_rn/2024-03-05/rawtake_n7_well0-0_zheigth452.ims")
-            shutil.copy2(img, img_path)
+            shutil.copy2(img, self.img_name_dict["Path"])
 
-        return img_path
+        return self.img_name_dict["Path"]
 
     def savedatafromexecution(self, vector, coordinate_frame_algorithm, homography_matrix_algorithm, well_dir):
 
@@ -239,7 +242,7 @@ class Protocol(FusionApi):
                                      n_acquisitions=n_aqcuisitions)  # Significant delay
 
         # Obtain image with current protocol
-        img_path = self.image_acquisition(img_name, protocol_name)  # Delay
+        img_path = self.image_acquisition(os.path.join(well_dir, img_name), protocol_name)  # Delay
 
         logger.log(level=20, msg="Path of image: {}".format(img_path))
         # Save data

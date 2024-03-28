@@ -154,17 +154,19 @@ class CreateNewWellPlateTemplate(QWidget):
 
 
 class Calibration(QWidget):
-    def __init__(self, wellplate, buttons, parent=None):
+    def __init__(self, wellplate, buttons, wellname, parent=None):
         super().__init__(parent=parent)
 
         self.wellplate = wellplate
 
         main_layout = QVBoxLayout(self)
         self.calibrationdisplay = create_colored_label(parent=self, text="")
+        self.calibrationdisplay.setWordWrap(True)
         main_layout.addWidget(self.calibrationdisplay)
 
         horizonti_ml = QHBoxLayout()
         self.placeholder_coordinates = create_colored_label("", self)
+        self.placeholder_coordinates.setWordWrap(True)
         horizonti_ml.addWidget(self.placeholder_coordinates)
         self.read_button = QPushButton("Read", self)
         self.read_button.clicked.connect(self.read_calibration_well)
@@ -174,13 +176,15 @@ class Calibration(QWidget):
         self.setLayout(main_layout)
         self.buttons = buttons
 
+        self.move2calibration_well(wellname)
+
     def move2calibration_well(self, wellname):
-        self.wellplate.automated_wp_movement(wellname)  # Delay
+        self.wellplate.automated_wp_movement(wellname)  # Delay #Give message on GUI to inform to refrain from closing
+                                                        # the application
 
         self.calibrationdisplay.setText("Have we arrived on mid-point of well {} ?"
                                         "If not, please move stage accordingly, then press read and "
-                                        "afterwards enter.").format(wellname)
-        self.calibrationdisplay.setWordWrap(True)
+                                        "afterwards enter.".format(wellname))
 
     def read_calibration_well(self):
         state = self.wellplate.get_state(test_key="Bottom right well")
@@ -190,11 +194,12 @@ class Calibration(QWidget):
 
 
 class WellAsButton(QPushButton):
-    def __init__(self, text=None, parent=None, coordinates=None, xyz_stage_state=None):
-        super().__init__(text=text, parent=parent)
+    def __init__(self, text=None, wellname_string=None, parent=None, coordinates=None, xyz_stage_state=None):
+        super().__init__(text=wellname_string, parent=parent)
 
         self.coordinates = coordinates  # integer coords
         self.wellname = text
+        self.wellname_string = wellname_string
         self.color = "#00aa00"
         self.setStyleSheet("background-color: {}; color: #ffffff;".format(self.color))
         self.setCheckable(True)
@@ -226,9 +231,9 @@ class CustomButtonGroup(QWidget):
         self.stacked_widget = stacked_widget
         self.well_plate = well_plate
 
-    def createcalibrationwidget(self, well_plate, buttons):
+    def createcalibrationwidget(self, well_plate, buttons, wellname):
 
-        self.calibration_widget = Calibration(well_plate, buttons, parent=self)
+        self.calibration_widget = Calibration(well_plate, buttons, wellname, parent=self)
         self.main_layout.addWidget(self.calibration_widget)
 
     def creatbuttongrid(self):
@@ -237,9 +242,9 @@ class CustomButtonGroup(QWidget):
 
         self.buttons = []
 
-        for well_key in self.well_plate.wellnames:
-            wellname, r_str, c_str, r, c = self.well_plate.mapwellintegercoords2alphabet(well_key)
-            button = WellAsButton(text=wellname, parent=self, coordinates=(r, c))
+        for wellname in self.well_plate.wellnames:
+            wellname_string, r_str, c_str, r, c = self.well_plate.mapwellintegercoords2alphabet(wellname)
+            button = WellAsButton(text=wellname, parent=self, coordinates=(r, c), wellname_string=wellname_string)
             button.clicked.connect(button.handleButtonClick)
             self.buttons.append(button)
             layout.addWidget(button, button.coordinates[0], button.coordinates[1])
@@ -251,7 +256,7 @@ class CustomButtonGroup(QWidget):
         self.enter_button.clicked.connect(self.handleEnterPressed)
         main_layout.addWidget(self.enter_button)
 
-        self.createcalibrationwidget(self.well_plate, self.buttons)
+        self.createcalibrationwidget(self.well_plate, self.buttons, self.well_plate.wellnames[-1])
         self.main_layout.addLayout(main_layout)
         self.setLayout(self.main_layout)
 
@@ -259,7 +264,7 @@ class CustomButtonGroup(QWidget):
         try:
 
             # Add to well plate instance
-            self.well_plate.selected_wells = [(button.well_state_dict, button.coordinates, button.wellname) for button
+            self.well_plate.selected_wells = [(button.wellname, button.wellname_string) for button
                                               in
                                               self.buttons if
                                               button.isChecked()]

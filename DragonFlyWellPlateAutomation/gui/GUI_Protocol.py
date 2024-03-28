@@ -8,12 +8,12 @@ from helperfunctions import create_colored_label
 # TODO Test the script and add a widget that informs operator to select the protocol needed
 
 class GUIProtocol(QWidget):
-    def __init__(self, stacked_widget, img_dir):
+    def __init__(self, stacked_widget):
         super().__init__()
 
         self.wellcords = None
         self.stacked_widget = stacked_widget
-        self.protocol = Protocol(img_dir=img_dir)
+        self.protocol = Protocol()
 
         stackie_tl = QVBoxLayout()
         self.z_increment = QLineEdit(parent=self)
@@ -30,6 +30,7 @@ class GUIProtocol(QWidget):
         stackie_tr.addWidget(self.z_height_travelled)
         self.img_name = QLineEdit(parent=self)
         self.img_name.setPlaceholderText("Please give an image name")
+        self.img_name.editingFinished.connect(self.enteredvalues)
         stackie_tr.addWidget(self.img_name)
 
         horizonti_top = QHBoxLayout()
@@ -45,8 +46,10 @@ class GUIProtocol(QWidget):
         horizonti_middle.addWidget(self.dropdown)
 
         horizonti_low = QHBoxLayout()
-        self.checkbox = QCheckBox('Use non-linear correction for well prediction ?', self)
-        horizonti_low.addWidget(self.checkbox)
+        self.protocol_name_widget = QLineEdit(parent=self)
+        self.protocol_name_widget.setPlaceholderText("Protocol name")
+        self.protocol_name_widget.editingFinished.connect(self.enteredvalues)
+        horizonti_low.addWidget(self.protocol_name_widget)
         self.enter_button = QPushButton("Run automated image acquisition", parent=self)
         horizonti_low.addWidget(self.enter_button)
         self.enter_button.clicked.connect(self.run_automated_acquisition)
@@ -80,15 +83,28 @@ class GUIProtocol(QWidget):
 
         if isinstance(n_acquisitions, (int, float)) is True and isinstance(z_increment, (int, float)):
             self.z_height_travelled.setText("Z position starts at {} and will end at {}.\n"
-                                            "<font color='red'>Please confirm that the objective will "
-                                            "not crash into the well plate.</font>".format
+                                            "Please confirm that the objective will "
+                                            "not crash into the well plate.".format
                                             (self.protocol.microscope.starting_z_height,
                                              round(self.protocol.microscope.starting_z_height +
                                                    (n_acquisitions * z_increment), 3)))
 
             # Assign the acquisition number and z increment to protocol instance
             self.protocol.n_acquisitions = n_acquisitions
+
             self.protocol.z_increment = z_increment
+
+            self.protocol.protocol_name = self.protocol_name_widget.text()
+
+            # Assign image name
+            self.protocol.image_name = self.img_name.text()
+
+            # Assign chosen algorithm
+            self.protocol.autofocus_algorithm = self.dropdown.currentText()
+
+            # Assign image directory
+            self.protocol.image_dir = self.stacked_widget.frame0.img_dir  # os.path.join(os.getcwd(), "test_rn") =
+            # self.stacked_widget.frame0.img_dir
 
         else:
             self.z_height_travelled.setText("Both entries must be integers or floats")
@@ -97,13 +113,5 @@ class GUIProtocol(QWidget):
     def run_automated_acquisition(self):
 
         if self.protocol.n_acquisitions is not None and self.protocol.z_increment is not None:
-            # Assign nonlinear correction for well prediction
-            self.protocol.non_linear_correction = True if self.checkbox.isChecked() else False
-
-            # Assign image name
-            self.protocol.image_name = self.img_name.text()
-
-            # Assign chosen algorithm
-            self.protocol.autofocus_algorithm = self.dropdown.currentText()
 
             self.stacked_widget.switch2WPrtplotter()

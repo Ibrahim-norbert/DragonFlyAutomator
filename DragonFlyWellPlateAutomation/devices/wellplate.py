@@ -160,6 +160,7 @@ class WellPlate(XYZStage):
                 self.homography_matrix, c_n, r_n)
 
         # Save all variables as parameters
+        self.set_xyzstagecoords(vectors, well_names, r_n, c_n) #Just add well names please
         self.set_parameters(well_names,
                             r_n, c_n, length, height, x_spacing, y_spacing,
                             algorithm_CF=algorithm, algorithm_H=algorithm_H)
