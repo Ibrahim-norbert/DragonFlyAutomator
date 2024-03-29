@@ -40,15 +40,19 @@ class AutoFocus:
     def refresh(self):
         self.variables = {
             "Img_ID": [], "Z plane": [], "Well coords": [], "Acquisition number": [], "Metrics": [], "Value": [],
-        "Variables": [], "Frequency": [], "Total power": []}
+            "Variables": [], "Frequency": [], "Total power": []}
 
-    def savestats2dict(self, key, res, img_name):
+    def savestats2dict(self, key, res, img_name, key_v=np.nan, sum_=np.nan, f_k=np.nan):
         self.variables["Metrics"] += [key]
         self.variables["Value"] += [res]  # self.collector
         self.variables["Img_ID"] += [img_name]
         self.variables["Z plane"] += [eval((img_name.split("_zheigth")[1]).split(".")[0])]
         self.variables["Well coords"] += [(img_name.split("_well")[1]).split("_zheigth")[0]]
         self.variables["Acquisition number"] += [eval((img_name.split("_n")[1]).split("_well")[0])]
+
+        self.variables["Variables"] += [key_v]
+        self.variables["Total power"] += [sum_]
+        self.variables["Frequency"] += [f_k]
 
     def calculate_summed_power(self, power, x_spacing=(1 / 0.01), img_name=None):
         """
@@ -67,36 +71,24 @@ class AutoFocus:
 
         f_k = np.linspace(0, 1, sum_.size) * (1.0 / (2 * x_spacing))
 
-        key = "Psw"
-        self.variables["Variables"] += [key]
+        key_v = "Psw"
 
-        self.variables["Total power"] += [sum_.tolist()]
-        self.variables["Frequency"] += [f_k.tolist()]
-
-        self.variables["Img_ID"] += [img_name]
-        self.variables["Z plane"] += [eval((img_name.split("_zheigth")[1]).split(".")[0])]
-        self.variables["Well coords"] += [(img_name.split("_well")[1]).split("_zheigth")[0]]
-        self.variables["Acquisition number"] += [eval((img_name.split("_n")[1]).split("_well")[0])]
-
-        return [f_k, sum_]
+        return [f_k, sum_], key_v
 
     def power_spectrum(self, img, power_threshold=0.02, img_name=None):
         power = calculate_power_spectrum(img)
 
-        summed_power = self.calculate_summed_power(power, x_spacing=(1 / 0.01), img_name=img_name)
+        [f_k, sum_], key_v = self.calculate_summed_power(power, x_spacing=(1 / 0.01), img_name=img_name)
 
         # Extract the power spectrum tail
-        return summed_power[1][summed_power[0] > power_threshold * summed_power[0].max()]
+        return sum_[f_k > power_threshold * f_k.max()], [f_k, sum_], key_v
 
     def turn2dt(self):
-        df = pd.DataFrame.from_dict(
-            self.variables, orient="index")
-        return df.transpose()
+        return pd.DataFrame(dict([(key, pd.Series(value)) for key, value in self.variables.items()]))
 
     def save2DT_excel(self, directory, dt):
         dt.to_csv(os.path.join(directory, "well_plate_data.csv"))
-        self.variables = {
-            "Img_ID": [], "Z plane": [], "Well coords": [], "Acquisition number": [], "Metrics": [], "Value": []}
+        self.refresh()
 
     def Variance(self, img, img_name=None):
         res = np.var(img)
@@ -121,7 +113,9 @@ class AutoFocus:
 
         power = calculate_power_spectrum(img)
 
-        something, summed_power = self.calculate_summed_power(power, x_spacing=(1 / 0.01), img_name=img_name)
+        out, key_v = self.calculate_summed_power(power, x_spacing=(1 / 0.01), img_name=img_name)
+
+        something, summed_power = out
 
         percent_spectrum = calculate_percent_spectrum(summed_power)
 
@@ -130,7 +124,8 @@ class AutoFocus:
         res = (percent_spectrum * np.log10(bin_index)).sum()
 
         key = "Spectral Moments"
-        self.savestats2dict(key, res, img_name)
+        self.savestats2dict(key, res, img_name,
+                            key_v=key_v, sum_=summed_power, f_k=something)
 
         return res
 
@@ -138,10 +133,11 @@ class AutoFocus:
         """
         Run the image quality analysis on the power spectrum
         """
-
-        res = np.mean(self.power_spectrum(img, power_threshold=power_threshold, img_name=img_name))
+        output, [f_k, sum_], key_v = self.power_spectrum(img, power_threshold=power_threshold, img_name=img_name)
+        res = np.mean(output)
         key = "Psm mean"
-        self.savestats2dict(key, res, img_name)
+        self.savestats2dict(key, res, img_name,
+                            key_v=key_v, sum_=sum_, f_k=f_k)
 
         return res
 
@@ -149,17 +145,20 @@ class AutoFocus:
         """
         Run the image quality analysis on the power spectrum
         """
-
-        res = np.std(self.power_spectrum(img, power_threshold=power_threshold, img_name=img_name))
+        output, [f_k, sum_], key_v = self.power_spectrum(img, power_threshold=power_threshold, img_name=img_name)
+        res = np.std(output)
         key = "Psm std"
-        self.savestats2dict(key, res, img_name)
+        self.savestats2dict(key, res, img_name,
+                            key_v=key_v, sum_=sum_, f_k=f_k)
 
         return res
 
     def Psw_meanbin(self, img, power_threshold=0.02, img_name=None):
-        res = np.mean(self.power_spectrum(img, power_threshold=power_threshold, img_name=img_name)[0:5])
+        output, [f_k, sum_], key_v = self.power_spectrum(img, power_threshold=power_threshold, img_name=img_name)
+        res = np.mean(output[0:5])
         key = "Psm meanbin"
-        self.savestats2dict(key, res, img_name)
+        self.savestats2dict(key, res, img_name,
+                            key_v=key_v, sum_=sum_, f_k=f_k)
 
         return res
 
@@ -191,9 +190,11 @@ def main():
         autofocus.Spectral_moments(img, img_name=img_name)
 
     print("After update: {}".format(autofocus.variables))
-    df = pd.DataFrame.from_dict(
-        autofocus.variables, orient="index")
-    df = df.transpose()
+
+    df = autofocus.turn2dt()
+
     df.to_csv("/media/ibrahim/Extended Storage/cloud/Internship/bioquant/348_wellplate_automation/test_rn/df.csv")
+
+
 if __name__ == '__main__':
     main()

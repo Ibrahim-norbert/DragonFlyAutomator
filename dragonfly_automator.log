@@ -1,60 +1,206 @@
-fusionrest.py - 2024-03-28 22:37:27,425 - INFO - This log message is from DragonFlyWellPlateAutomation.RestAPI.fusionrest
-utils.py - 2024-03-28 22:37:27,576 - INFO - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
-utils.py - 2024-03-28 22:37:27,576 - INFO - NumExpr defaulting to 8 threads.
-xyzstage.py - 2024-03-28 22:37:27,847 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.xyzstage.py
-micrscope.py - 2024-03-28 22:37:27,847 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.micrscope.py
-protocol.py - 2024-03-28 22:37:27,847 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.protocol.py
-helperfunctions.py - 2024-03-28 22:37:27,847 - INFO - This log message is from helperfunctions.py
-CoordinateTransforms.py - 2024-03-28 22:37:28,425 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.CoordinateTransforms.py
-wellplate.py - 2024-03-28 22:37:28,425 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.wellplate.py
-GUI_WellPlate.py - 2024-03-28 22:37:28,438 - INFO - This log message is from GUI_WellPlate.py
-SaveDirectory.py - 2024-03-28 22:37:28,453 - INFO - This log message is from SaveDirectory.py
-Visualisation.py - 2024-03-28 22:37:28,578 - INFO - This log message is from Visualisation.py
-FrameSwitcher.py - 2024-03-28 22:37:28,578 - INFO - This log message is from FrameSwitcher.py
-MainWindow.py - 2024-03-28 22:37:28,579 - INFO - This log message is from __main__.py
-MainWindow.py - 2024-03-28 22:37:28,579 - INFO - Directory: /media/ibrahim/Extended Storage/cloud/Internship/bioquant/348_wellplate_automation
-micrscope.py - 2024-03-28 22:37:28,807 - INFO - Current Z: 487.42
-SaveDirectory.py - 2024-03-28 22:38:37,457 - INFO - Selected saved well-plate dimension
-SaveDirectory.py - 2024-03-28 22:38:37,457 - INFO - Username: ibrahim
-SaveDirectory.py - 2024-03-28 22:38:37,457 - INFO - Image directory: /media/ibrahim/Extended Storage/cloud/Internship/bioquant/figures/test
-wellplate.py - 2024-03-28 22:38:37,481 - INFO - Stage is moving from Here to new position {'xposition': {'Value': 59.4}, 'yposition': {'Value': -38.6}, 'analoguecontrol': {'Value': False}}
-wellplate.py - 2024-03-28 22:38:47,491 - INFO - Stage has arrived at target position
-GUI_WellPlate.py - 2024-03-28 22:39:05,764 - INFO - Wells that have been selected: ['A1', 'A2', 'F5', 'F6', 'P1', 'P2', 'P23', 'P24']
-wellplate.py - 2024-03-28 22:39:35,221 - INFO - Stage is moving from Here to new position {'xposition': {'Value': -47.7}, 'yposition': {'Value': 33.1}, 'analoguecontrol': {'Value': False}}
-Visualisation.py - 2024-03-28 22:39:35,275 - INFO - Wells that have been selected: A1 and their coordinates [-47.7  33.1]
-Visualisation.py - 2024-03-28 22:39:35,278 - INFO - Create the following coordinate plot of well: A1 and their coordinates [-47.7, 33.1]
-wellplate.py - 2024-03-28 22:39:45,230 - INFO - Stage has arrived at target position
-protocol.py - 2024-03-28 22:39:45,230 - INFO - Autofocus begins for well: 1-1
-protocol.py - 2024-03-28 22:39:45,230 - INFO - Z stack begins for well: 1-1
-protocol.py - 2024-03-28 22:39:45,230 - INFO - Total height to travel 4 mm. Please determine from current position that this is safe
-micrscope.py - 2024-03-28 22:39:45,254 - INFO - Current Z: 487.42
-micrscope.py - 2024-03-28 22:39:45,255 - INFO - Moving z axis
-micrscope.py - 2024-03-28 22:39:45,255 - INFO - Current Z: 487.42
-micrscope.py - 2024-03-28 22:39:55,256 - INFO - Updated referencezposition from 487.42 to 489.42
-micrscope.py - 2024-03-28 22:39:55,256 - INFO - Current Z: 489.42
-micrscope.py - 2024-03-28 22:39:55,289 - INFO - Current Z: 489.42
-micrscope.py - 2024-03-28 22:39:55,289 - INFO - Moving z axis
-micrscope.py - 2024-03-28 22:39:55,289 - INFO - Current Z: 489.42
-micrscope.py - 2024-03-28 22:40:05,299 - INFO - Updated referencezposition from 489.42 to 491.42
-micrscope.py - 2024-03-28 22:40:05,300 - INFO - Current Z: 491.42
-micrscope.py - 2024-03-28 22:40:05,305 - INFO - Moving z axis
-micrscope.py - 2024-03-28 22:40:05,306 - INFO - Current Z: 491.42
-micrscope.py - 2024-03-28 22:40:15,314 - INFO - Updated referencezposition from 491.42 to 487.42
-micrscope.py - 2024-03-28 22:40:15,314 - INFO - Current Z: 487.42
-micrscope.py - 2024-03-28 22:40:15,315 - INFO - Current Z: 487.42
-micrscope.py - 2024-03-28 22:40:15,315 - INFO - Moving z axis
-micrscope.py - 2024-03-28 22:40:15,315 - INFO - Current Z: 487.42
-micrscope.py - 2024-03-28 22:40:25,322 - INFO - Updated referencezposition from 487.42 to 485.42
-micrscope.py - 2024-03-28 22:40:25,323 - INFO - Current Z: 485.42
-micrscope.py - 2024-03-28 22:40:25,328 - INFO - Current Z: 485.42
-micrscope.py - 2024-03-28 22:40:25,328 - INFO - Moving z axis
-micrscope.py - 2024-03-28 22:40:25,328 - INFO - Current Z: 485.42
-micrscope.py - 2024-03-28 22:40:35,338 - INFO - Updated referencezposition from 485.42 to 483.42
-micrscope.py - 2024-03-28 22:40:35,338 - INFO - Current Z: 483.42
-micrscope.py - 2024-03-28 22:40:35,342 - INFO - Moving z axis
-micrscope.py - 2024-03-28 22:40:35,343 - INFO - Current Z: 483.42
-micrscope.py - 2024-03-28 22:40:45,343 - INFO - Updated referencezposition from 483.42 to 487.42
-micrscope.py - 2024-03-28 22:40:45,343 - INFO - Current Z: 487.42
-protocol.py - 2024-03-28 22:40:45,344 - INFO - Z stack done for well 1-1
-protocol.py - 2024-03-28 22:40:45,344 - INFO - The affected images are: ['/media/ibrahim/Extended Storage/cloud/Internship/bioquant/figures/test/well_1-1/rawtake_n2_well1-1_zheigth491.ims', '/media/ibrahim/Extended Storage/cloud/Internship/bioquant/figures/test/well_1-1/rawtake_n2_well1-1_zheigth483.ims', '/media/ibrahim/Extended Storage/cloud/Internship/bioquant/figures/test/well_1-1/rawtake_n1_well1-1_zheigth489.ims', '/media/ibrahim/Extended Storage/cloud/Internship/bioquant/figures/test/well_1-1/rawtake_n1_well1-1_zheigth485.ims']
-protocol.py - 2024-03-28 22:40:45,594 - INFO - Image quality metric applied to all z-stack images
+fusionrest.py - 2024-03-29 08:47:40,340 - INFO - This log message is from DragonFlyWellPlateAutomation.RestAPI.fusionrest
+utils.py - 2024-03-29 08:47:40,386 - INFO - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+utils.py - 2024-03-29 08:47:40,386 - INFO - NumExpr defaulting to 8 threads.
+xyzstage.py - 2024-03-29 08:47:40,460 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.xyzstage.py
+micrscope.py - 2024-03-29 08:47:40,460 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.micrscope.py
+protocol.py - 2024-03-29 08:47:40,460 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.protocol.py
+helperfunctions.py - 2024-03-29 08:47:40,460 - INFO - This log message is from helperfunctions.py
+CoordinateTransforms.py - 2024-03-29 08:47:40,621 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.CoordinateTransforms.py
+wellplate.py - 2024-03-29 08:47:40,621 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.wellplate.py
+GUI_WellPlate.py - 2024-03-29 08:47:40,621 - INFO - This log message is from GUI_WellPlate.py
+SaveDirectory.py - 2024-03-29 08:47:40,621 - INFO - This log message is from SaveDirectory.py
+Visualisation.py - 2024-03-29 08:47:40,669 - INFO - This log message is from Visualisation.py
+FrameSwitcher.py - 2024-03-29 08:47:40,670 - INFO - This log message is from FrameSwitcher.py
+MainWindow.py - 2024-03-29 08:47:40,670 - INFO - This log message is from __main__.py
+MainWindow.py - 2024-03-29 08:47:40,670 - INFO - Directory: /media/ibrahim/Extended Storage/cloud/Internship/bioquant/348_wellplate_automation
+micrscope.py - 2024-03-29 08:47:40,768 - INFO - Current Z: 487.42
+SaveDirectory.py - 2024-03-29 08:47:53,445 - INFO - Selected saved well-plate dimension
+SaveDirectory.py - 2024-03-29 08:47:53,445 - INFO - Username: ibrahim
+SaveDirectory.py - 2024-03-29 08:47:53,445 - INFO - Image directory: /media/ibrahim/Extended Storage/cloud/Internship/bioquant/figures/test
+wellplate.py - 2024-03-29 08:47:53,490 - INFO - Stage is moving from Here to new position {'xposition': {'Value': 59.4}, 'yposition': {'Value': -38.6}, 'analoguecontrol': {'Value': False}}
+wellplate.py - 2024-03-29 08:48:03,500 - INFO - Stage has arrived at target position
+GUI_WellPlate.py - 2024-03-29 08:48:18,740 - INFO - Wells that have been selected: ['A1', 'A2', 'I8', 'J8']
+wellplate.py - 2024-03-29 08:48:49,696 - INFO - Stage is moving from Here to new position {'xposition': {'Value': -47.7}, 'yposition': {'Value': 33.1}, 'analoguecontrol': {'Value': False}}
+Visualisation.py - 2024-03-29 08:48:49,742 - INFO - Wells that have been selected: A1 and their coordinates [-47.7  33.1]
+Visualisation.py - 2024-03-29 08:48:49,744 - INFO - Create the following coordinate plot of well: A1 and their coordinates [-47.7, 33.1]
+wellplate.py - 2024-03-29 08:48:59,706 - INFO - Stage has arrived at target position
+protocol.py - 2024-03-29 08:48:59,706 - INFO - Autofocus begins for well: 1-1
+protocol.py - 2024-03-29 08:48:59,707 - INFO - Z stack begins for well: 1-1
+protocol.py - 2024-03-29 08:48:59,707 - INFO - Total height to travel 4 mm. Please determine from current position that this is safe
+micrscope.py - 2024-03-29 08:48:59,707 - INFO - Current Z: 487.42
+micrscope.py - 2024-03-29 08:48:59,707 - INFO - Moving z axis
+micrscope.py - 2024-03-29 08:48:59,708 - INFO - Current Z: 487.42
+micrscope.py - 2024-03-29 08:49:09,718 - INFO - Updated referencezposition from 487.42 to 489.42
+micrscope.py - 2024-03-29 08:49:09,718 - INFO - Current Z: 489.42
+micrscope.py - 2024-03-29 08:49:09,723 - INFO - Current Z: 489.42
+micrscope.py - 2024-03-29 08:49:09,723 - INFO - Moving z axis
+micrscope.py - 2024-03-29 08:49:09,723 - INFO - Current Z: 489.42
+micrscope.py - 2024-03-29 08:49:19,730 - INFO - Updated referencezposition from 489.42 to 491.42
+micrscope.py - 2024-03-29 08:49:19,730 - INFO - Current Z: 491.42
+micrscope.py - 2024-03-29 08:49:19,739 - INFO - Moving z axis
+micrscope.py - 2024-03-29 08:49:19,739 - INFO - Current Z: 491.42
+micrscope.py - 2024-03-29 08:49:29,749 - INFO - Updated referencezposition from 491.42 to 487.42
+micrscope.py - 2024-03-29 08:49:29,750 - INFO - Current Z: 487.42
+micrscope.py - 2024-03-29 08:49:29,750 - INFO - Current Z: 487.42
+micrscope.py - 2024-03-29 08:49:29,751 - INFO - Moving z axis
+micrscope.py - 2024-03-29 08:49:29,751 - INFO - Current Z: 487.42
+micrscope.py - 2024-03-29 08:49:39,762 - INFO - Updated referencezposition from 487.42 to 485.42
+micrscope.py - 2024-03-29 08:49:39,762 - INFO - Current Z: 485.42
+micrscope.py - 2024-03-29 08:49:39,767 - INFO - Current Z: 485.42
+micrscope.py - 2024-03-29 08:49:39,767 - INFO - Moving z axis
+micrscope.py - 2024-03-29 08:49:39,767 - INFO - Current Z: 485.42
+micrscope.py - 2024-03-29 08:49:49,770 - INFO - Updated referencezposition from 485.42 to 483.42
+micrscope.py - 2024-03-29 08:49:49,770 - INFO - Current Z: 483.42
+micrscope.py - 2024-03-29 08:49:49,778 - INFO - Moving z axis
+micrscope.py - 2024-03-29 08:49:49,778 - INFO - Current Z: 483.42
+micrscope.py - 2024-03-29 08:49:59,789 - INFO - Updated referencezposition from 483.42 to 487.42
+micrscope.py - 2024-03-29 08:49:59,789 - INFO - Current Z: 487.42
+protocol.py - 2024-03-29 08:49:59,789 - INFO - Z stack done for well 1-1
+protocol.py - 2024-03-29 08:49:59,791 - INFO - The affected images are: ['/media/ibrahim/Extended Storage/cloud/Internship/bioquant/figures/test/well_1-1/rawtake_n2_well1-1_zheigth491.ims', '/media/ibrahim/Extended Storage/cloud/Internship/bioquant/figures/test/well_1-1/rawtake_n2_well1-1_zheigth483.ims', '/media/ibrahim/Extended Storage/cloud/Internship/bioquant/figures/test/well_1-1/rawtake_n1_well1-1_zheigth489.ims', '/media/ibrahim/Extended Storage/cloud/Internship/bioquant/figures/test/well_1-1/rawtake_n1_well1-1_zheigth485.ims']
+protocol.py - 2024-03-29 08:49:59,834 - INFO - Image quality metric applied to all z-stack images
+micrscope.py - 2024-03-29 08:49:59,838 - INFO - Moving z axis
+micrscope.py - 2024-03-29 08:49:59,838 - INFO - Current Z: 487.42
+micrscope.py - 2024-03-29 08:50:09,848 - INFO - Updated referencezposition from 487.42 to 491.0
+micrscope.py - 2024-03-29 08:50:09,849 - INFO - Current Z: 491.0
+protocol.py - 2024-03-29 08:50:09,855 - INFO - Path of image: /media/ibrahim/Extended Storage/cloud/Internship/bioquant/figures/test/well_1-1/Kadiatu.ims
+wellplate.py - 2024-03-29 08:50:09,862 - INFO - Stage is moving from Here to new position {'xposition': {'Value': -43.04347826086957}, 'yposition': {'Value': 33.1}, 'analoguecontrol': {'Value': False}}
+Visualisation.py - 2024-03-29 08:50:09,865 - INFO - Shape of img: (1024, 1024)
+Visualisation.py - 2024-03-29 08:50:09,866 - INFO - Image has dimensions: (1024, 1024)
+Visualisation.py - 2024-03-29 08:50:09,870 - INFO - Display the autofocused image for well 1-1
+Visualisation.py - 2024-03-29 08:50:09,932 - INFO - Wells that have been selected: A2 and their coordinates [-43.04347826  33.1       ]
+Visualisation.py - 2024-03-29 08:50:09,933 - INFO - Continue the following coordinate plot of well: A2 and their coordinates [-43.04347826086957, 33.1]
+wellplate.py - 2024-03-29 08:50:19,866 - INFO - Stage has arrived at target position
+protocol.py - 2024-03-29 08:50:19,867 - INFO - Autofocus begins for well: 1-2
+protocol.py - 2024-03-29 08:50:19,867 - INFO - Z stack begins for well: 1-2
+protocol.py - 2024-03-29 08:50:19,867 - INFO - Total height to travel 4 mm. Please determine from current position that this is safe
+micrscope.py - 2024-03-29 08:50:19,867 - INFO - Current Z: 491.0
+micrscope.py - 2024-03-29 08:50:19,867 - INFO - Moving z axis
+micrscope.py - 2024-03-29 08:50:19,867 - INFO - Current Z: 491.0
+micrscope.py - 2024-03-29 08:50:29,871 - INFO - Updated referencezposition from 491.0 to 493.0
+micrscope.py - 2024-03-29 08:50:29,872 - INFO - Current Z: 493.0
+micrscope.py - 2024-03-29 08:50:29,877 - INFO - Current Z: 493.0
+micrscope.py - 2024-03-29 08:50:29,877 - INFO - Moving z axis
+micrscope.py - 2024-03-29 08:50:29,877 - INFO - Current Z: 493.0
+micrscope.py - 2024-03-29 08:50:39,888 - INFO - Updated referencezposition from 493.0 to 495.0
+micrscope.py - 2024-03-29 08:50:39,888 - INFO - Current Z: 495.0
+micrscope.py - 2024-03-29 08:50:39,894 - INFO - Moving z axis
+micrscope.py - 2024-03-29 08:50:39,894 - INFO - Current Z: 495.0
+micrscope.py - 2024-03-29 08:50:49,905 - INFO - Updated referencezposition from 495.0 to 487.42
+micrscope.py - 2024-03-29 08:50:49,906 - INFO - Current Z: 487.42
+micrscope.py - 2024-03-29 08:50:49,906 - INFO - Current Z: 487.42
+micrscope.py - 2024-03-29 08:50:49,906 - INFO - Moving z axis
+micrscope.py - 2024-03-29 08:50:49,906 - INFO - Current Z: 487.42
+micrscope.py - 2024-03-29 08:50:59,914 - INFO - Updated referencezposition from 487.42 to 485.42
+micrscope.py - 2024-03-29 08:50:59,914 - INFO - Current Z: 485.42
+micrscope.py - 2024-03-29 08:50:59,922 - INFO - Current Z: 485.42
+micrscope.py - 2024-03-29 08:50:59,922 - INFO - Moving z axis
+micrscope.py - 2024-03-29 08:50:59,922 - INFO - Current Z: 485.42
+micrscope.py - 2024-03-29 08:51:09,930 - INFO - Updated referencezposition from 485.42 to 483.42
+micrscope.py - 2024-03-29 08:51:09,930 - INFO - Current Z: 483.42
+micrscope.py - 2024-03-29 08:51:09,933 - INFO - Moving z axis
+micrscope.py - 2024-03-29 08:51:09,933 - INFO - Current Z: 483.42
+micrscope.py - 2024-03-29 08:51:19,943 - INFO - Updated referencezposition from 483.42 to 487.42
+micrscope.py - 2024-03-29 08:51:19,944 - INFO - Current Z: 487.42
+protocol.py - 2024-03-29 08:51:19,944 - INFO - Z stack done for well 1-2
+protocol.py - 2024-03-29 08:51:19,944 - INFO - The affected images are: ['/media/ibrahim/Extended Storage/cloud/Internship/bioquant/figures/test/well_1-2/rawtake_n1_well1-2_zheigth489.ims', '/media/ibrahim/Extended Storage/cloud/Internship/bioquant/figures/test/well_1-2/rawtake_n1_well1-2_zheigth485.ims', '/media/ibrahim/Extended Storage/cloud/Internship/bioquant/figures/test/well_1-2/rawtake_n1_well1-2_zheigth493.ims', '/media/ibrahim/Extended Storage/cloud/Internship/bioquant/figures/test/well_1-2/rawtake_n2_well1-2_zheigth483.ims', '/media/ibrahim/Extended Storage/cloud/Internship/bioquant/figures/test/well_1-2/rawtake_n2_well1-2_zheigth495.ims']
+protocol.py - 2024-03-29 08:51:19,981 - INFO - Image quality metric applied to all z-stack images
+micrscope.py - 2024-03-29 08:51:19,985 - INFO - Moving z axis
+micrscope.py - 2024-03-29 08:51:19,985 - INFO - Current Z: 487.42
+micrscope.py - 2024-03-29 08:51:29,994 - INFO - Updated referencezposition from 487.42 to 489.0
+micrscope.py - 2024-03-29 08:51:29,995 - INFO - Current Z: 489.0
+protocol.py - 2024-03-29 08:51:29,999 - INFO - Path of image: /media/ibrahim/Extended Storage/cloud/Internship/bioquant/figures/test/well_1-2/Kadiatu.ims
+wellplate.py - 2024-03-29 08:51:30,003 - INFO - Stage is moving from Here to new position {'xposition': {'Value': -15.104347826086958}, 'yposition': {'Value': -5.140000000000001}, 'analoguecontrol': {'Value': False}}
+Visualisation.py - 2024-03-29 08:51:30,004 - INFO - Shape of img: (1024, 1024)
+Visualisation.py - 2024-03-29 08:51:30,004 - INFO - Image has dimensions: (1024, 1024)
+Visualisation.py - 2024-03-29 08:51:30,006 - INFO - Display the autofocused image for well 1-2
+Visualisation.py - 2024-03-29 08:51:30,063 - INFO - Wells that have been selected: I8 and their coordinates [-15.10434783  -5.14      ]
+Visualisation.py - 2024-03-29 08:51:30,063 - INFO - Continue the following coordinate plot of well: I8 and their coordinates [-15.104347826086958, -5.140000000000001]
+wellplate.py - 2024-03-29 08:51:40,010 - INFO - Stage has arrived at target position
+protocol.py - 2024-03-29 08:51:40,010 - INFO - Autofocus begins for well: 9-8
+protocol.py - 2024-03-29 08:51:40,010 - INFO - Z stack begins for well: 9-8
+protocol.py - 2024-03-29 08:51:40,010 - INFO - Total height to travel 4 mm. Please determine from current position that this is safe
+micrscope.py - 2024-03-29 08:51:40,010 - INFO - Current Z: 489.0
+micrscope.py - 2024-03-29 08:51:40,011 - INFO - Moving z axis
+micrscope.py - 2024-03-29 08:51:40,011 - INFO - Current Z: 489.0
+micrscope.py - 2024-03-29 08:51:50,018 - INFO - Updated referencezposition from 489.0 to 491.0
+micrscope.py - 2024-03-29 08:51:50,018 - INFO - Current Z: 491.0
+micrscope.py - 2024-03-29 08:51:50,022 - INFO - Current Z: 491.0
+micrscope.py - 2024-03-29 08:51:50,022 - INFO - Moving z axis
+micrscope.py - 2024-03-29 08:51:50,022 - INFO - Current Z: 491.0
+micrscope.py - 2024-03-29 08:52:00,030 - INFO - Updated referencezposition from 491.0 to 493.0
+micrscope.py - 2024-03-29 08:52:00,030 - INFO - Current Z: 493.0
+micrscope.py - 2024-03-29 08:52:00,034 - INFO - Moving z axis
+micrscope.py - 2024-03-29 08:52:00,035 - INFO - Current Z: 493.0
+micrscope.py - 2024-03-29 08:52:10,045 - INFO - Updated referencezposition from 493.0 to 487.42
+micrscope.py - 2024-03-29 08:52:10,045 - INFO - Current Z: 487.42
+micrscope.py - 2024-03-29 08:52:10,045 - INFO - Current Z: 487.42
+micrscope.py - 2024-03-29 08:52:10,045 - INFO - Moving z axis
+micrscope.py - 2024-03-29 08:52:10,045 - INFO - Current Z: 487.42
+micrscope.py - 2024-03-29 08:52:20,056 - INFO - Updated referencezposition from 487.42 to 485.42
+micrscope.py - 2024-03-29 08:52:20,056 - INFO - Current Z: 485.42
+micrscope.py - 2024-03-29 08:52:20,060 - INFO - Current Z: 485.42
+micrscope.py - 2024-03-29 08:52:20,061 - INFO - Moving z axis
+micrscope.py - 2024-03-29 08:52:20,061 - INFO - Current Z: 485.42
+micrscope.py - 2024-03-29 08:52:30,071 - INFO - Updated referencezposition from 485.42 to 483.42
+micrscope.py - 2024-03-29 08:52:30,072 - INFO - Current Z: 483.42
+micrscope.py - 2024-03-29 08:52:30,076 - INFO - Moving z axis
+micrscope.py - 2024-03-29 08:52:30,077 - INFO - Current Z: 483.42
+micrscope.py - 2024-03-29 08:52:40,087 - INFO - Updated referencezposition from 483.42 to 487.42
+micrscope.py - 2024-03-29 08:52:40,087 - INFO - Current Z: 487.42
+protocol.py - 2024-03-29 08:52:40,087 - INFO - Z stack done for well 9-8
+protocol.py - 2024-03-29 08:52:40,088 - INFO - The affected images are: ['/media/ibrahim/Extended Storage/cloud/Internship/bioquant/figures/test/well_9-8/rawtake_n1_well9-8_zheigth491.ims', '/media/ibrahim/Extended Storage/cloud/Internship/bioquant/figures/test/well_9-8/rawtake_n1_well9-8_zheigth485.ims', '/media/ibrahim/Extended Storage/cloud/Internship/bioquant/figures/test/well_9-8/rawtake_n2_well9-8_zheigth483.ims', '/media/ibrahim/Extended Storage/cloud/Internship/bioquant/figures/test/well_9-8/rawtake_n2_well9-8_zheigth493.ims']
+protocol.py - 2024-03-29 08:52:40,113 - INFO - Image quality metric applied to all z-stack images
+micrscope.py - 2024-03-29 08:52:40,115 - INFO - Moving z axis
+micrscope.py - 2024-03-29 08:52:40,115 - INFO - Current Z: 487.42
+micrscope.py - 2024-03-29 08:52:50,126 - INFO - Updated referencezposition from 487.42 to 491.0
+micrscope.py - 2024-03-29 08:52:50,126 - INFO - Current Z: 491.0
+protocol.py - 2024-03-29 08:52:50,130 - INFO - Path of image: /media/ibrahim/Extended Storage/cloud/Internship/bioquant/figures/test/well_9-8/Kadiatu.ims
+wellplate.py - 2024-03-29 08:52:50,134 - INFO - Stage is moving from Here to new position {'xposition': {'Value': -15.104347826086958}, 'yposition': {'Value': -9.920000000000002}, 'analoguecontrol': {'Value': False}}
+Visualisation.py - 2024-03-29 08:52:50,135 - INFO - Shape of img: (1024, 1024)
+Visualisation.py - 2024-03-29 08:52:50,136 - INFO - Image has dimensions: (1024, 1024)
+Visualisation.py - 2024-03-29 08:52:50,138 - INFO - Display the autofocused image for well 9-8
+Visualisation.py - 2024-03-29 08:52:50,220 - INFO - Wells that have been selected: J8 and their coordinates [-15.10434783  -9.92      ]
+Visualisation.py - 2024-03-29 08:52:50,221 - INFO - Continue the following coordinate plot of well: J8 and their coordinates [-15.104347826086958, -9.920000000000002]
+wellplate.py - 2024-03-29 08:53:00,142 - INFO - Stage has arrived at target position
+protocol.py - 2024-03-29 08:53:00,142 - INFO - Autofocus begins for well: 10-8
+protocol.py - 2024-03-29 08:53:00,142 - INFO - Z stack begins for well: 10-8
+protocol.py - 2024-03-29 08:53:00,142 - INFO - Total height to travel 4 mm. Please determine from current position that this is safe
+micrscope.py - 2024-03-29 08:53:00,143 - INFO - Current Z: 491.0
+micrscope.py - 2024-03-29 08:53:00,143 - INFO - Moving z axis
+micrscope.py - 2024-03-29 08:53:00,143 - INFO - Current Z: 491.0
+micrscope.py - 2024-03-29 08:53:10,153 - INFO - Updated referencezposition from 491.0 to 493.0
+micrscope.py - 2024-03-29 08:53:10,153 - INFO - Current Z: 493.0
+micrscope.py - 2024-03-29 08:53:10,159 - INFO - Current Z: 493.0
+micrscope.py - 2024-03-29 08:53:10,160 - INFO - Moving z axis
+micrscope.py - 2024-03-29 08:53:10,160 - INFO - Current Z: 493.0
+micrscope.py - 2024-03-29 08:53:20,170 - INFO - Updated referencezposition from 493.0 to 495.0
+micrscope.py - 2024-03-29 08:53:20,170 - INFO - Current Z: 495.0
+micrscope.py - 2024-03-29 08:53:20,176 - INFO - Moving z axis
+micrscope.py - 2024-03-29 08:53:20,176 - INFO - Current Z: 495.0
+micrscope.py - 2024-03-29 08:53:30,187 - INFO - Updated referencezposition from 495.0 to 487.42
+micrscope.py - 2024-03-29 08:53:30,187 - INFO - Current Z: 487.42
+micrscope.py - 2024-03-29 08:53:30,187 - INFO - Current Z: 487.42
+micrscope.py - 2024-03-29 08:53:30,187 - INFO - Moving z axis
+micrscope.py - 2024-03-29 08:53:30,187 - INFO - Current Z: 487.42
+micrscope.py - 2024-03-29 08:53:40,195 - INFO - Updated referencezposition from 487.42 to 485.42
+micrscope.py - 2024-03-29 08:53:40,195 - INFO - Current Z: 485.42
+micrscope.py - 2024-03-29 08:53:40,198 - INFO - Current Z: 485.42
+micrscope.py - 2024-03-29 08:53:40,199 - INFO - Moving z axis
+micrscope.py - 2024-03-29 08:53:40,199 - INFO - Current Z: 485.42
+micrscope.py - 2024-03-29 08:53:50,206 - INFO - Updated referencezposition from 485.42 to 483.42
+micrscope.py - 2024-03-29 08:53:50,206 - INFO - Current Z: 483.42
+micrscope.py - 2024-03-29 08:53:50,213 - INFO - Moving z axis
+micrscope.py - 2024-03-29 08:53:50,214 - INFO - Current Z: 483.42
+micrscope.py - 2024-03-29 08:54:00,222 - INFO - Updated referencezposition from 483.42 to 487.42
+micrscope.py - 2024-03-29 08:54:00,222 - INFO - Current Z: 487.42
+protocol.py - 2024-03-29 08:54:00,222 - INFO - Z stack done for well 10-8
+protocol.py - 2024-03-29 08:54:00,223 - INFO - The affected images are: ['/media/ibrahim/Extended Storage/cloud/Internship/bioquant/figures/test/well_10-8/rawtake_n2_well10-8_zheigth495.ims', '/media/ibrahim/Extended Storage/cloud/Internship/bioquant/figures/test/well_10-8/rawtake_n2_well10-8_zheigth483.ims', '/media/ibrahim/Extended Storage/cloud/Internship/bioquant/figures/test/well_10-8/rawtake_n1_well10-8_zheigth485.ims', '/media/ibrahim/Extended Storage/cloud/Internship/bioquant/figures/test/well_10-8/rawtake_n1_well10-8_zheigth493.ims']
+protocol.py - 2024-03-29 08:54:00,249 - INFO - Image quality metric applied to all z-stack images
+micrscope.py - 2024-03-29 08:54:00,251 - INFO - Moving z axis
+micrscope.py - 2024-03-29 08:54:00,251 - INFO - Current Z: 487.42
+micrscope.py - 2024-03-29 08:54:10,258 - INFO - Updated referencezposition from 487.42 to 495.0
+micrscope.py - 2024-03-29 08:54:10,258 - INFO - Current Z: 495.0
+protocol.py - 2024-03-29 08:54:10,262 - INFO - Path of image: /media/ibrahim/Extended Storage/cloud/Internship/bioquant/figures/test/well_10-8/Kadiatu.ims
+Visualisation.py - 2024-03-29 08:54:10,266 - INFO - Shape of img: (1024, 1024)
+Visualisation.py - 2024-03-29 08:54:10,267 - INFO - Image has dimensions: (1024, 1024)
+Visualisation.py - 2024-03-29 08:54:10,269 - INFO - Display the autofocused image for well 10-8
