@@ -4,8 +4,8 @@ import logging
 import os
 import sys
 from time import sleep
-
-from .xyzstage import get_output, update, FusionApi
+import numpy as np
+from DragonFlyWellPlateAutomation.devices.xyzstage import get_output, update, FusionApi
 
 logger = logging.getLogger("DragonFlyWellPlateAutomation.RestAPI.fusionrest")
 logger.info("This log message is from {}.py".format(__name__))
@@ -51,79 +51,56 @@ class Microscope(FusionApi):
 
     def get_current_z(self):
         state = self.get_state()
-        z = eval(state["referencezposition"]["Value"].replace(",", "."))
+        z = round(eval(state["referencezposition"]["Value"].replace(",", ".")), 3)
         state["referencezposition"]["Value"] = z
         logger.log(level=20, msg="Current Z: {}".format(z))
         return state, z
 
+    def changezvalue(self, state, z_increment, new_z_height):
+        current = state["referencezposition"]["Value"]
+
+        if new_z_height is None:
+            increment = z_increment["Value"]
+            if z_increment["up"] == True:
+                state["referencezposition"]["Value"] += increment
+            else:
+                state["referencezposition"]["Value"] -= increment
+        elif new_z_height is not None:
+            state["referencezposition"]["Value"] = float(new_z_height)
+
+        return state, current
+
+    def updatezposition(self, state, current):
+
+        self.update_state(key="referencezposition", state_dict=state)
+
+        logger.log(level=20, msg="Updated referencezposition from {} to {}".format(current,
+                                                                                   state["referencezposition"][
+                                                                                       "Value"]))
+        # We wait until the microscope has moved position to target Z.
+        target = round(state["referencezposition"]["Value"], 3)
+        count = 0
+        while target != self.get_current_z()[-1]:
+            logger.log(level=20, msg="Microscope is moving to new position")
+            if count == 100:
+                msg = ("Microscope failed to reach z position. Current {} and target {}. Please look at log file "
+                       "to find any errors").format(self.get_current_z()[-1],
+                                                    state["referencezposition"]["Value"])
+                logger.log(level=40, msg=msg)
+                sys.exit(msg)
+            count += 1
+            sleep(3)
     def move_z_axis(self, z_increment={"up": True, "Value": 5}, new_z_height=None):
+        
         logger.log(level=20, msg="Moving z axis")
 
         state, z = self.get_current_z()
 
-        if state["driftstabilisationactive"]["Value"] == "False":
-            current = state["referencezposition"]["Value"]
-            if new_z_height is None:
-                increment = z_increment["Value"]
-                if z_increment["up"] == True:
-                    state["referencezposition"]["Value"] += increment
-                else:
-                    state["referencezposition"]["Value"] -= increment
-            elif new_z_height is not None:
-                state["referencezposition"]["Value"] = float(new_z_height)
+        state, current = self.changezvalue(state, z_increment, new_z_height)
 
-            self.update_state(key="referencezposition", state_dict=state)
-            logger.log(level=20, msg="Updated referencezposition from {} to {}".format(current,
-                                                                                       state["referencezposition"][
-                                                                                           "Value"]))
-            # We wait until the microscope has moved position to target Z.
-            count = 0
-            while state["referencezposition"]["Value"] != self.get_current_z()[-1]:
-                logger.log(level=20, msg="Microscope is moving to new position")
-                if count == 10:
-                    msg = ("Microscope failed to reach z position. Current {} and target {}. Please look at log file "
-                           "to find any errors").format(self.get_current_z()[-1],
-                                                        state["referencezposition"]["Value"])
-                    logger.log(level=40, msg=msg)
+        self.updatezposition(state, current)
 
-                    sys.exit(msg)
-                count += 1
-                sleep(3)
-
-            return state["referencezposition"]["Value"]
+        return state["referencezposition"]["Value"]
 
     def return2start_z(self):
         self.move_z_axis(new_z_height=self.starting_z_height)
-
-
-def main():
-    import argparse
-
-    parser = argparse.ArgumentParser(description='Testing microscope stage for movement of z stage')
-    parser.add_argument("--z_height", type=float, required=True, help="Enter the z height")
-
-    microscope = Microscope()
-
-    microscope.test = True
-
-    args = parser.parse_args()
-
-    # Get state
-    state = microscope.get_state()
-    logger.log(level=20, msg="Get state")
-
-    # Update state
-    microscope.update_state("referencezposition", state_dict=state)
-    logger.log(level=20, msg="Update z position")
-
-    # Get current z height
-    z = microscope.get_current_z()
-    logger.log(level=20, msg="Current z height")
-
-    # Move stage to new z height
-    microscope.move_z_axis(new_z_height=args.z_height)
-    logger.log(level=20, msg="Move z height from {} to {}".format(z, microscope.get_current_z()))
-
-
-if __name__ == '__main__':
-    main()

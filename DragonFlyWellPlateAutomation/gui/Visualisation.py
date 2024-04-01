@@ -3,6 +3,7 @@ import sys
 
 import matplotlib
 import numpy as np
+
 from PyQt6.QtCore import *
 from PyQt6.QtWidgets import QApplication, QVBoxLayout, QWidget, QSizePolicy, \
     QPlainTextEdit
@@ -34,6 +35,7 @@ def setplotlimits(xmin, xmax, ymin, ymax, axis):
     axis.set_xlim(xmin, xmax)
     axis.set_ylim(ymin, ymax)
 
+
 def setticks(x_coords, x_values, ycoords, y_values, axis):
     axis.set_xticks(x_coords)
     axis.set_xticklabels(x_values)
@@ -43,6 +45,7 @@ def setticks(x_coords, x_values, ycoords, y_values, axis):
     axis.set_yticks(ycoords)
     axis.set_yticklabels(reversed(y_values))
     axis.tick_params(axis='y', labelsize='medium')
+
 
 def createplot(tr, tl, bl, c_n, r_n, coordinate_plot, image_plot
                ):
@@ -54,12 +57,12 @@ def createplot(tr, tl, bl, c_n, r_n, coordinate_plot, image_plot
     setplotlimits(xmin=tl[0] - x_offset, xmax=tr[0] + x_offset,
                   ymin=bl[1] - y_offset, ymax=tl[1] + y_offset, axis=coordinate_plot)
 
-    x_values = list(range(1, c_n+1))
+    x_values = list(range(1, c_n + 1))
     y_values = [x for x in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[:r_n]]
 
     setticks(x_coords=np.linspace(tl[0], tr[0], len(x_values)),
-            ycoords=np.linspace(bl[1], tl[1], len(y_values)),
-            x_values=x_values, y_values=y_values, axis=coordinate_plot)
+             ycoords=np.linspace(bl[1], tl[1], len(y_values)),
+             x_values=x_values, y_values=y_values, axis=coordinate_plot)
 
     coordinate_plot.set_title('Real-Time {} well plate positioning'.format(c_n * r_n))
 
@@ -88,45 +91,44 @@ class WorkerSignals(QObject):
     result = pyqtSignal(object)
 
 
-class Automation(QRunnable):
-    def __init__(self, well_plate=None, protocol=None):
+class Automation(QThread):
+    def __init__(self, well_plate, protocol):
         super().__init__()
-        self.well_plate = well_plate
-        self.protocol = protocol
         self.signal = WorkerSignals()
         self.signals_coords = WorkerSignals()
         self.signals_img = WorkerSignals()
+        self.well_plate = well_plate
+        self.protocol = protocol
 
-        self.mutex = QMutex()
 
-    @pyqtSlot()
     def run(self):
-        with QMutexLocker(self.mutex):
-            for wellname, wellname_string in self.well_plate.selected_wells:
 
-                vector = self.well_plate.state_dict_2_vector(self.well_plate.all_well_dicts[wellname])
+        for wellname, wellname_string in self.well_plate.selected_wells:
 
-                # Emit the result from the thread
-                self.signals_coords.result.emit((vector, wellname, wellname_string))
+            vector = self.well_plate.state_dict_2_vector(self.well_plate.all_well_dicts[wellname])
 
-                # Move stage
-                self.well_plate.automated_wp_movement(wellname)
+            # Emit the result from the thread
+            self.signals_coords.result.emit((vector, wellname, wellname_string))
 
-                # Perform image acquisition
-                img_path = self.protocol.processwell(vector, wellname, self.well_plate.coordinate_frame_algorithm,
-                                                     self.well_plate.homography_matrix_algorithm,
-                                                     self.protocol.z_increment, self.protocol.n_acquisitions,
-                                                     self.protocol.protocol_name, self.protocol.image_name)
+            # Move stage
+            self.well_plate.automated_wp_movement(wellname) #60 seconds delay
 
-                # Emit the current image from the thread
-                self.signals_img.result.emit((ims(img_path, squeeze_output=True), wellname))
+            # Perform image acquisition
+            img_path = self.protocol.processwell(vector, wellname, self.well_plate.coordinate_frame_algorithm,
+                                                self.well_plate.homography_matrix_algorithm,
+                                                self.protocol.z_increment, self.protocol.n_acquisitions,
+                                                self.protocol.protocol_name, self.protocol.image_name)
 
-            self.signal.finished.emit()
+            # Emit the current image from the thread
+            self.signals_img.result.emit((ims(img_path, squeeze_output=True), wellname))
+
+        self.signal.finished.emit()
 
 
 class CoordinatePlotAndImgDisplay(QWidget):
     def __init__(self, stacked_widget, parent=None):
         super().__init__(parent)
+        self.thread = None
         self.imgdisplay = None
         self.coordplot = None
         self.stacked_widget = stacked_widget
@@ -141,7 +143,12 @@ class CoordinatePlotAndImgDisplay(QWidget):
         main_layout.addWidget(self.canvas)
         self.setLayout(main_layout)
 
-        self.threadpool = QThreadPool(self)
+        handler = CustomLogger()
+        logger.addHandler(handler)
+        handler.new_record.connect(self.text_display.appendPlainText)
+
+
+
 
     def initviz(self, well_plate, protocol):
         tl, tr, bl, _ = well_plate.corners_coords  # Top left, Top right, Bottom left
@@ -152,7 +159,8 @@ class CoordinatePlotAndImgDisplay(QWidget):
                    )
 
         # Start data generation
-        self.startprocess(well_plate, protocol)
+        self.initprocess(well_plate, protocol)
+        self.startthread()
 
     def addcoorddata(self, result):
         vector, wellname, wellname_string = result
@@ -223,34 +231,20 @@ class CoordinatePlotAndImgDisplay(QWidget):
     @pyqtSlot()
     def close_updater(self):
         self.text_display.appendPlainText("We are done")
+        self.thread.stop()
 
-    def startprocess(self, well_plate, protocol):
-        worker = Automation(well_plate, protocol)
-        worker.signals_coords.result.connect(self.updatecoord)
-        worker.signals_img.result.connect(self.updateimg)
-        worker.signal.finished.connect(self.close_updater)
-        # Setup logger
-        handler = CustomLogger()
-        logger.addHandler(handler)
-        handler.new_record.connect(self.text_display.appendPlainText)
-        worker.setAutoDelete(True)
-        self.threadpool.start(worker)
+    def initprocess(self, well_plate, protocol):
+        self.thread = Automation(well_plate, protocol)
+        self.thread.signals_coords.result.connect(self.updatecoord)
+        self.thread.signals_img.result.connect(self.updateimg)
+        self.thread.signal.finished.connect(self.close_updater)
 
 
-def main():
-    from DragonFlyWellPlateAutomation.devices.wellplate import WellPlate
-    from DragonFlyWellPlateAutomation.devices.protocol import Protocol
-    # TODO Correct this
-    app = QApplication(sys.argv)
-    # Update the canvas with new data
-    p = Protocol("/media/ibrahim/Extended Storage/cloud/Internship/bioquant/348_wellplate_automation/test_rn")
-    wellplate2 = WellPlate()
-    wellplate2.load_attributes(name="384_WellPlate_12345_Falcon.json")
-    window = CoordinatePlot(well_plate=wellplate2, protocol=p)
-    window.initviz()
-    window.show()
-    sys.exit(app.exec())
+    def startthread(self):
+        if not self.thread.isRunning():
+            self.thread.start()
+
+    def closethread(self):
+        self.thread.stop()
 
 
-if __name__ == '__main__':
-    main()

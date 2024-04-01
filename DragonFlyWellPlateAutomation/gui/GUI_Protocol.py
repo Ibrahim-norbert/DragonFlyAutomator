@@ -1,8 +1,7 @@
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QPushButton, QWidget, QLineEdit, QVBoxLayout, QComboBox, QHBoxLayout, QCheckBox
-
 from DragonFlyWellPlateAutomation.devices.protocol import Protocol
-from helperfunctions import create_colored_label
+from DragonFlyWellPlateAutomation.gui.helperfunctions import create_colored_label
 
 
 # TODO Test the script and add a widget that informs operator to select the protocol needed

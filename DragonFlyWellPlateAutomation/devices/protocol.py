@@ -8,9 +8,9 @@ import time
 from imaris_ims_file_reader.ims import ims
 
 from DragonFlyWellPlateAutomation.RestAPI import fusionrest
-from .image_based_autofocus import AutoFocus
-from .micrscope import Microscope
-from .xyzstage import FusionApi, get_output, update
+from DragonFlyWellPlateAutomation.devices.image_based_autofocus import AutoFocus
+from DragonFlyWellPlateAutomation.devices.micrscope import Microscope
+from DragonFlyWellPlateAutomation.devices.xyzstage import FusionApi, get_output, update
 
 logger = logging.getLogger("DragonFlyWellPlateAutomation.RestAPI.fusionrest")
 logger.info("This log message is from {}.py".format(__name__))
@@ -64,8 +64,8 @@ class Protocol(FusionApi):
 
     def get_image_dir(self):
         if self.test is False:
-            img_name_dict = get_output(os.path.dirname(self.endpoint) + "/{}".format("datasets"))
-            return img_name_dict, os.path.split(img_name_dict["Path"])[0]
+            img_name_dict = get_output(os.path.dirname(self.endpoint) + "/{}".format("datasets/current"))
+            return img_name_dict
         else:
             f = open(os.path.join(os.getcwd(), "endpoint_outputs", "dataset.json"))
             img_name_dict = json.load(f)
@@ -83,7 +83,7 @@ class Protocol(FusionApi):
 
         if self.test is False:
             logger.log(level=20, msg="New image path: {}".format(self.img_name_dict["Path"]))
-            update(self.endpoint + "/{}".format("filename"), self.img_name_dict)
+            update(self.endpoint + "/{}".format("datasets/current"), self.img_name_dict)
 
     def well_folder(self, wellname):
         well_dir = os.path.join(self.image_dir, "well_{}".format(wellname))
@@ -145,10 +145,10 @@ class Protocol(FusionApi):
 
         return well_dir, wellname
 
-
     def load_ims_imgs(self, img_path):
         img = ims(img_path, squeeze_output=True)
         return img[0, :, 0].astype(float)
+
     def autofocusing(self, wellname, z_increment, n_acquisitions):
 
         start = time.time()
@@ -161,7 +161,7 @@ class Protocol(FusionApi):
         # Get all recent z stack acquisitions
         img_paths = glob.glob(os.path.join(well_dir, "*.ims"))
 
-        logger.log(level=20, msg="The affected images are: {}".format(img_paths))
+        logger.log(level=20, msg="The affected images are: {}".format([os.path.basename(x) for x in img_paths]))
 
         # Get autofocus algorithm
         func = getattr(self.autofocus, self.autofocus_algorithm)
@@ -249,63 +249,3 @@ class Protocol(FusionApi):
         self.savedatafromexecution(vector, coordinate_frame_algorithm, homography_matrix_algorithm, well_dir)
 
         return img_path
-
-
-def main():
-    import argparse
-
-    parser = argparse.ArgumentParser(description='train a phase registration model')
-
-    parser.add_argument("--img_name", type=str, required=False, help="Enter image name",
-                        default="Session")
-    parser.add_argument("--well_coords", type=str, required=True, help="Enter well coordinates as 0-0 "
-                                                                       "instead of A1")
-    parser.add_argument("--z_spacing", type=float, required=True, help="Enter z spacing for z-stack")
-
-    parser.add_argument("--n_acquisitions", type=int, required=True, help="Enter number of acquisitions "
-                                                                          "in z-stack")
-    parser.add_argument("--autofocus_alg", type=str, required=True,
-                        help="Choose autofocus algorithm: " + str(AutoFocus().metrics))
-    parser.add_argument("--image_dir", type=str, required=True, help="Enter the image directory path")
-
-    parser.add_argument("--coordinate_frame_algorithm", type=str, required=True, help="Enter the "
-                                                                                      "algorithm to predict the grid")
-
-    parser.add_argument("--homography_matrix_algorithm", type=str, required=True, help="Enter the "
-                                                                                       "algorithm to "
-                                                                                       "estimate the homography matrix")
-
-    args = parser.parse_args()
-
-    imagename = args.img_name
-    wellcoord = args.well_coords
-    z_spacing = args.z_spacing
-    n_aqcuisitions = args.n_acquisitions
-    autofocus_alg = args.autofocus_alg
-    coordinate_frame_algorithm = args.coordinate_frame_algorithm
-    homography_matrix_algorithm = args.homography_matrix_algorithm
-
-    protocol = Protocol(args.image_dir)
-
-    print("This is a test run, no change in state of the microscope is performed.")
-
-    protocol.test = True
-
-    protocol.image_name = imagename
-    protocol.autofocus_algorithm = autofocus_alg
-
-    logger.log(level=20, msg="Current Protocol: {}".format(protocol.get_state()))
-
-    logger.log(level=20, msg="image acquisition is on")
-    img_path = protocol.image_acquisition(img_path=imagename, protocol_name="Protocol 59")
-
-    logger.log(level=20, msg="Autofocusing is on")
-    welldir = protocol.autofocusing(wellname=wellcoord, z_increment=z_spacing, n_acquisitions=n_aqcuisitions)
-
-    logger.log(level=20, msg="Path of image: {}".format(img_path))
-    # Save data
-    protocol.savedatafromexecution([-48, 33.1, 0], coordinate_frame_algorithm, homography_matrix_algorithm, welldir)
-
-
-if __name__ == '__main__':
-    main()

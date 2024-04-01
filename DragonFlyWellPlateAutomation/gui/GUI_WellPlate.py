@@ -9,7 +9,7 @@ from PyQt6.QtWidgets import QGridLayout, QPushButton, QWidget, QLineEdit, QVBoxL
 from matplotlib import pyplot as plt
 
 from DragonFlyWellPlateAutomation.devices.wellplate import WellPlate
-from helperfunctions import create_colored_label
+from DragonFlyWellPlateAutomation.gui.helperfunctions import create_colored_label
 
 wellplate_paths = [os.path.basename(x) for x in glob.glob(os.path.join(os.getcwd(), "models", "*WellPlate*"))]
 
@@ -278,48 +278,3 @@ class CustomButtonGroup(QWidget):
             print(f"An unexpected error occurred: {e}")
             logger.exception("What happened here ", exc_info=True)
 
-
-def main():
-    # TODO Correct this
-    well_plate = WellPlate()
-    well_plate.load_attributes(name="384_falcon_wellplate.json")
-
-    fig, axes = plt.subplots(dpi=300)
-
-    axes.set_xlim(well_plate.corners_coords[0][0], well_plate.corners_coords[1][0])
-    axes.set_ylim(well_plate.corners_coords[0][1], well_plate.corners_coords[2][1])
-
-    x_values = list(range(1, 25))
-    y_values = [x for x in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[:well_plate.r_n]]
-
-    # Set y-axis ticks from P to A
-    axes.set_yticks(
-        np.linspace(well_plate.corners_coords[0][1], well_plate.corners_coords[2][1],
-                    len(y_values)))
-    axes.set_yticklabels(reversed(y_values))
-
-    axes.set_title(
-        'Real-Time {} well plate positioning'.format(well_plate.c_n * well_plate.r_n))
-
-    for key, value in well_plate.all_well_dicts.items():
-        data = well_plate.state_dict_2_vector(value)
-        axes.scatter(data[0], data[1])
-        sleep(0.1)
-        plt.show()
-
-    # def update_canvas():
-    #     if wellplate2.all_well_dicts:
-    #         key, value = next(iter(wellplate2.all_well_dicts.items()))
-    #         window.canvas.CoordinateFrameVisualisation(wellplate2.corners_coords,
-    #                                                    wellplate2.r_n, wellplate2.c_n,
-    #                                                    )
-    #         wellplate2.all_well_dicts.pop(key)  # Remove the processed entry
-    #         QTimer.singleShot(5000, update_canvas)
-    #
-    # update_canvas()
-    # window.show()
-    # sys.exit(app.exec())
-
-
-if __name__ == '__main__':
-    main()

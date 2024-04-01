@@ -23,7 +23,7 @@ def get_output(endpoint):
         return fusionrest.__get(endpoint)
     except Exception as e:
         print(f"An unexpected output error occurred: {e}")
-        logging.exception("An unexpected output error occurred", exc_info=True)
+        logging.exception("An unexpected output error occurred with endpoint: {}".format(endpoint), exc_info=True)
 
 
 def update(endpoint, obj):
@@ -31,15 +31,13 @@ def update(endpoint, obj):
         fusionrest.__put(endpoint, obj)
     except Exception as e:
         print(f"An unexpected update error occurred: {e}")
-        logging.exception("An unexpected update error occurred", exc_info=True)
+        logging.exception("An unexpected update error occurred at endpoint {} with state {}".format(endpoint, obj), exc_info=True)
 
 
 class FusionApi:
     def __init__(self, test=True):
         self.endpoint = "/v1"
         self.test = test
-        if self.test is False:
-            self.current_output = get_output(self.endpoint)
 
         self.selected_path_option = "/v1"
         self.path_options = "/v1"
@@ -190,33 +188,4 @@ class XYZStage(FusionApi):
             return state_dict
 
 
-def main():
-    import argparse
 
-    parser = argparse.ArgumentParser(description='train a phase registration model')
-    parser.add_argument("--x", type=int, required=True, help="Enter x coordinates for xyz stage")
-    parser.add_argument("--y", type=int, required=True, help="Enter y coordinates for xyz stage")
-    parser.add_argument("--analoguecontrol", type=bool, default=False,
-                        help="Enter boolean for analog control of xyz stage")
-    parser.add_argument("--update", type=bool, default=False, help="Enter boolean for analog control of xyz stage")
-
-    args = parser.parse_args()
-
-    instance_xyz_Stage = XYZStage()
-
-    print("Before update: " + str(instance_xyz_Stage.__dict__))
-
-    print(" ")
-
-    print("Test get state functionality: {}".format(instance_xyz_Stage.get_state()))
-
-    x_, y_ = args.x, args.y
-
-    if x_ is not None and y_ is not None:
-        out = instance_xyz_Stage.enter_coords(x_, y_, instance_xyz_Stage.get_state())
-        if args.update is True:
-            instance_xyz_Stage.update_state(state_dict=out, analoguecontrol_bool=args.analoguecontrol)
-
-
-if __name__ == '__main__':
-    main()

@@ -2,10 +2,10 @@ import logging
 
 from PyQt6.QtWidgets import QStackedWidget
 
-import GUI_Protocol as GUIP
-import GUI_WellPlate as GUIWP
-import SaveDirectory
-import Visualisation as VIZ
+import DragonFlyWellPlateAutomation.gui.GUI_Protocol as GUIP
+import DragonFlyWellPlateAutomation.gui.GUI_WellPlate as GUIWP
+import DragonFlyWellPlateAutomation.gui.SaveDirectory as SaveDirectory
+import DragonFlyWellPlateAutomation.gui.Visualisation as VIZ
 
 logger = logging.getLogger("DragonFlyWellPlateAutomation.RestAPI.fusionrest")
 logger.info("This log message is from {}.py".format(__name__))
@@ -46,10 +46,3 @@ class FrameManager(QStackedWidget):
     def switch2Protocol(self):
         self.setCurrentWidget(self.frame3)
 
-
-def main():
-    FrameManager()
-
-
-if __name__ == '__main__':
-    main()

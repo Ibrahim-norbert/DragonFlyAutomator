@@ -5,7 +5,6 @@ import time
 
 import requests
 from ProjectRoot import change_wd_to_project_root
-
 change_wd_to_project_root()
 
 logging.basicConfig(level=logging.INFO, filemode="w", filename=os.path.join(os.getcwd(), 'dragonfly_automator.log'),

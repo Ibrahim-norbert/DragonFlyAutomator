@@ -166,35 +166,3 @@ class AutoFocus:
         # Combine INvsStd and Entropy for noise and fine detail?
         pass
 
-
-def main():
-    autofocus = AutoFocus()
-    # os.path.join(os.getcwd(), "test_rn/2024-03-05/*.ims")
-    img_paths = glob.glob(
-        "/media/ibrahim/Extended Storage/cloud/Internship/bioquant/348_wellplate_automation/test_rn/2024-03-05/*.ims")
-
-    print("Before update: {}".format(autofocus.variables))
-
-    for img_path in img_paths:
-        img = ims(img_path, squeeze_output=True)
-        img = img[0, :, 0]
-
-        img_name = os.path.basename(img_path)
-
-        autofocus.Variance(img, img_name=img_name)
-
-        autofocus.Brenner(img, img_name=img_name)
-
-        autofocus.Psw_mean(img, img_name=img_name)
-
-        autofocus.Spectral_moments(img, img_name=img_name)
-
-    print("After update: {}".format(autofocus.variables))
-
-    df = autofocus.turn2dt()
-
-    df.to_csv("/media/ibrahim/Extended Storage/cloud/Internship/bioquant/348_wellplate_automation/test_rn/df.csv")
-
-
-if __name__ == '__main__':
-    main()

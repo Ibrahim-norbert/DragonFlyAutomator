@@ -7,7 +7,7 @@ from time import sleep
 import numpy as np
 
 from DragonFlyWellPlateAutomation.devices import CoordinateTransforms as CT
-from .xyzstage import XYZStage, get_output
+from DragonFlyWellPlateAutomation.devices.xyzstage import XYZStage, get_output
 
 logger = logging.getLogger("DragonFlyWellPlateAutomation.RestAPI.fusionrest")
 logger.info("This log message is from {}.py".format(__name__))
@@ -35,7 +35,7 @@ class WellPlate(XYZStage):
 
         self.homography_matrix_algorithms = ["Levenberg-Marquardt", "SVD", "Eigen-decomposition"]
         self.coordinate_frame_algorithm = None
-        self.coordinate_frame_algorithms = ["Linear spacing"]
+        self.coordinate_frame_algorithms = ["Linear spacing", "Homography"]
         self.currentwellposition = None
         self.wellbywell = False
         self.non_linear_correction = True
@@ -160,7 +160,7 @@ class WellPlate(XYZStage):
                 self.homography_matrix, c_n, r_n)
 
         # Save all variables as parameters
-        self.set_xyzstagecoords(vectors, well_names, r_n, c_n) #Just add well names please
+        self.set_xyzstagecoords(vectors, well_names, r_n, c_n)  # Just add well names please
         self.set_parameters(well_names,
                             r_n, c_n, length, height, x_spacing, y_spacing,
                             algorithm_CF=algorithm, algorithm_H=algorithm_H)
@@ -186,31 +186,23 @@ class WellPlate(XYZStage):
         self.set_xyzstagecoords(vectors, well_names, r_n, c_n)
         return vectors, well_names
 
-    def move2coord(self, state_dict):
-
-        # Configure drawer
+    def move2coord(self, state_dict, wellname):
 
         try:
             # Wait until we reach well position
             if self.test is False:
                 logger.log(level=20,
-                           msg="Stage is moving from {} to new position {}".format(self.get_state(), state_dict))
-                self.update_state(state_dict, analoguecontrol_bool=False)
-                count = 0
-                while self.state_dict_2_vector(self.get_state()) != self.state_dict_2_vector(state_dict):
-                    logger.log(level=20, msg="Stage is moving...")
-                    if count == 60:
-                        sys.exit("XYZ-stage failed to reach well position. Current {} and target {}. Please look at"
-                                 "log file to find any errors".format(self.state_dict_2_vector(state_dict),
-                                                                      self.state_dict_2_vector(self.get_state())))
-                    count += 1
-                    sleep(1)
-            else:
-                # length = np.linalg.norm(np.array([0, 0]) - np.array(self.state_dict_2_vector(state_dict)))
-                logger.log(level=20, msg="Stage is moving from {} to new position {}".format("Here", state_dict))
-                sleep(10)
+                           msg="Stage is moving for well {} from coordinates {} to new coordinates{}".format(
+                               wellname, self.get_state(), state_dict))
 
-            logger.log(level=20, msg="Stage has arrived at target position")
+                self.update_state(state_dict, analoguecontrol_bool=False)
+
+                sleep(60)
+            else:
+                logger.log(level=20,
+                           msg="Stage is moving for well {} from coordinates {} to new coordinates{}".format(
+                               wellname, "dummycoords", state_dict))
+                sleep(60)
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
             logger.exception("What happened here ", exc_info=True)
@@ -242,68 +234,8 @@ class WellPlate(XYZStage):
         state_dict = self.all_well_dicts[wellname]
 
         # Draw graph only when xyz-stage has arrived at well
-        self.move2coord(state_dict)  # Delay
+        self.move2coord(state_dict, wellname)  # Delay
 
         vector = self.state_dict_2_vector(state_dict)
 
         return vector, wellname
-
-
-def main():
-    import argparse
-
-    parser = argparse.ArgumentParser(description='train a phase registration model')
-    parser.add_argument("--rows", type=int, required=False, help="Enter number of rows", default=16)
-    parser.add_argument("--columns", type=int, required=False, help="Enter number of columns", default=24)
-
-    wellplate = WellPlate()
-    print("Before update: " + str(wellplate.__dict__))
-    for test_key in wellplate.homography_source_coordinates.keys():
-        # Opening JSON file
-        file = os.path.join(os.getcwd(), r"endpoint_outputs", "{}xposition.json".format(test_key.replace(" well", "_")))
-        f = open(file)
-        x_ = json.load(f)
-        # Opening JSON file
-        file = os.path.join(os.getcwd(), r"endpoint_outputs", "{}yposition.json".format(test_key.replace(" well", "_")))
-        f = open(file)
-        y = json.load(f)
-
-        wellplate.homography_source_coordinates[test_key] = {x: [x_, y, None][id] for id,
-        x in enumerate(["xposition", "yposition"])}
-
-    args = parser.parse_args()
-
-    # Predict well cords from corners
-    vectors, well_names, length, height, x_spacing = wellplate.predict_well_coords(args.columns, args.rows,
-                                                                                   wellplate.homography_source_coordinates)
-
-    print("After update: " + str(wellplate.__dict__))
-
-    vectors = wellplate.calibrate_xyzstagecoords([60, -38.9], vectors, well_names, args.rows, args.columns)
-
-    print("With calibrated vectors: " + str(wellplate.__dict__))
-    print(wellplate.all_well_dicts)
-
-    # Save the attributes
-    wellplate.save_attributes2json(partnumber="12345", manufacturer="Falcon")
-
-    # Test if wellplate can load attributes
-
-    wellplate2 = WellPlate()
-
-    wellplate2.load_attributes(name="384_falcon_wellplate.json")
-
-    print("After loading attributes: " + str(wellplate2.__dict__))
-
-    print("-----------------------------------------------------")
-
-    vectors, well_names = wellplate.fixit_xyzstagecoords([65, -38.9], vectors, well_names, args.rows, args.columns)
-
-    print("With fixit vectors: " + str(wellplate.__dict__))
-    print(wellplate.all_well_dicts)
-
-    wellplate.automated_wp_movement(well_names[0])
-
-
-if __name__ == '__main__':
-    main()
