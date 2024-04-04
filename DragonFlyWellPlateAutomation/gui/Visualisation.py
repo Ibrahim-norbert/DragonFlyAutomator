@@ -100,24 +100,21 @@ class Automation(QThread):
         self.well_plate = well_plate
         self.protocol = protocol
 
-
     def run(self):
-
         for wellname, wellname_string in self.well_plate.selected_wells:
-
             vector = self.well_plate.state_dict_2_vector(self.well_plate.all_well_dicts[wellname])
 
             # Emit the result from the thread
             self.signals_coords.result.emit((vector, wellname, wellname_string))
 
             # Move stage
-            self.well_plate.automated_wp_movement(wellname) #60 seconds delay
+            self.well_plate.automated_wp_movement(wellname)  # 60 seconds delay
 
             # Perform image acquisition
             img_path = self.protocol.processwell(vector, wellname, self.well_plate.coordinate_frame_algorithm,
-                                                self.well_plate.homography_matrix_algorithm,
-                                                self.protocol.z_increment, self.protocol.n_acquisitions,
-                                                self.protocol.protocol_name, self.protocol.image_name)
+                                                 self.well_plate.homography_matrix_algorithm,
+                                                 self.protocol.z_increment, self.protocol.n_acquisitions,
+                                                 self.protocol.protocol_name, self.protocol.image_name)
 
             # Emit the current image from the thread
             self.signals_img.result.emit((ims(img_path, squeeze_output=True), wellname))
@@ -146,9 +143,6 @@ class CoordinatePlotAndImgDisplay(QWidget):
         handler = CustomLogger()
         logger.addHandler(handler)
         handler.new_record.connect(self.text_display.appendPlainText)
-
-
-
 
     def initviz(self, well_plate, protocol):
         tl, tr, bl, _ = well_plate.corners_coords  # Top left, Top right, Bottom left
@@ -231,7 +225,6 @@ class CoordinatePlotAndImgDisplay(QWidget):
     @pyqtSlot()
     def close_updater(self):
         self.text_display.appendPlainText("We are done")
-        self.thread.stop()
 
     def initprocess(self, well_plate, protocol):
         self.thread = Automation(well_plate, protocol)
@@ -239,12 +232,9 @@ class CoordinatePlotAndImgDisplay(QWidget):
         self.thread.signals_img.result.connect(self.updateimg)
         self.thread.signal.finished.connect(self.close_updater)
 
-
     def startthread(self):
         if not self.thread.isRunning():
             self.thread.start()
 
     def closethread(self):
         self.thread.stop()
-
-

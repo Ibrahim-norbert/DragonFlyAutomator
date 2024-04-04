@@ -27,7 +27,8 @@ class Microscope(FusionApi):
         logger.log(level=10, msg="The next path destinations of microscope: {}".format(self.path_options))
 
         # Used only in test phase
-        self.test_state = {x: {"Value": y["Value"]} for x, y in
+        self.test_https = {x: {"Value": y["Value"]} if x != "referencezposition" else
+        {"Value": round(eval(y["Value"].replace(",", ".")), 3)} for x, y in
                            zip(self.path_options, self.current_output)}
 
         self.starting_z_height = self.get_current_z()[-1]
@@ -38,25 +39,23 @@ class Microscope(FusionApi):
                     self.path_options}
         else:
             # Make copy
-            return copy.deepcopy(self.test_state)
+            return {x: self.test_https[x] for x in self.path_options}
 
     def update_state(self, key, state_dict):
         if self.test is False:
             if state_dict is not None:
                 update(self.endpoint + "/{}".format(key), state_dict[key])
         else:
-            sleep(10)
-            self.test_state["referencezposition"]["Value"] = str(state_dict["referencezposition"]["Value"]).replace(".",
-                                                                                                                    ",")
+            self.test_https["referencezposition"] = state_dict[key]
 
     def get_current_z(self):
         state = self.get_state()
-        z = round(eval(state["referencezposition"]["Value"].replace(",", ".")), 3)
-        state["referencezposition"]["Value"] = z
+        z = state["referencezposition"]["Value"]
         logger.log(level=20, msg="Current Z: {}".format(z))
         return state, z
 
     def changezvalue(self, state, z_increment, new_z_height):
+
         current = state["referencezposition"]["Value"]
 
         if new_z_height is None:
@@ -66,7 +65,11 @@ class Microscope(FusionApi):
             else:
                 state["referencezposition"]["Value"] -= increment
         elif new_z_height is not None:
-            state["referencezposition"]["Value"] = float(new_z_height)
+            state["referencezposition"]["Value"] = new_z_height
+
+        new = state["referencezposition"]["Value"]
+
+        state["referencezposition"]["Value"] = round(new, 3)
 
         return state, current
 
@@ -74,24 +77,24 @@ class Microscope(FusionApi):
 
         self.update_state(key="referencezposition", state_dict=state)
 
-        logger.log(level=20, msg="Updated referencezposition from {} to {}".format(current,
-                                                                                   state["referencezposition"][
-                                                                                       "Value"]))
+        target = state["referencezposition"]["Value"]
+
+        logger.log(level=20, msg="Updated referencezposition from {} to {}".format(current, target))
+
         # We wait until the microscope has moved position to target Z.
-        target = round(state["referencezposition"]["Value"], 3)
         count = 0
         while target != self.get_current_z()[-1]:
             logger.log(level=20, msg="Microscope is moving to new position")
             if count == 100:
                 msg = ("Microscope failed to reach z position. Current {} and target {}. Please look at log file "
-                       "to find any errors").format(self.get_current_z()[-1],
-                                                    state["referencezposition"]["Value"])
+                       "to find any errors").format(self.get_current_z()[-1], target)
                 logger.log(level=40, msg=msg)
                 sys.exit(msg)
             count += 1
             sleep(3)
+
     def move_z_axis(self, z_increment={"up": True, "Value": 5}, new_z_height=None):
-        
+
         logger.log(level=20, msg="Moving z axis")
 
         state, z = self.get_current_z()
@@ -104,3 +107,6 @@ class Microscope(FusionApi):
 
     def return2start_z(self):
         self.move_z_axis(new_z_height=self.starting_z_height)
+
+
+
