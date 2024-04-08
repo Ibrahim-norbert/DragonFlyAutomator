@@ -81,17 +81,7 @@ class Microscope(FusionApi):
 
         logger.log(level=20, msg="Updated referencezposition from {} to {}".format(current, target))
 
-        # We wait until the microscope has moved position to target Z.
-        count = 0
-        while target != self.get_current_z()[-1]:
-            logger.log(level=20, msg="Microscope is moving to new position")
-            if count == 100:
-                msg = ("Microscope failed to reach z position. Current {} and target {}. Please look at log file "
-                       "to find any errors").format(self.get_current_z()[-1], target)
-                logger.log(level=40, msg=msg)
-                sys.exit(msg)
-            count += 1
-            sleep(3)
+        sleep(10)
 
     def move_z_axis(self, z_increment={"up": True, "Value": 5}, new_z_height=None):
 

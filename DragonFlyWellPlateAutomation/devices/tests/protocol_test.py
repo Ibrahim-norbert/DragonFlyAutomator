@@ -1,7 +1,7 @@
 from DragonFlyWellPlateAutomation.devices.image_based_autofocus import AutoFocus
 from DragonFlyWellPlateAutomation.devices.protocol import Protocol
 
-
+# TODO Move file to devices folder and add working directory to path for this file and mainwindow file
 def main():
     import argparse
     import os
@@ -42,13 +42,13 @@ def main():
     coordinate_frame_algorithm = args.coordinate_frame_algorithm
     homography_matrix_algorithm = args.homography_matrix_algorithm
 
-    protocol = Protocol()
+    protocol = Protocol(args.test)
 
-    print("This is a test run, no change in state of the microscope is performed.")
-
-    protocol.test = args.test
+    print("This is a test run, no change in state of the microscope is performed. \n"
+          "HTTP not connected: {}".format(protocol.test))
 
     protocol.image_name = imagename
+
     protocol.image_dir = args.image_dir
 
     protocol.autofocus_algorithm = autofocus_alg

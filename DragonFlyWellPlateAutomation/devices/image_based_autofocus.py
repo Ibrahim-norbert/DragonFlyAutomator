@@ -45,10 +45,10 @@ class AutoFocus:
     def savestats2dict(self, key, res, img_name, key_v=np.nan, sum_=np.nan, f_k=np.nan):
         self.variables["Metrics"] += [key]
         self.variables["Value"] += [res]  # self.collector
-        self.variables["Img_ID"] += [img_name]
-        self.variables["Z plane"] += [eval((img_name.split("_zheigth")[1]).split(".")[0])]
-        self.variables["Well coords"] += [(img_name.split("_well")[1]).split("_zheigth")[0]]
-        self.variables["Acquisition number"] += [eval((img_name.split("_n")[1]).split("_well")[0])]
+        self.variables["Img_ID"] += [img_name[-1]]
+        self.variables["Z plane"] += [img_name[0]]
+        self.variables["Well coords"] += [img_name[2]]
+        self.variables["Acquisition number"] += [img_name[1]]
 
         self.variables["Variables"] += [key_v]
         self.variables["Total power"] += [sum_]

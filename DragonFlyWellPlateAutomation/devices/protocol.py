@@ -17,10 +17,12 @@ logger.info("This log message is from {}.py".format(__name__))
 
 
 class Protocol(FusionApi):
-    def __init__(self):
+    def __init__(self, test=True):
         super().__init__()  # inherits
 
-        self.image_dir = None
+        self.test = test
+
+
         self.autofocus = AutoFocus()
         self.variables = None
         self.image_array = None
@@ -40,6 +42,7 @@ class Protocol(FusionApi):
         self.z_increment = None
         self.n_acquisitions = None
         self.img_name_dict = self.get_image_dir()
+        self.image_dir = os.path.dirname(self.img_name_dict["Path"])
 
         # Only for live image acquisition method
         self.image_name = None  # "Phalloidin_Hoechst_GfP_HeLa"
@@ -55,8 +58,8 @@ class Protocol(FusionApi):
 
     def run_protocol(self, protocol_name):
         if self.test is False:
+            logger.log(level=20, msg="Running protocol: {}".format(fusionrest.get_protocol_name()))
             fusionrest.run_protocol_completely(protocol_name=protocol_name)
-            logger.log(level=20, msg="Running protocol: {}".format(self.current_output.values()))
         else:
             time.sleep(5)
             logger.log(level=20, msg="Running protocol: {}".format(self.current_output.values()))
@@ -71,21 +74,22 @@ class Protocol(FusionApi):
             return img_name_dict
 
     def update_img_name(self, image_path):
+        pass
 
-        if ".ims" not in image_path:
-            image_path = image_path + ".ims"
-
-        if self.image_dir not in image_path:
-            self.img_name_dict["Path"] = os.path.join(self.image_dir, image_path)
-        else:
-            self.img_name_dict["Path"] = image_path
-
-        if self.test is False:
-            logger.log(level=20, msg="New image path: {}".format(self.img_name_dict["Path"]))
-            update(self.endpoint + "/{}".format("datasets/current"), self.img_name_dict)
+        # if ".ims" not in image_path:
+        #     image_path = image_path + ".ims"
+        #
+        # if self.image_dir not in image_path:
+        #     self.img_name_dict["Path"] = os.path.join(self.image_dir, image_path)
+        # else:
+        #     self.img_name_dict["Path"] = image_path
+        #
+        # if self.test is False:
+        #     logger.log(level=20, msg="New image path: {}".format(self.img_name_dict["Path"]))
+        #     update(self.endpoint + "/{}".format("datasets/current"), self.img_name_dict)
 
     def well_folder(self, wellname):
-        well_dir = os.path.join(self.image_dir, "well_{}".format(wellname))
+        well_dir = os.path.join(os.path.dirname(self.img_name_dict["Path"]), "well_{}".format(wellname))
         if not os.path.exists(well_dir):
             os.mkdir(well_dir)
         return well_dir
@@ -105,6 +109,9 @@ class Protocol(FusionApi):
 
         # Image paths
         img_paths = []
+        z_heights = []
+        acquisition_n = []
+
 
         if self.test is False:
             for direction in [True, False]:
@@ -116,6 +123,9 @@ class Protocol(FusionApi):
 
                     # Request update to target z position
                     z = self.microscope.move_z_axis({"up": direction, "Value": z_increment})  # Delay
+
+                    z_heights.append(z)
+                    acquisition_n.append(i)
 
                     # Request path change for saving images
                     img_path = os.path.join(well_dir, "rawtake_n{}_well{}_zheigth{}.ims".
@@ -135,7 +145,8 @@ class Protocol(FusionApi):
                     state, _ = self.microscope.get_current_z()
                     # Request update to target z position
                     z = self.microscope.move_z_axis({"up": direction, "Value": z_increment})  # Delay
-
+                    z_heights.append(z)
+                    acquisition_n.append(i)
                     # Request path change for saving images
                     img_path = os.path.join(well_dir, "rawtake_n{}_well{}_zheigth{}.ims".
                                             format(i + 1, wellname, int(z)))
@@ -149,7 +160,7 @@ class Protocol(FusionApi):
         # Return to original height
         logger.log(level=20, msg="Z stack done for well {}".format(wellname))
 
-        return well_dir, img_paths
+        return well_dir, z_heights, acquisition_n
 
     def load_ims_imgs(self, img_path):
         img = ims(img_path, squeeze_output=True)
@@ -162,7 +173,13 @@ class Protocol(FusionApi):
         logger.log(level=20, msg="Autofocus begins for well: {}".format(wellname))
 
         # Perform z stack
-        well_dir, img_paths = self.z_stack(wellname, z_increment, n_acquisitions)
+        well_dir, z_heights, acquisition_n = self.z_stack(wellname, z_increment, n_acquisitions)
+
+        img_paths = glob.glob(os.path.join(os.path.dirname(self.img_name_dict["Path"]), "*.ims"))
+        n_imgs = 2*n_acquisitions
+        if len(img_paths) > n_imgs:
+            img_paths.sort(key=os.path.getmtime)
+            img_paths = img_paths[-n_imgs:]
 
         logger.log(level=20, msg="The affected images are: {}".format([os.path.basename(x) for x in img_paths]))
 
@@ -174,8 +191,9 @@ class Protocol(FusionApi):
 
         # Populate autofocus variable
         if func is not None and callable(func):
-            [func(self.load_ims_imgs(img_path), os.path.basename(img_path)) for img_path in
-             img_paths]  # Time point 0, Channel 0, z-layer 5
+            [func(self.load_ims_imgs(img_path), (z_heights[indx], acquisition_n[indx],
+                                                 wellname, os.path.basename(img_path))) for indx, img_path in
+             enumerate(img_paths)]  # Time point 0, Channel 0, z-layer 5
             logger.log(level=20, msg="Image quality metric applied to all z-stack images")
         else:
             logger.log(level=20, msg="Image quality metric cannot be found.")
@@ -221,7 +239,9 @@ class Protocol(FusionApi):
             self.run_protocol(protocol_name)
         else:
             img = os.path.join(os.getcwd(), "test_rn/2024-03-05/rawtake_n7_well0-0_zheigth452.ims")
-            shutil.copy2(img, self.img_name_dict["Path"])
+
+            img_path = os.path.join(os.path.dirname(self.img_name_dict["Path"]), img_path)
+            shutil.copy2(img, img_path)
 
         return self.img_name_dict["Path"]
 
@@ -250,6 +270,12 @@ class Protocol(FusionApi):
 
         # Obtain image with current protocol
         img_path = self.image_acquisition(os.path.join(well_dir, img_name), protocol_name)  # Delay
+
+        img_paths = glob.glob(os.path.join(os.path.dirname(self.img_name_dict["Path"]), "*.ims"))
+        img_paths.sort(key=os.path.getmtime)
+        img_path = img_paths[-1]
+
+        self.microscope.return2start_z()
 
         logger.log(level=20, msg="Path of image: {}".format(img_path))
 

@@ -1,124 +1,47 @@
-fusionrest.py - 2024-04-03 13:57:17,515 - INFO - This log message is from DragonFlyWellPlateAutomation.RestAPI.fusionrest
-xyzstage.py - 2024-04-03 13:57:17,516 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.xyzstage.py
-micrscope.py - 2024-04-03 13:57:17,516 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.micrscope.py
-protocol.py - 2024-04-03 13:57:17,516 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.protocol.py
-micrscope.py - 2024-04-03 13:57:17,516 - INFO - Current Z: 487.42
-protocol.py - 2024-04-03 13:57:17,539 - INFO - Autofocus begins for well: 1-1
-protocol.py - 2024-04-03 13:57:17,539 - INFO - Z stack begins for well: 1-1
-protocol.py - 2024-04-03 13:57:17,539 - INFO - Total height to travel 50.0 mm. Please determine from current position that this is safe
-micrscope.py - 2024-04-03 13:57:17,539 - INFO - Current Z: 487.42
-micrscope.py - 2024-04-03 13:57:17,539 - INFO - Moving z axis
-micrscope.py - 2024-04-03 13:57:17,539 - INFO - Current Z: 487.42
-micrscope.py - 2024-04-03 13:57:17,539 - INFO - Updated referencezposition from 487.42 to 492.42
-micrscope.py - 2024-04-03 13:57:17,539 - INFO - Current Z: 492.42
-micrscope.py - 2024-04-03 13:57:17,542 - INFO - Current Z: 492.42
-micrscope.py - 2024-04-03 13:57:17,542 - INFO - Moving z axis
-micrscope.py - 2024-04-03 13:57:17,542 - INFO - Current Z: 492.42
-micrscope.py - 2024-04-03 13:57:17,542 - INFO - Updated referencezposition from 492.42 to 497.42
-micrscope.py - 2024-04-03 13:57:17,542 - INFO - Current Z: 497.42
-micrscope.py - 2024-04-03 13:57:17,544 - INFO - Current Z: 497.42
-micrscope.py - 2024-04-03 13:57:17,544 - INFO - Moving z axis
-micrscope.py - 2024-04-03 13:57:17,544 - INFO - Current Z: 497.42
-micrscope.py - 2024-04-03 13:57:17,544 - INFO - Updated referencezposition from 497.42 to 502.42
-micrscope.py - 2024-04-03 13:57:17,544 - INFO - Current Z: 502.42
-micrscope.py - 2024-04-03 13:57:17,547 - INFO - Current Z: 502.42
-micrscope.py - 2024-04-03 13:57:17,547 - INFO - Moving z axis
-micrscope.py - 2024-04-03 13:57:17,547 - INFO - Current Z: 502.42
-micrscope.py - 2024-04-03 13:57:17,547 - INFO - Updated referencezposition from 502.42 to 507.42
-micrscope.py - 2024-04-03 13:57:17,547 - INFO - Current Z: 507.42
-micrscope.py - 2024-04-03 13:57:17,549 - INFO - Current Z: 507.42
-micrscope.py - 2024-04-03 13:57:17,549 - INFO - Moving z axis
-micrscope.py - 2024-04-03 13:57:17,549 - INFO - Current Z: 507.42
-micrscope.py - 2024-04-03 13:57:17,549 - INFO - Updated referencezposition from 507.42 to 512.42
-micrscope.py - 2024-04-03 13:57:17,549 - INFO - Current Z: 512.42
-micrscope.py - 2024-04-03 13:57:17,552 - INFO - Current Z: 512.42
-micrscope.py - 2024-04-03 13:57:17,552 - INFO - Moving z axis
-micrscope.py - 2024-04-03 13:57:17,552 - INFO - Current Z: 512.42
-micrscope.py - 2024-04-03 13:57:17,552 - INFO - Updated referencezposition from 512.42 to 517.42
-micrscope.py - 2024-04-03 13:57:17,552 - INFO - Current Z: 517.42
-micrscope.py - 2024-04-03 13:57:17,554 - INFO - Current Z: 517.42
-micrscope.py - 2024-04-03 13:57:17,554 - INFO - Moving z axis
-micrscope.py - 2024-04-03 13:57:17,554 - INFO - Current Z: 517.42
-micrscope.py - 2024-04-03 13:57:17,554 - INFO - Updated referencezposition from 517.42 to 522.42
-micrscope.py - 2024-04-03 13:57:17,554 - INFO - Current Z: 522.42
-micrscope.py - 2024-04-03 13:57:17,557 - INFO - Current Z: 522.42
-micrscope.py - 2024-04-03 13:57:17,557 - INFO - Moving z axis
-micrscope.py - 2024-04-03 13:57:17,557 - INFO - Current Z: 522.42
-micrscope.py - 2024-04-03 13:57:17,557 - INFO - Updated referencezposition from 522.42 to 527.42
-micrscope.py - 2024-04-03 13:57:17,557 - INFO - Current Z: 527.42
-micrscope.py - 2024-04-03 13:57:17,559 - INFO - Current Z: 527.42
-micrscope.py - 2024-04-03 13:57:17,559 - INFO - Moving z axis
-micrscope.py - 2024-04-03 13:57:17,559 - INFO - Current Z: 527.42
-micrscope.py - 2024-04-03 13:57:17,559 - INFO - Updated referencezposition from 527.42 to 532.42
-micrscope.py - 2024-04-03 13:57:17,559 - INFO - Current Z: 532.42
-micrscope.py - 2024-04-03 13:57:17,562 - INFO - Current Z: 532.42
-micrscope.py - 2024-04-03 13:57:17,562 - INFO - Moving z axis
-micrscope.py - 2024-04-03 13:57:17,562 - INFO - Current Z: 532.42
-micrscope.py - 2024-04-03 13:57:17,562 - INFO - Updated referencezposition from 532.42 to 537.42
-micrscope.py - 2024-04-03 13:57:17,562 - INFO - Current Z: 537.42
-micrscope.py - 2024-04-03 13:57:17,564 - INFO - Moving z axis
-micrscope.py - 2024-04-03 13:57:17,564 - INFO - Current Z: 537.42
-micrscope.py - 2024-04-03 13:57:17,564 - INFO - Updated referencezposition from 537.42 to 487.42
-micrscope.py - 2024-04-03 13:57:17,564 - INFO - Current Z: 487.42
-micrscope.py - 2024-04-03 13:57:17,564 - INFO - Current Z: 487.42
-micrscope.py - 2024-04-03 13:57:17,564 - INFO - Moving z axis
-micrscope.py - 2024-04-03 13:57:17,564 - INFO - Current Z: 487.42
-micrscope.py - 2024-04-03 13:57:17,564 - INFO - Updated referencezposition from 487.42 to 482.42
-micrscope.py - 2024-04-03 13:57:17,564 - INFO - Current Z: 482.42
-micrscope.py - 2024-04-03 13:57:17,567 - INFO - Current Z: 482.42
-micrscope.py - 2024-04-03 13:57:17,567 - INFO - Moving z axis
-micrscope.py - 2024-04-03 13:57:17,567 - INFO - Current Z: 482.42
-micrscope.py - 2024-04-03 13:57:17,567 - INFO - Updated referencezposition from 482.42 to 477.42
-micrscope.py - 2024-04-03 13:57:17,567 - INFO - Current Z: 477.42
-micrscope.py - 2024-04-03 13:57:17,569 - INFO - Current Z: 477.42
-micrscope.py - 2024-04-03 13:57:17,569 - INFO - Moving z axis
-micrscope.py - 2024-04-03 13:57:17,569 - INFO - Current Z: 477.42
-micrscope.py - 2024-04-03 13:57:17,569 - INFO - Updated referencezposition from 477.42 to 472.42
-micrscope.py - 2024-04-03 13:57:17,569 - INFO - Current Z: 472.42
-micrscope.py - 2024-04-03 13:57:17,571 - INFO - Current Z: 472.42
-micrscope.py - 2024-04-03 13:57:17,571 - INFO - Moving z axis
-micrscope.py - 2024-04-03 13:57:17,571 - INFO - Current Z: 472.42
-micrscope.py - 2024-04-03 13:57:17,572 - INFO - Updated referencezposition from 472.42 to 467.42
-micrscope.py - 2024-04-03 13:57:17,572 - INFO - Current Z: 467.42
-micrscope.py - 2024-04-03 13:57:17,574 - INFO - Current Z: 467.42
-micrscope.py - 2024-04-03 13:57:17,574 - INFO - Moving z axis
-micrscope.py - 2024-04-03 13:57:17,574 - INFO - Current Z: 467.42
-micrscope.py - 2024-04-03 13:57:17,574 - INFO - Updated referencezposition from 467.42 to 462.42
-micrscope.py - 2024-04-03 13:57:17,574 - INFO - Current Z: 462.42
-micrscope.py - 2024-04-03 13:57:17,576 - INFO - Current Z: 462.42
-micrscope.py - 2024-04-03 13:57:17,576 - INFO - Moving z axis
-micrscope.py - 2024-04-03 13:57:17,576 - INFO - Current Z: 462.42
-micrscope.py - 2024-04-03 13:57:17,576 - INFO - Updated referencezposition from 462.42 to 457.42
-micrscope.py - 2024-04-03 13:57:17,576 - INFO - Current Z: 457.42
-micrscope.py - 2024-04-03 13:57:17,579 - INFO - Current Z: 457.42
-micrscope.py - 2024-04-03 13:57:17,579 - INFO - Moving z axis
-micrscope.py - 2024-04-03 13:57:17,579 - INFO - Current Z: 457.42
-micrscope.py - 2024-04-03 13:57:17,579 - INFO - Updated referencezposition from 457.42 to 452.42
-micrscope.py - 2024-04-03 13:57:17,579 - INFO - Current Z: 452.42
-micrscope.py - 2024-04-03 13:57:17,582 - INFO - Current Z: 452.42
-micrscope.py - 2024-04-03 13:57:17,582 - INFO - Moving z axis
-micrscope.py - 2024-04-03 13:57:17,582 - INFO - Current Z: 452.42
-micrscope.py - 2024-04-03 13:57:17,582 - INFO - Updated referencezposition from 452.42 to 447.42
-micrscope.py - 2024-04-03 13:57:17,582 - INFO - Current Z: 447.42
-micrscope.py - 2024-04-03 13:57:17,584 - INFO - Current Z: 447.42
-micrscope.py - 2024-04-03 13:57:17,584 - INFO - Moving z axis
-micrscope.py - 2024-04-03 13:57:17,584 - INFO - Current Z: 447.42
-micrscope.py - 2024-04-03 13:57:17,584 - INFO - Updated referencezposition from 447.42 to 442.42
-micrscope.py - 2024-04-03 13:57:17,584 - INFO - Current Z: 442.42
-micrscope.py - 2024-04-03 13:57:17,587 - INFO - Current Z: 442.42
-micrscope.py - 2024-04-03 13:57:17,587 - INFO - Moving z axis
-micrscope.py - 2024-04-03 13:57:17,587 - INFO - Current Z: 442.42
-micrscope.py - 2024-04-03 13:57:17,587 - INFO - Updated referencezposition from 442.42 to 437.42
-micrscope.py - 2024-04-03 13:57:17,587 - INFO - Current Z: 437.42
-micrscope.py - 2024-04-03 13:57:17,589 - INFO - Moving z axis
-micrscope.py - 2024-04-03 13:57:17,589 - INFO - Current Z: 437.42
-micrscope.py - 2024-04-03 13:57:17,589 - INFO - Updated referencezposition from 437.42 to 487.42
-micrscope.py - 2024-04-03 13:57:17,589 - INFO - Current Z: 487.42
-protocol.py - 2024-04-03 13:57:17,589 - INFO - Z stack done for well 1-1
-protocol.py - 2024-04-03 13:57:17,589 - INFO - The affected images are: ['rawtake_n1_well1-1_zheigth492.ims', 'rawtake_n2_well1-1_zheigth497.ims', 'rawtake_n3_well1-1_zheigth502.ims', 'rawtake_n4_well1-1_zheigth507.ims', 'rawtake_n5_well1-1_zheigth512.ims', 'rawtake_n6_well1-1_zheigth517.ims', 'rawtake_n7_well1-1_zheigth522.ims', 'rawtake_n8_well1-1_zheigth527.ims', 'rawtake_n9_well1-1_zheigth532.ims', 'rawtake_n10_well1-1_zheigth537.ims', 'rawtake_n1_well1-1_zheigth482.ims', 'rawtake_n2_well1-1_zheigth477.ims', 'rawtake_n3_well1-1_zheigth472.ims', 'rawtake_n4_well1-1_zheigth467.ims', 'rawtake_n5_well1-1_zheigth462.ims', 'rawtake_n6_well1-1_zheigth457.ims', 'rawtake_n7_well1-1_zheigth452.ims', 'rawtake_n8_well1-1_zheigth447.ims', 'rawtake_n9_well1-1_zheigth442.ims', 'rawtake_n10_well1-1_zheigth437.ims']
-protocol.py - 2024-04-03 13:57:17,752 - INFO - Image quality metric applied to all z-stack images
-micrscope.py - 2024-04-03 13:57:17,753 - INFO - Moving z axis
-micrscope.py - 2024-04-03 13:57:17,754 - INFO - Current Z: 487.42
-micrscope.py - 2024-04-03 13:57:17,754 - INFO - Updated referencezposition from 487.42 to 492
-micrscope.py - 2024-04-03 13:57:17,754 - INFO - Current Z: 492
-protocol.py - 2024-04-03 13:57:17,754 - INFO - Autofocus ended for well 1-1 with elapsed time: 0.2145836353302002
+fusionrest.py - 2024-04-08 07:52:29,682 - INFO - This log message is from DragonFlyWellPlateAutomation.RestAPI.fusionrest
+utils.py - 2024-04-08 07:52:29,754 - INFO - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+utils.py - 2024-04-08 07:52:29,754 - INFO - NumExpr defaulting to 8 threads.
+xyzstage.py - 2024-04-08 07:52:29,961 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.xyzstage.py
+micrscope.py - 2024-04-08 07:52:29,961 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.micrscope.py
+protocol.py - 2024-04-08 07:52:29,961 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.protocol.py
+helperfunctions.py - 2024-04-08 07:52:29,962 - INFO - This log message is from DragonFlyWellPlateAutomation.gui.helperfunctions.py
+CoordinateTransforms.py - 2024-04-08 07:52:30,321 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.CoordinateTransforms.py
+wellplate.py - 2024-04-08 07:52:30,322 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.wellplate.py
+GUI_WellPlate.py - 2024-04-08 07:52:30,322 - INFO - This log message is from DragonFlyWellPlateAutomation.gui.GUI_WellPlate.py
+SaveDirectory.py - 2024-04-08 07:52:30,323 - INFO - This log message is from DragonFlyWellPlateAutomation.gui.SaveDirectory.py
+Visualisation.py - 2024-04-08 07:52:30,378 - INFO - This log message is from DragonFlyWellPlateAutomation.gui.Visualisation.py
+FrameSwitcher.py - 2024-04-08 07:52:30,379 - INFO - This log message is from DragonFlyWellPlateAutomation.gui.FrameSwitcher.py
+MainWindow.py - 2024-04-08 07:52:30,379 - INFO - This log message is from __main__.py
+MainWindow.py - 2024-04-08 07:52:30,379 - INFO - Directory: /media/ibrahim/Extended Storage/cloud/Internship/bioquant/348_wellplate_automation
+micrscope.py - 2024-04-08 07:52:30,463 - INFO - Current Z: 487.42
+SaveDirectory.py - 2024-04-08 07:52:37,437 - INFO - Selected to create new well-plate dimension
+SaveDirectory.py - 2024-04-08 07:52:37,438 - INFO - Username: ibrahim
+SaveDirectory.py - 2024-04-08 07:52:37,438 - INFO - Image directory: /media/ibrahim/Extended Storage/cloud
+wellplate.py - 2024-04-08 07:52:46,526 - INFO - Well plate dimension: state dict as vectors [array(['59.4', '33.8'], dtype='<U4'), array(['-47.7', '33.1'], dtype='<U5'), array(['-47.7', '-38.6'], dtype='<U5'), array(['4.5', '-2.2'], dtype='<U4'), array(['59.4', '-38.6'], dtype='<U5')]
+CoordinateTransforms.py - 2024-04-08 07:52:46,528 - INFO - The chosen well coords [[ 1.  1.  1.]
+ [ 1. 16.  1.]
+ [24.  1.  1.]
+ [12.  8.  1.]]
+CoordinateTransforms.py - 2024-04-08 07:52:46,529 - INFO - The corresponding xyz coordinates [[-47.70000076  33.09999847   1.        ]
+ [-47.70000076 -38.59999847   1.        ]
+ [ 59.40000153  33.79999924   1.        ]
+ [  4.5         -2.20000005   1.        ]]
+CoordinateTransforms.py - 2024-04-08 07:52:46,529 - INFO - Homography estimation method: Levenberg-Marquardt
+CoordinateTransforms.py - 2024-04-08 07:52:46,530 - INFO - Well plate dimension: length - 107.10228755726928, height - 71.7
+CoordinateTransforms.py - 2024-04-08 07:52:46,530 - INFO - Computed well spacing: x:spacing = 4.656521739130435 and y_spacing = -4.78
+wellplate.py - 2024-04-08 07:52:46,533 - INFO - Well plate corner coordinates: [[-47.7, 33.1, 1.0], [59.4, 33.1, 1.0], [-47.7, -38.6, 1.0], [59.4, -38.6, 1.0]]
+wellplate.py - 2024-04-08 07:52:46,533 - INFO - Well plate matrix dimension: rows: 16, columns: 24
+wellplate.py - 2024-04-08 07:52:46,533 - INFO - Well plate dimension: length - 107.10228755726928, height - 71.7
+wellplate.py - 2024-04-08 07:52:46,533 - INFO - Computed well spacing: x:spacing = 4.656521739130435 and y_spacing = -4.78
+wellplate.py - 2024-04-08 07:52:46,580 - INFO - Stage is moving for well 16-24 from coordinates dummycoords to new coordinates{'xposition': {'Value': 59.4}, 'yposition': {'Value': -38.6}, 'analoguecontrol': {'Value': False}}
+GUI_WellPlate.py - 2024-04-08 07:53:56,636 - INFO - Wells that have been selected: ['G7', 'H8']
+wellplate.py - 2024-04-08 07:54:08,489 - INFO - Stage is moving for well 7-7 from coordinates dummycoords to new coordinates{'xposition': {'Value': -19.760869565217394}, 'yposition': {'Value': 4.420000000000002}, 'analoguecontrol': {'Value': False}}
+Visualisation.py - 2024-04-08 07:54:08,585 - INFO - Wells that have been selected: G7 and their coordinates [-19.76086957   4.42      ]
+Visualisation.py - 2024-04-08 07:54:08,589 - INFO - Create the following coordinate plot of well: G7 and their coordinates [-19.760869565217394, 4.420000000000002]
+protocol.py - 2024-04-08 07:55:08,513 - INFO - Autofocus begins for well: 7-7
+protocol.py - 2024-04-08 07:55:08,513 - INFO - Z stack begins for well: 7-7
+protocol.py - 2024-04-08 07:55:08,514 - INFO - Total height to travel 4 mm. Please determine from current position that this is safe
+micrscope.py - 2024-04-08 07:55:08,514 - INFO - Current Z: 487.42
+micrscope.py - 2024-04-08 07:55:08,514 - INFO - Moving z axis
+micrscope.py - 2024-04-08 07:55:08,514 - INFO - Current Z: 487.42
+micrscope.py - 2024-04-08 07:55:08,514 - INFO - Updated referencezposition from 487.42 to 489.42

@@ -40,6 +40,8 @@ class WellPlate(XYZStage):
         self.wellbywell = False
         self.non_linear_correction = True
 
+        self.test = True
+
     def get_state(self, test_key=None):
 
         if self.test is False:
@@ -197,7 +199,7 @@ class WellPlate(XYZStage):
 
                 self.update_state(state_dict, analoguecontrol_bool=False)
 
-                sleep(60)
+                sleep(25)
             else:
                 logger.log(level=20,
                            msg="Stage is moving for well {} from coordinates {} to new coordinates{}".format(
