@@ -1,0 +1,11 @@
+The simulator is provided to allow developent in the absence of a Dragonfly (500) or Damselfly (200) unit.
+It will help the developer to test their implementation in a safe controlled manner.
+The simulator requires a simple RS232 to RS232 connection, the simulator connects to one port and the SDK  the other.
+The simulator will respond to all commands as per real unit, allowing testing to be completed before moving to the hardware.
+
+This can be achieved using a simple USB to multiple RS232 device, with an RS232 cable connecting each port.
+There are software alternatives (virtual comports) but we do not warrant such drivers, so leave the developer to explore that avenue if so desired.
+
+There are 2 configuration provided, Dragonfly and Damselfy, copy the relevant file to the root folder before starting the application.
+This will help to simulate and full test each devce type.
+Note - You cannot swap the ini file while the simulator is open (even when disconnected).

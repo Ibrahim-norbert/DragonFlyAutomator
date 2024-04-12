@@ -1,47 +1,17 @@
-fusionrest.py - 2024-04-08 07:52:29,682 - INFO - This log message is from DragonFlyWellPlateAutomation.RestAPI.fusionrest
-utils.py - 2024-04-08 07:52:29,754 - INFO - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
-utils.py - 2024-04-08 07:52:29,754 - INFO - NumExpr defaulting to 8 threads.
-xyzstage.py - 2024-04-08 07:52:29,961 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.xyzstage.py
-micrscope.py - 2024-04-08 07:52:29,961 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.micrscope.py
-protocol.py - 2024-04-08 07:52:29,961 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.protocol.py
-helperfunctions.py - 2024-04-08 07:52:29,962 - INFO - This log message is from DragonFlyWellPlateAutomation.gui.helperfunctions.py
-CoordinateTransforms.py - 2024-04-08 07:52:30,321 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.CoordinateTransforms.py
-wellplate.py - 2024-04-08 07:52:30,322 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.wellplate.py
-GUI_WellPlate.py - 2024-04-08 07:52:30,322 - INFO - This log message is from DragonFlyWellPlateAutomation.gui.GUI_WellPlate.py
-SaveDirectory.py - 2024-04-08 07:52:30,323 - INFO - This log message is from DragonFlyWellPlateAutomation.gui.SaveDirectory.py
-Visualisation.py - 2024-04-08 07:52:30,378 - INFO - This log message is from DragonFlyWellPlateAutomation.gui.Visualisation.py
-FrameSwitcher.py - 2024-04-08 07:52:30,379 - INFO - This log message is from DragonFlyWellPlateAutomation.gui.FrameSwitcher.py
-MainWindow.py - 2024-04-08 07:52:30,379 - INFO - This log message is from __main__.py
-MainWindow.py - 2024-04-08 07:52:30,379 - INFO - Directory: /media/ibrahim/Extended Storage/cloud/Internship/bioquant/348_wellplate_automation
-micrscope.py - 2024-04-08 07:52:30,463 - INFO - Current Z: 487.42
-SaveDirectory.py - 2024-04-08 07:52:37,437 - INFO - Selected to create new well-plate dimension
-SaveDirectory.py - 2024-04-08 07:52:37,438 - INFO - Username: ibrahim
-SaveDirectory.py - 2024-04-08 07:52:37,438 - INFO - Image directory: /media/ibrahim/Extended Storage/cloud
-wellplate.py - 2024-04-08 07:52:46,526 - INFO - Well plate dimension: state dict as vectors [array(['59.4', '33.8'], dtype='<U4'), array(['-47.7', '33.1'], dtype='<U5'), array(['-47.7', '-38.6'], dtype='<U5'), array(['4.5', '-2.2'], dtype='<U4'), array(['59.4', '-38.6'], dtype='<U5')]
-CoordinateTransforms.py - 2024-04-08 07:52:46,528 - INFO - The chosen well coords [[ 1.  1.  1.]
- [ 1. 16.  1.]
- [24.  1.  1.]
- [12.  8.  1.]]
-CoordinateTransforms.py - 2024-04-08 07:52:46,529 - INFO - The corresponding xyz coordinates [[-47.70000076  33.09999847   1.        ]
- [-47.70000076 -38.59999847   1.        ]
- [ 59.40000153  33.79999924   1.        ]
- [  4.5         -2.20000005   1.        ]]
-CoordinateTransforms.py - 2024-04-08 07:52:46,529 - INFO - Homography estimation method: Levenberg-Marquardt
-CoordinateTransforms.py - 2024-04-08 07:52:46,530 - INFO - Well plate dimension: length - 107.10228755726928, height - 71.7
-CoordinateTransforms.py - 2024-04-08 07:52:46,530 - INFO - Computed well spacing: x:spacing = 4.656521739130435 and y_spacing = -4.78
-wellplate.py - 2024-04-08 07:52:46,533 - INFO - Well plate corner coordinates: [[-47.7, 33.1, 1.0], [59.4, 33.1, 1.0], [-47.7, -38.6, 1.0], [59.4, -38.6, 1.0]]
-wellplate.py - 2024-04-08 07:52:46,533 - INFO - Well plate matrix dimension: rows: 16, columns: 24
-wellplate.py - 2024-04-08 07:52:46,533 - INFO - Well plate dimension: length - 107.10228755726928, height - 71.7
-wellplate.py - 2024-04-08 07:52:46,533 - INFO - Computed well spacing: x:spacing = 4.656521739130435 and y_spacing = -4.78
-wellplate.py - 2024-04-08 07:52:46,580 - INFO - Stage is moving for well 16-24 from coordinates dummycoords to new coordinates{'xposition': {'Value': 59.4}, 'yposition': {'Value': -38.6}, 'analoguecontrol': {'Value': False}}
-GUI_WellPlate.py - 2024-04-08 07:53:56,636 - INFO - Wells that have been selected: ['G7', 'H8']
-wellplate.py - 2024-04-08 07:54:08,489 - INFO - Stage is moving for well 7-7 from coordinates dummycoords to new coordinates{'xposition': {'Value': -19.760869565217394}, 'yposition': {'Value': 4.420000000000002}, 'analoguecontrol': {'Value': False}}
-Visualisation.py - 2024-04-08 07:54:08,585 - INFO - Wells that have been selected: G7 and their coordinates [-19.76086957   4.42      ]
-Visualisation.py - 2024-04-08 07:54:08,589 - INFO - Create the following coordinate plot of well: G7 and their coordinates [-19.760869565217394, 4.420000000000002]
-protocol.py - 2024-04-08 07:55:08,513 - INFO - Autofocus begins for well: 7-7
-protocol.py - 2024-04-08 07:55:08,513 - INFO - Z stack begins for well: 7-7
-protocol.py - 2024-04-08 07:55:08,514 - INFO - Total height to travel 4 mm. Please determine from current position that this is safe
-micrscope.py - 2024-04-08 07:55:08,514 - INFO - Current Z: 487.42
-micrscope.py - 2024-04-08 07:55:08,514 - INFO - Moving z axis
-micrscope.py - 2024-04-08 07:55:08,514 - INFO - Current Z: 487.42
-micrscope.py - 2024-04-08 07:55:08,514 - INFO - Updated referencezposition from 487.42 to 489.42
+2024-03-13 20:59:10,870 - INFO - This log message is from DragonFlyWellPlateAutomation.RestAPI.fusionrest
+2024-03-13 20:59:10,870 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.xyzstage.py
+2024-03-13 20:59:10,870 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.micrscope.py
+2024-03-13 20:59:10,914 - INFO - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2024-03-13 20:59:10,914 - INFO - NumExpr defaulting to 8 threads.
+2024-03-13 20:59:10,985 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.protocol.py
+2024-03-13 20:59:10,985 - INFO - This log message is from helperfunctions.py
+2024-03-13 20:59:11,140 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.CoordinateTransforms.py
+2024-03-13 20:59:11,141 - INFO - This log message is from DragonFlyWellPlateAutomation.devices.wellplate.py
+2024-03-13 20:59:11,141 - INFO - This log message is from GUI_WellPlate.py
+2024-03-13 20:59:11,141 - INFO - This log message is from SaveDirectory.py
+2024-03-13 20:59:11,158 - INFO - This log message is from DragonFlyWellPlateAutomation.gui.helperfunctions.py
+2024-03-13 20:59:11,186 - INFO - This log message is from Visualisation.py
+2024-03-13 20:59:11,187 - INFO - This log message is from FrameSwitcher.py
+2024-03-13 20:59:11,187 - INFO - This log message is from __main__.py
+2024-03-13 20:59:11,187 - INFO - Directory: /media/ibrahim/Extended Storage/cloud/Internship/bioquant/348_wellplate_automation
+2024-03-13 20:59:11,267 - INFO - Current Z: 487.42

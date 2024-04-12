@@ -1,0 +1,737 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "FusionApi",
+    "description": "This defines the api to remotely control Fusion.",
+    "version": "1.0",
+    "x-logo": {
+      "url": "spacelogo.png",
+      "backgroundColor": "#FFFFFF",
+      "altText": "Fusion Logo"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:15120"
+    }
+  ],
+  "paths": {
+    "/v1/protocol/current": {
+      "get": {
+        "summary": "Get Protocol",
+        "description": "Gets the currently selected protocol.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Name": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "examples": {
+                  "OK": {
+                    "value": {
+                      "Name": "Protocol 1"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No protocol selected"
+          }
+        }
+      },
+      "put": {
+        "summary": "Set Protocol",
+        "description": "Sets the currently selected protocol by name.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "Name": {
+                    "type": "string"
+                  }
+                }
+              },
+              "examples": {
+                "OK": {
+                  "value": {
+                    "Name": "Protocol 1"
+                  }
+                },
+                "Bad request syntax": {
+                  "value": {
+                    "Value": "Protocol 1"
+                  }
+                },
+                "No Such protocol": {
+                  "value": {
+                    "Name": "Invalid protocol"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad request syntax"
+          },
+          "404": {
+            "description": "No such protocol"
+          },
+          "409": {
+            "description": "Current protocol running"
+          }
+        }
+      }
+    },
+    "/v1/protocol/state": {
+      "get": {
+        "summary": "Get Protocol State.",
+        "description": "Gets the current protocol state.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "State": {
+                      "type": "string",
+                      "enum": [
+                        "Idle",
+                        "Waiting",
+                        "Running",
+                        "Paused",
+                        "Aborting",
+                        "Aborted"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "State"
+                  ]
+                },
+                "examples": {
+                  "Idle": {
+                    "value": {
+                      "State": "Idle"
+                    }
+                  },
+                  "Waiting": {
+                    "value": {
+                      "State": "Waiting"
+                    }
+                  },
+                  "Running": {
+                    "value": {
+                      "State": "Running"
+                    }
+                  },
+                  "Paused": {
+                    "value": {
+                      "State": "Paused"
+                    }
+                  },
+                  "Aborting": {
+                    "value": {
+                      "State": "Aborting"
+                    }
+                  },
+                  "Aborted": {
+                    "value": {
+                      "State": "Aborted"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Set Protocol State.",
+        "description": "\nSets the current protocol state.\n\n\nThe following state transitions are supported:\n\n| Current State              | Request State |\n|-------------------------|-------------------------|\n|Idle | Running   |\n|Running    | Paused|\n|Paused | Running |\n|Paused | Aborted |\n|Running | Aborted |\n\n Other state tranisitions will result in an invalid state transition response.\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "State": {
+                    "type": "string"
+                  }
+                }
+              },
+              "examples": {
+                "Run": {
+                  "value": {
+                    "State": "Running"
+                  }
+                },
+                "Pause": {
+                  "value": {
+                    "State": "Paused"
+                  }
+                },
+                "Resume": {
+                  "value": {
+                    "State": "Running"
+                  }
+                },
+                "Abort": {
+                  "value": {
+                    "State": "Aborted"
+                  }
+                },
+                "Bad request syntax": {
+                  "value": {
+                    "Value": "Aborted"
+                  }
+                },
+                "Invalid state transition": {
+                  "value": {
+                    "State": "Waiting"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad request syntax"
+          },
+          "409": {
+            "description": "Invalid state transition"
+          }
+        }
+      }
+    },
+    "/v1/protocol/progress": {
+      "get": {
+        "summary": "Get Protocol Progress",
+        "description": "Gets the most recent protocol progress",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Progress": {
+                      "type": "number"
+                    },
+                    "StartTime": {
+                      "type": "string"
+                    },
+                    "RemainingTime": {
+                      "type": "string"
+                    },
+                    "ElapsedTime": {
+                      "type": "string"
+                    },
+                    "EstimatedTimeOfCompletion": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "examples": {
+                  "During Run": {
+                    "value": {
+                      "StartTime": "2019-01-31T11:53:37.6799174Z",
+                      "ElapsedTime": "00:00:06.9610000",
+                      "RemainingTime": "00:00:20.4000000",
+                      "EstimatedTimeOfCompletion": "2019-01-31T11:54:05.1522273Z",
+                      "Progress": 0.2
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/protocol/filename": {
+      "put": {
+        "summary": "Set Filename Preferences",
+        "description": "Sets the preferences for which components to include in the filename.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "ImageName",
+                  "IncludeDate",
+                  "IncludeTime",
+                  "IncludeUser",
+                  "IncludeProtocolName",
+                  "IncludeChannelName"
+                ],
+                "properties": {
+                  "ImageName": {
+                    "type": "string",
+                    "description": "Image name must not contain <>?|\"/\\\\:*"
+                  },
+                  "IncludeDate": {
+                    "type": "boolean"
+                  },
+                  "IncludeTime": {
+                    "type": "boolean"
+                  },
+                  "IncludeUser": {
+                    "type": "boolean"
+                  },
+                  "IncludeProtocolName": {
+                    "type": "boolean"
+                  },
+                  "IncludeChannelName": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "examples": {
+                "OK": {
+                  "value": {
+                    "ImageName": "MyExperiment",
+                    "IncludeDate": true,
+                    "IncludeTime": true,
+                    "IncludeUser": true,
+                    "IncludeProtocolName": true,
+                    "IncludeChannelName": true
+                  }
+                },
+                "Bad request syntax": {
+                  "value": {
+                    "ImageName": "MyExperiment",
+                    "IncludeDate": true,
+                    "IncludeTime": true
+                  }
+                },
+                "Invalid image name": {
+                  "value": {
+                    "ImageName": "MyExperiment://",
+                    "IncludeDate": true,
+                    "IncludeTime": true,
+                    "IncludeUser": true,
+                    "IncludeProtocolName": true,
+                    "IncludeChannelName": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad request syntax"
+          },
+          "409": {
+            "description": "Invalid image name"
+          }
+        }
+      }
+    },
+    "/v1/devices": {
+      "get": {
+        "summary": "Get Connected Devices",
+        "description": "Gets the currently connected devices.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Devices": {
+                      "type": "array",
+                      "description": "An array of currently connected devices."
+                    }
+                  }
+                },
+                "examples": {
+                  "Devices": {
+                    "value": {
+                      "Devices": [
+                        "dummy-camera",
+                        "dummy-xy-stage",
+                        "dummy-z-control",
+                        "microscope",
+                        "light-source",
+                        "dummy-confocal-unit",
+                        "dummy-light-source"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No devices"
+          }
+        }
+      }
+    },
+    "/v1/devices/{devicename}": {
+      "get": {
+        "summary": "Get Device Features",
+        "description": "Gets a list of features of the requested device.",
+        "parameters": [
+          {
+            "name": "devicename",
+            "in": "path",
+            "description": "The device name that needs to be fetched. Must be lower case and must use - instead of spaces. The correct device name can be read from Get Connected Devices command.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Name": {
+                      "type": "string",
+                      "description": "Value is a string representation of the feature value and will always be returned."
+                    },
+                    "Value": {
+                      "type": "string",
+                      "description": "Value is a string representation of the feature value and will always be returned."
+                    },
+                    "Min": {
+                      "type": "string",
+                      "description": "Value is a string representation of the feature value and will only be returned for certain features."
+                    },
+                    "Max": {
+                      "type": "string",
+                      "description": "Value is a string representation of the feature value and will only be returned for certain features."
+                    },
+                    "Values": {
+                      "type": "array",
+                      "description": "Value is a string representation of an array of feature values and will only be returned for certain features."
+                    }
+                  }
+                },
+                "examples": {
+                  "Exposure Time Feature": {
+                    "value": {
+                      "Name": "exposuretime",
+                      "Value": "48 ms",
+                      "Min": "0 s",
+                      "Max": "1 d"
+                    }
+                  },
+                  "X Position Feature": {
+                    "value": {
+                      "Name": "xposition",
+                      "Value": "150",
+                      "Min": "0",
+                      "Max": "1000"
+                    }
+                  },
+                  "Objective Feature Selector": {
+                    "value": {
+                      "Name": "objectivefeatureselector",
+                      "Value": "0",
+                      "Values": [
+                        "0: 10x/0.45",
+                        "1: 20x/0.6",
+                        "2: 36x/0.8",
+                        "3: 40x/0.9",
+                        "4: No Objective",
+                        "5: No Objective"
+                      ]
+                    }
+                  },
+                  "Objective Escaped": {
+                    "value": {
+                      "Name": "objectiveescaped",
+                      "Value": "False"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No device/feature found"
+          }
+        }
+      }
+    },
+    "/v1/devices/{devicename}/{featurename}": {
+      "get": {
+        "summary": "Get Device Feature",
+        "description": "Gets the value of the feature of the device.",
+        "parameters": [
+          {
+            "name": "devicename",
+            "in": "path",
+            "description": "The device name that needs to be fetched. Must be lower case and must use - instead of spaces. The correct device name can be read from Get Connected Devices command.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "featurename",
+            "in": "path",
+            "description": "The feature name that needs to be fetched. Must be lower case and must use - instead of spaces. The correct feature name can be read from Get Device Features command.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Value": {
+                      "type": "string",
+                      "description": "Value is a string representation of the feature value."
+                    }
+                  }
+                },
+                "examples": {
+                  "Exposure Time Feature Value": {
+                    "value": {
+                      "Value": "48 ms"
+                    }
+                  },
+                  "X Position Feature Value": {
+                    "value": {
+                      "Value": "150"
+                    }
+                  },
+                  "Objective Feature Selector": {
+                    "value": {
+                      "Value": "1"
+                    }
+                  },
+                  "Objective Escaped Value": {
+                    "value": {
+                      "Value": "true"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No device/feature found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Set Device Feature",
+        "description": "Sets the value of the feature of the device.",
+        "parameters": [
+          {
+            "name": "devicename",
+            "in": "path",
+            "description": "The device name that needs to be fetched. Must be lower case and must use - instead of spaces. The correct device name can be read from Get Connected Devices command.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "featurename",
+            "in": "path",
+            "description": "The feature name that needs to be fetched. Must be lower case and must use - instead of spaces. The correct feature name can be read from Get Device Features command.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "Value"
+                ],
+                "properties": {
+                  "Value": {
+                    "type": "string",
+                    "description": "Value is a string representation of the feature value."
+                  }
+                }
+              },
+              "examples": {
+                "Exposure Time Feature Value": {
+                  "value": {
+                    "Value": "48 ms"
+                  }
+                },
+                "X Position Feature Value": {
+                  "value": {
+                    "Value": "150"
+                  }
+                },
+                "Objective Feature Selector": {
+                  "value": {
+                    "Value": "1"
+                  }
+                },
+                "Objective Escaped value": {
+                  "value": {
+                    "Value": "false"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "210": {
+            "description": "Value was coerced",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Value": {
+                      "type": "string",
+                      "description": "Value is coerced to be within the defined range of the feature if requested value was set outside of the range. Value is a string representation of the feature's value."
+                    }
+                  }
+                },
+                "examples": {
+                  "Exposure Time Feature Value": {
+                    "value": {
+                      "Value": "48 ms"
+                    }
+                  },
+                  "X Position Feature Value": {
+                    "value": {
+                      "Value": "1000"
+                    }
+                  },
+                  "Objective Feature Selector": {
+                    "value": {
+                      "Value": "0"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request syntax"
+          },
+          "404": {
+            "description": "No device/feature found"
+          }
+        }
+      }
+    },
+    "/v1/datasets/current": {
+      "get": {
+        "summary": "Get Current Dataset Details",
+        "description": "Gets the currently open dataset details.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Id": {
+                      "type": "string",
+                      "description": "An string representation of the dataset id."
+                    },
+                    "Path": {
+                      "type": "string",
+                      "description": "The filesystem path of the dataset."
+                    }
+                  }
+                },
+                "examples": {
+                  "OK": {
+                    "value": {
+                      "Id": "C8128D72-B6D8-4F22-926D-9E09036ACC60",
+                      "Path": "C:\\FusionImages\\Snap.ims"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No current dataset"
+          }
+        }
+      }
+    },
+    "/v1/datasets/{datasetID}": {
+      "delete": {
+        "summary": "Delete Dataset",
+        "description": "Deletes a dataset with the specified id.",
+        "parameters": [
+          {
+            "name": "datasetID",
+            "in": "path",
+            "description": "The id of the dataset. The id of the current dataset can be read from Get Current Dataset Details command.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request Syntax"
+          },
+          "404": {
+            "description": "No dataset with specified id"
+          }
+        }
+      }
+    }
+  }
+}
