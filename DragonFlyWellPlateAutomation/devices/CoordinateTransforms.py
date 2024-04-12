@@ -121,7 +121,7 @@ def homography_matrix_estimation(method, vectors, wellcoords_key):
 
         logger.log(level=20, msg="Homography estimation method: {}".format("Eigenvectors"))
         # Construct matrix A
-        A = []  # 3,9
+        A = []  # pts_src*2,9
         for i in range(len(pts_src)):
             x, y, z = pts_src[i]
             u, v, z = pts_dst[i]
@@ -130,7 +130,7 @@ def homography_matrix_estimation(method, vectors, wellcoords_key):
 
         A = np.array(A)
 
-        # 9,3 @ 3,9
+        # 9,pts_src*2 @ pts_src*2,9
         eigenvalues, eigenvectors = np.linalg.eig(A.T @ A)
         # Find the smallest eigenvalue and its index
         smallest_eigenvalue_index = np.argmin(eigenvalues)
