@@ -16,12 +16,11 @@ logger.info("This log message is from {}.py".format(__name__))
 # TODO go over the signature mismatch problem in the last method and include more logs
 
 class WellPlate(XYZStage):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, test=True):
+        super().__init__(test=test)
         self.bottomright_calibration = None
         self.selected_wells = None
-        self.homography_source_coordinates = {"Bottom left well": {}, "Top left well": {}, "Top right well": {},
-                                              "Middle well": {}}
+        self.homography_source_coordinates = {"Bottom left well": {}, "Top left well": {}, "Top right well": {}}
         self.corners_coords = None
         self.yspacing = None
         self.xspacing = None
@@ -39,8 +38,7 @@ class WellPlate(XYZStage):
         self.currentwellposition = None
         self.wellbywell = False
         self.non_linear_correction = True
-
-        self.test = True
+        self.move_wait = 25
 
     def get_state(self, test_key=None):
 
@@ -78,8 +76,7 @@ class WellPlate(XYZStage):
         try:
             specified_vectors = [self.state_dict_2_vector(homography_source_coordinates["Top right well"]),
                                  self.state_dict_2_vector(homography_source_coordinates["Top left well"]),
-                                 self.state_dict_2_vector(homography_source_coordinates["Bottom left well"]),
-                                 self.state_dict_2_vector(homography_source_coordinates["Middle well"])]
+                                 self.state_dict_2_vector(homography_source_coordinates["Bottom left well"])]
 
             # Top right, Bottom left = Bottom right
             specified_vectors = specified_vectors + [np.array([specified_vectors[0][0], specified_vectors[2][1]])]
@@ -89,11 +86,10 @@ class WellPlate(XYZStage):
             bottomleft = specified_vectors[2].astype(float)
             topright = specified_vectors[0].astype(float)
             bottomright = specified_vectors[-1].astype(float)
-            middle = specified_vectors[3].astype(float)
 
             logger.log(level=20, msg="Well plate dimension: state dict as vectors {}".format(specified_vectors))
 
-            return topleft, bottomleft, topright, middle, bottomright
+            return topleft, bottomleft, topright, bottomright
 
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
@@ -137,19 +133,17 @@ class WellPlate(XYZStage):
     def predict_well_coords(self, c_n, r_n, homography_source_coordinates, algorithm="Linear spacing",
                             algorithm_H="non-linear"):
 
-        topleft, bottomleft, topright, middle, bottomright = self.get_source_coordinates(homography_source_coordinates)
+        topleft, bottomleft, topright, bottomright = self.get_source_coordinates(homography_source_coordinates)
 
         wellcoords_key = sum([[str(r + 1) + "-" + str(c + 1) for c in range(c_n)] for r in range(r_n)], [])
-        topleft_wn, topright_wn, bottomleft_wn, bottomright_wn, middle_wn = [wellcoords_key[x] for x in
-                                                                             [0, c_n - 1, (r_n * c_n) - c_n,
-                                                                              (r_n * c_n) - 1,
-                                                                              int(((r_n / 2) * c_n) - (
-                                                                                      (c_n / 2) + 1))]]
+        topleft_wn, topright_wn, bottomleft_wn, bottomright_wn = [wellcoords_key[x] for x in
+                                                                  [0, c_n - 1, (r_n * c_n) - c_n,
+                                                                   (r_n * c_n) - 1]]
 
         self.homography_matrix = CT.homography_matrix_estimation(algorithm_H,
-                                                                 [topleft, bottomleft, topright, middle],
+                                                                 [topleft, bottomleft, topright, bottomright],
                                                                  wellcoords_key=[topleft_wn, bottomleft_wn,
-                                                                                 topright_wn, middle_wn])
+                                                                                 topright_wn, bottomright_wn])
 
         print("2. Computing coordinate space from well corners using {}".format(algorithm))
 
@@ -199,12 +193,13 @@ class WellPlate(XYZStage):
 
                 self.update_state(state_dict, analoguecontrol_bool=False)
 
-                sleep(25)
+                sleep(self.move_wait)
+
             else:
                 logger.log(level=20,
                            msg="Stage is moving for well {} from coordinates {} to new coordinates{}".format(
                                wellname, "dummycoords", state_dict))
-                sleep(60)
+                sleep(self.move_wait)
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
             logger.exception("What happened here ", exc_info=True)
@@ -228,7 +223,8 @@ class WellPlate(XYZStage):
     def load_attributes(self, name):
         f = open(os.path.join(os.getcwd(), "models", '{}'.format(name)))
         attributes = json.load(f)
-        self.__dict__.update(attributes)
+
+        self.__dict__.update({key:value for key,value in attributes.items() if key != "test"})
         self.wellbywell = True
 
     def automated_wp_movement(self, wellname):

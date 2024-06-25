@@ -126,8 +126,8 @@ class FusionApi:
 class XYZStage(FusionApi):
     """From what I have seen, the XYZStage path outputs a list."""
 
-    def __init__(self, endpoint="v1"):
-        super().__init__()  # inherits
+    def __init__(self, endpoint="v1", test=True):
+        super().__init__(test=test)  # inherits
 
         self.endpoint = self.endpoint + "/{}/{}".format("devices", "xyz-stage")
 

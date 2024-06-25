@@ -4,9 +4,23 @@ import os
 from time import sleep
 
 import numpy as np
-from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QGridLayout, QPushButton, QWidget, QLineEdit, QVBoxLayout, QComboBox, QHBoxLayout
+from PyQt6.QtCore import Qt, QTimer
+from PyQt6.QtGui import QPixmap, QColor, QPainter
+from PyQt6.QtWidgets import QGridLayout, QPushButton, QWidget, QLineEdit, QVBoxLayout, QComboBox, QHBoxLayout, \
+    QSplashScreen, QLabel, QMessageBox
 from matplotlib import pyplot as plt
+import logging
+import sys
+
+import matplotlib
+import numpy as np
+
+from PyQt6.QtCore import *
+from PyQt6.QtWidgets import QApplication, QVBoxLayout, QWidget, QSizePolicy, \
+    QPlainTextEdit
+from imaris_ims_file_reader.ims import ims
+from matplotlib import pyplot as plt
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
 from DragonFlyWellPlateAutomation.devices.wellplate import WellPlate
 from DragonFlyWellPlateAutomation.gui.helperfunctions import create_colored_label
@@ -23,9 +37,30 @@ logger.debug("Directory: {}".format(os.getcwd()))
 # TODO Test the script
 # TODO Switch order of widgets enter is below add well plate name and edit boxes must be larger
 
+
+class WorkerSignals(QObject):
+    finished = pyqtSignal()
+    error = pyqtSignal(tuple)
+    result = pyqtSignal(object)
+
+
+class Automation(QThread):
+    def __init__(self, parent, well_plate):
+        super().__init__(parent)
+        self.signal = WorkerSignals()
+        self.well_plate = well_plate
+        self.well_name = None
+
+    def run(self):
+        if self.well_name is not None:
+            self.well_plate.automated_wp_movement(self.well_name)
+            self.signal.finished.emit()
+            return None
+
+
 class CreateNewWellPlateTemplate(QWidget):
-    def __init__(self, stacked_widget, well_plate):
-        super().__init__()
+    def __init__(self, parent, stacked_widget, well_plate):
+        super().__init__(parent)
 
         self.well_plate = well_plate
         self.stacked_widget = stacked_widget
@@ -154,7 +189,7 @@ class CreateNewWellPlateTemplate(QWidget):
 
 
 class Calibration(QWidget):
-    def __init__(self, wellplate, buttons, wellname, parent=None):
+    def __init__(self, wellplate, buttons, enter, parent=None):
         super().__init__(parent=parent)
 
         self.wellplate = wellplate
@@ -163,6 +198,7 @@ class Calibration(QWidget):
         self.calibrationdisplay = create_colored_label(parent=self, text="")
         self.calibrationdisplay.setWordWrap(True)
         main_layout.addWidget(self.calibrationdisplay)
+
 
         horizonti_ml = QHBoxLayout()
         self.placeholder_coordinates = create_colored_label("", self)
@@ -175,22 +211,103 @@ class Calibration(QWidget):
         main_layout.addLayout(horizonti_ml)
         self.setLayout(main_layout)
         self.buttons = buttons
+        self.enter = enter
 
-        self.move2calibration_well(wellname)
+        ### Moves well to last well plate once is frame switched
+        self.worker = Automation(parent=self,
+                                 well_plate=self.wellplate)  # Requires parent argument, else initialization is not in sync
+        self.worker.signal.finished.connect(self.show_message)
 
-    def move2calibration_well(self, wellname):
-        self.wellplate.automated_wp_movement(wellname)  # Delay #Give message on GUI to inform to refrain from closing
-                                                        # the application
-
-        self.calibrationdisplay.setText("Have we arrived on mid-point of well {} ?"
-                                        "If not, please move stage accordingly, then press read and "
-                                        "afterwards enter.".format(wellname))
+    def move2calibration_well(self, wellname, buttons, enter):
+        self.show_splash_screen(self.wellplate.move_wait, buttons, enter)
+        # message = QMessageBox(parent=self)
+        # message.setText("Window is frozen until XY-stage has calibrated")
+        self.worker.well_name = wellname
+        self.wellname = wellname
+        self.worker.start()
 
     def read_calibration_well(self):
         state = self.wellplate.get_state(test_key="Bottom right well")
         self.wellplate.bottomright_calibration = self.wellplate.state_dict_2_vector(state)
         self.placeholder_coordinates.setText("Current coordinates: {}".format(self.wellplate.bottomright_calibration))
         [button.setEnabled(True) for button in self.buttons]
+        self.reverse_greyoutbuttons(self.buttons, self.enter)
+
+    def greyoutbuttons(self , buttons, enter):
+
+        for x in buttons:
+            x.setEnabled(False)
+            x.setStyleSheet("background-color: {}; color: #ffffff;".format("#808080"))
+
+        self.original_style = enter.styleSheet()
+        enter.setEnabled(False)
+        enter.setStyleSheet("background-color: {}; color: #ffffff;".format("#808080"))
+
+
+    def reverse_greyoutbuttons(self, buttons, enter):
+
+        for x in buttons:
+            x.setEnabled(True)
+            x.setStyleSheet("background-color: {}; color: #ffffff;".format(x.color))
+
+        enter.setEnabled(True)
+        enter.setStyleSheet("background-color: {}; color: #ffffff;".format(self.original_style))
+    @pyqtSlot()
+    def show_message(self):
+        self.calibrationdisplay.setText("Have we arrived on mid-point of well {} ?"
+                                        "If not, please move stage accordingly, then press 'Read'"
+                                        .format(self.wellname))
+
+        self.close_loading_screen()
+
+    def show_splash_screen(self, length, buttons, enter):
+        self.greyoutbuttons(buttons, enter)
+        self.splash = SplashScreen(self)
+        self.splash.setGeometry(self.rect())
+        self.splash.showMessage("Please wait {} seconds \n for well  plate to position.\n"
+                                "Afterwards, please click \n the 'Read' button to save the\n"
+                                "current XY-stage coordinate".format(length), Qt.AlignmentFlag.AlignCenter,
+                                QColor("white"))
+        self.splash.show()
+
+    def close_loading_screen(self):
+        self.splash.close()
+
+    # def make_unresponsive(self):
+    #     self.calibrationdisplay.setDisabled(True)
+    #     self.overlay = QWidget(parent=self)
+    #     self.overlay.setGeometry(self.rect())
+    #     self.overlay.setStyleSheet("background-color: rgba(0, 0, 0, 100);")
+    #     self.overlay.show()
+    #
+    #
+    # def make_responsive(self):
+    #     self.calibrationdisplay.setDisabled(False)
+    #     self.overlay.hide()
+    #     self.overlay.deleteLater()
+
+
+class SplashScreen(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.SubWindow)
+        self.alignment = Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignCenter
+        self.color = QColor("white")
+        self.setFixedSize(parent.size())
+        self.move(0, 0)
+
+    def showMessage(self, message, alignment=Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignCenter,
+                    color=QColor("white")):
+        self.message = message
+        self.alignment = alignment
+        self.color = color
+        self.update()
+
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.fillRect(self.rect(), QColor(0, 0, 0, 160))
+        painter.setPen(self.color)
+        painter.drawText(self.rect(), self.alignment, self.message)
 
 
 class WellAsButton(QPushButton):
@@ -221,8 +338,8 @@ class WellAsButton(QPushButton):
 
 
 class CustomButtonGroup(QWidget):
-    def __init__(self, stacked_widget, well_plate):
-        super().__init__()
+    def __init__(self, parent, stacked_widget, well_plate):
+        super().__init__(parent)
 
         self.main_layout = QHBoxLayout(self)
         self.buttons = None
@@ -231,10 +348,8 @@ class CustomButtonGroup(QWidget):
         self.stacked_widget = stacked_widget
         self.well_plate = well_plate
 
-    def createcalibrationwidget(self, well_plate, buttons, wellname):
-
-        self.calibration_widget = Calibration(well_plate, buttons, wellname, parent=self)
-        self.main_layout.addWidget(self.calibration_widget)
+    def calibrate(self):
+        self.calibration_widget.move2calibration_well(self.well_plate.wellnames[-1], self.buttons, self.enter_button)
 
     def creatbuttongrid(self):
 
@@ -256,7 +371,9 @@ class CustomButtonGroup(QWidget):
         self.enter_button.clicked.connect(self.handleEnterPressed)
         main_layout.addWidget(self.enter_button)
 
-        self.createcalibrationwidget(self.well_plate, self.buttons, self.well_plate.wellnames[-1])
+        self.calibration_widget = Calibration(self.well_plate, self.buttons, self.enter_button, parent=self)
+        self.main_layout.addWidget(self.calibration_widget)
+
         self.main_layout.addLayout(main_layout)
         self.setLayout(self.main_layout)
 
@@ -268,13 +385,14 @@ class CustomButtonGroup(QWidget):
                                               in
                                               self.buttons if
                                               button.isChecked()]
-            logger.log(level=20, msg="Wells that have been selected: {}".format([x[-1] for x in
-                                                                                 self.well_plate.selected_wells]))
 
-            # Automatic updater -> threading ?
-            self.stacked_widget.switch2Protocol()  # -> Underneath for loop or in parallel to
+            if self.well_plate.selected_wells:
+                logger.log(level=20, msg="Wells that have been selected: {}".format([x[-1] for x in
+                                                                                     self.well_plate.selected_wells]))
+
+                # Automatic updater -> threading ?
+                self.stacked_widget.switch2Protocol()  # -> Underneath for loop or in parallel to
 
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
             logger.exception("What happened here ", exc_info=True)
-

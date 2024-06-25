@@ -27,8 +27,7 @@ class Microscope(FusionApi):
         logger.log(level=10, msg="The next path destinations of microscope: {}".format(self.path_options))
 
         # Used only in test phase
-        self.test_https = {x: {"Value": y["Value"]} if x != "referencezposition" else
-        {"Value": round(eval(y["Value"].replace(",", ".")), 3)} for x, y in
+        self.test_https = {x: {"Value": y["Value"]}  for x, y in
                            zip(self.path_options, self.current_output)}
 
         self.starting_z_height = self.get_current_z()[-1]
@@ -42,15 +41,28 @@ class Microscope(FusionApi):
             return {x: self.test_https[x] for x in self.path_options}
 
     def update_state(self, key, state_dict):
+        logger.log(level=20, msg="Updating Z position: {}".format(state_dict[key]["Value"]))
         if self.test is False:
             if state_dict is not None:
                 update(self.endpoint + "/{}".format(key), state_dict[key])
         else:
-            self.test_https["referencezposition"] = state_dict[key]
+            if not isinstance(state_dict[key]["Value"], str):
+                state_dict[key]["Value"] = str(state_dict[key]["Value"])
+            self.test_https["referencezposition"]["Value"] = state_dict[key]["Value"].replace(".", ",")
+
+
+
 
     def get_current_z(self):
         state = self.get_state()
         z = state["referencezposition"]["Value"]
+
+        if isinstance(z, str):
+            if "," in z:
+                z = z.replace(",",".")
+            z = eval(z)
+
+        state["referencezposition"]["Value"] = z
         logger.log(level=20, msg="Current Z: {}".format(z))
         return state, z
 
@@ -67,19 +79,21 @@ class Microscope(FusionApi):
         elif new_z_height is not None:
             state["referencezposition"]["Value"] = new_z_height
 
-        new = state["referencezposition"]["Value"]
 
-        state["referencezposition"]["Value"] = round(new, 3)
+        if self.test is False:
+            state["referencezposition"]["Value"] = round(state["referencezposition"]["Value"], 3)
+        else:
+            state["referencezposition"]["Value"] = str(round(state["referencezposition"]["Value"], 3))
+
 
         return state, current
 
     def updatezposition(self, state, current):
 
+        logger.log(level=20,
+                   msg="Updated referencezposition from {} to {}".format(current, state["referencezposition"]["Value"]))
+
         self.update_state(key="referencezposition", state_dict=state)
-
-        target = state["referencezposition"]["Value"]
-
-        logger.log(level=20, msg="Updated referencezposition from {} to {}".format(current, target))
 
         sleep(10)
 
@@ -96,7 +110,9 @@ class Microscope(FusionApi):
         return state["referencezposition"]["Value"]
 
     def return2start_z(self):
+        logger.log(level=20, msg="Return z axis to starting position: {}".format(self.starting_z_height))
         self.move_z_axis(new_z_height=self.starting_z_height)
+
 
 
 

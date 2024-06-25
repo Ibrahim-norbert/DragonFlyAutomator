@@ -80,14 +80,15 @@ class AutoFocus:
 
         [f_k, sum_], key_v = self.calculate_summed_power(power, x_spacing=(1 / 0.01), img_name=img_name)
 
+
         # Extract the power spectrum tail
-        return sum_[f_k > power_threshold * f_k.max()], [f_k, sum_], key_v
+        return sum_[f_k > power_threshold * np.max(f_k)], [f_k, sum_], key_v
 
     def turn2dt(self):
         return pd.DataFrame(dict([(key, pd.Series(value)) for key, value in self.variables.items()]))
 
     def save2DT_excel(self, directory, dt):
-        dt.to_csv(os.path.join(directory, "well_plate_data.csv"))
+        dt.to_csv(os.path.join(directory, "data.csv"))
         self.refresh()
 
     def Variance(self, img, img_name=None):

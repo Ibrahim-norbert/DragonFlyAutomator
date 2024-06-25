@@ -7,8 +7,8 @@ from DragonFlyWellPlateAutomation.gui.helperfunctions import create_colored_labe
 # TODO Test the script and add a widget that informs operator to select the protocol needed
 
 class GUIProtocol(QWidget):
-    def __init__(self, stacked_widget):
-        super().__init__()
+    def __init__(self, parent, stacked_widget):
+        super().__init__(parent)
 
         self.wellcords = None
         self.stacked_widget = stacked_widget
@@ -27,10 +27,10 @@ class GUIProtocol(QWidget):
         stackie_tr = QVBoxLayout()
         self.z_height_travelled = create_colored_label("", self)
         stackie_tr.addWidget(self.z_height_travelled)
-        self.img_name = QLineEdit(parent=self)
-        self.img_name.setPlaceholderText("Please give an image name")
-        self.img_name.editingFinished.connect(self.enteredvalues)
-        stackie_tr.addWidget(self.img_name)
+        # self.img_name = QLineEdit(parent=self)
+        # self.img_name.setPlaceholderText("Please give an image name")
+        # self.img_name.editingFinished.connect(self.enteredvalues)
+        # stackie_tr.addWidget(self.img_name)
 
         horizonti_top = QHBoxLayout()
         horizonti_top.addLayout(stackie_tl)
@@ -76,7 +76,8 @@ class GUIProtocol(QWidget):
     #                                     " and minimum z height would be " + str(self.protocol.microscope.starting_z_height -
     #                                                                             n_acquisitions*z_increment))
 
-    def enteredvalues(self):
+
+    def save_values(self):
         n_acquisitions = eval(self.n_acquisitions.text())
         z_increment = eval(self.z_increment.text())
 
@@ -86,7 +87,7 @@ class GUIProtocol(QWidget):
                                             "not crash into the well plate.".format
                                             (self.protocol.microscope.starting_z_height,
                                              round(self.protocol.microscope.starting_z_height +
-                                                   (n_acquisitions * z_increment), 3)))
+                                                   n_acquisitions * z_increment, 3)))
 
             # Assign the acquisition number and z increment to protocol instance
             self.protocol.n_acquisitions = n_acquisitions
@@ -95,19 +96,37 @@ class GUIProtocol(QWidget):
 
             self.protocol.protocol_name = self.protocol_name_widget.text()
 
-            # Assign image name
-            self.protocol.image_name = self.img_name.text()
+            # # Assign image name
+            # self.protocol.image_name = self.img_name.text()
 
             # Assign chosen algorithm
             self.protocol.autofocus_algorithm = self.dropdown.currentText()
 
-            # Assign image directory
-            self.protocol.image_dir = self.stacked_widget.frame0.img_dir  # os.path.join(os.getcwd(), "test_rn") =
-            # self.stacked_widget.frame0.img_dir
+            # # Assign image directory
+            # self.protocol.image_dir = self.stacked_widget.frame0.img_dir  # os.path.join(os.getcwd(), "test_rn") =
+            # # self.stacked_widget.frame0.img_dir
+
+    def enteredvalues(self):
+
+        if self.is_number(self.n_acquisitions.text()) and self.is_number(self.z_increment.text()):
+            self.save_values()
 
         else:
             self.z_height_travelled.setText("Both entries must be integers or floats")
             self.z_height_travelled.setStyleSheet("color: red;")
+
+    def is_number(self, n):
+        try:
+            float(n)  # Type-casting the string to `float`.
+            # If string is not a valid `float`,
+            # it'll raise `ValueError` exception
+        except ValueError:
+            return False
+        return True
+
+
+
+
 
     def run_automated_acquisition(self):
 

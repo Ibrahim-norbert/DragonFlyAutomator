@@ -129,7 +129,7 @@ def _get_protocol_progress():
 # high-level API
 
 def get_protocol_name():
-    _get_selected_protocol()
+    return _get_selected_protocol()
 
 
 def change_protocol(name):

@@ -92,8 +92,8 @@ class WorkerSignals(QObject):
 
 
 class Automation(QThread):
-    def __init__(self, well_plate, protocol):
-        super().__init__()
+    def __init__(self, parent, well_plate, protocol):
+        super().__init__(parent=parent)
         self.signal = WorkerSignals()
         self.signals_coords = WorkerSignals()
         self.signals_img = WorkerSignals()
@@ -111,19 +111,16 @@ class Automation(QThread):
             self.well_plate.automated_wp_movement(wellname)  # 60 seconds delay
 
             # Perform image acquisition
-            img_path = self.protocol.processwell(vector, wellname, self.well_plate.coordinate_frame_algorithm,
+            self.protocol.processwell(vector, wellname, self.well_plate.coordinate_frame_algorithm,
                                                  self.well_plate.homography_matrix_algorithm,
                                                  self.protocol.z_increment, self.protocol.n_acquisitions,
-                                                 self.protocol.protocol_name, self.protocol.image_name)
-
-            # Emit the current image from the thread
-            self.signals_img.result.emit((ims(img_path, squeeze_output=True), wellname))
+                                                 self.protocol.protocol_name)
 
         self.signal.finished.emit()
 
 
 class CoordinatePlotAndImgDisplay(QWidget):
-    def __init__(self, stacked_widget, parent=None):
+    def __init__(self, stacked_widget, well_plate, protocol, parent=None):
         super().__init__(parent)
         self.thread = None
         self.imgdisplay = None
@@ -144,16 +141,19 @@ class CoordinatePlotAndImgDisplay(QWidget):
         logger.addHandler(handler)
         handler.new_record.connect(self.text_display.appendPlainText)
 
-    def initviz(self, well_plate, protocol):
-        tl, tr, bl, _ = well_plate.corners_coords  # Top left, Top right, Bottom left
-        r_n, c_n = well_plate.r_n, well_plate.c_n
+        self.well_plate = well_plate
+
+        self.initprocess(self, self.well_plate, protocol)
+
+    def initviz(self):
+        tl, tr, bl, _ = self.well_plate.corners_coords  # Top left, Top right, Bottom left
+        r_n, c_n = self.well_plate.r_n, self.well_plate.c_n
 
         # Create the coordinate plot
         createplot(tr, tl, bl, c_n, r_n, self.canvas.axes[0], self.canvas.axes[1]
                    )
 
         # Start data generation
-        self.initprocess(well_plate, protocol)
         self.startthread()
 
     def addcoorddata(self, result):
@@ -204,6 +204,8 @@ class CoordinatePlotAndImgDisplay(QWidget):
         try:
             logger.log(level=20, msg="Shape of img: {}".format(self.img.shape))
             logger.log(level=20, msg="Image has dimensions: {}".format(self.img.shape))
+            if self.img.ndim >2:
+                self.img = self.img[0]
 
             if self.imgdisplay is None:
                 self.imgdisplay = self.canvas.axes[1].imshow(self.img, cmap="gray")
@@ -226,8 +228,8 @@ class CoordinatePlotAndImgDisplay(QWidget):
     def close_updater(self):
         self.text_display.appendPlainText("We are done")
 
-    def initprocess(self, well_plate, protocol):
-        self.thread = Automation(well_plate, protocol)
+    def initprocess(self, parent, well_plate, protocol):
+        self.thread = Automation(parent, well_plate, protocol)
         self.thread.signals_coords.result.connect(self.updatecoord)
         self.thread.signals_img.result.connect(self.updateimg)
         self.thread.signal.finished.connect(self.close_updater)

@@ -81,7 +81,7 @@ def homography_matrix_estimation(method, vectors, wellcoords_key):
           "to xzy-stage coordinate space".format(method))
 
     # Define source and destination coordinates
-
+    #c,r
     wellcoords = [np.flip([int(x.split("-")[0]), int(x.split("-")[1])]) for x in wellcoords_key]
 
     pts_src = np.array(wellcoords, dtype=np.float32)
