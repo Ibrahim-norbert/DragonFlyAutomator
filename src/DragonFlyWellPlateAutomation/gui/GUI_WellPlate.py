@@ -1,7 +1,6 @@
 import glob
 import logging
 import os
-
 from PyQt6.QtCore import *
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QColor, QPainter

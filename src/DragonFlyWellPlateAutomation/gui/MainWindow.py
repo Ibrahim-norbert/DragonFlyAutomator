@@ -1,11 +1,8 @@
 import logging
 import os.path
 import sys
-
 from PyQt6.QtGui import QPainter, QPixmap, QColor, QFont
 from PyQt6.QtWidgets import QApplication, QMainWindow
-
-sys.path[0] =  r"C:\Users\Piotr Wajda\Desktop\384_wellplate\Dragonfly_package\348_wellplate_automation-main"
 
 from DragonFlyWellPlateAutomation.gui.FrameSwitcher import FrameManager
 
@@ -56,8 +53,12 @@ class DragonflyAutomator(BackgroundMainWindow):
         self.setCentralWidget(FrameManager(parent=self, test=True))
 
 
-if __name__ == '__main__':
+def main():
     app = QApplication(sys.argv)
     window = DragonflyAutomator()
     window.show()
     sys.exit(app.exec())
+
+if __name__ == '__main__':
+    main()
+

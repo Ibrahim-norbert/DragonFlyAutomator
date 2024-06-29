@@ -152,7 +152,7 @@ class XYZStage(FusionApi):
         self.ymin, self.ymax = float(self.y_dict[self.min_key].replace(",", ".")), float(
             self.y_dict[self.max_key].replace(",", "."))
 
-        self.selected_path_option = endpoint.split("/")[-1]
+        self.selected_path_option = endpoint.split(os.sep)[-1]
         self.selected_key = None
 
     def get_state(self):

@@ -1,5 +1,4 @@
 import sys
-sys.path[0] =  r"C:\Users\Piotr Wajda\Desktop\384_wellplate\Dragonfly_package\348_wellplate_automation-main"
 from DragonFlyWellPlateAutomation.devices.micrscope import Microscope
 
 
