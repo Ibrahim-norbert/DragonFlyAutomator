@@ -4,6 +4,7 @@
 name: Python application
 run-name: DragonFlyInstallation #Run name in worklfow github action tab
 on:
+  workflow_dispatch:
   pull_request:
     branches: [ "main" ] #Reinstall after every pull
 
