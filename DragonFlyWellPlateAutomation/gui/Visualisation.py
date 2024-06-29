@@ -1,13 +1,10 @@
 import logging
-import sys
 
 import matplotlib
 import numpy as np
-
 from PyQt6.QtCore import *
-from PyQt6.QtWidgets import QApplication, QVBoxLayout, QWidget, QSizePolicy, \
+from PyQt6.QtWidgets import QVBoxLayout, QWidget, QSizePolicy, \
     QPlainTextEdit
-from imaris_ims_file_reader.ims import ims
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 

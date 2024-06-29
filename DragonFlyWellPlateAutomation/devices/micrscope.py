@@ -1,10 +1,8 @@
-import copy
 import json
 import logging
 import os
-import sys
 from time import sleep
-import numpy as np
+
 from DragonFlyWellPlateAutomation.devices.xyzstage import get_output, update, FusionApi
 
 logger = logging.getLogger("DragonFlyWellPlateAutomation.RestAPI.fusionrest")

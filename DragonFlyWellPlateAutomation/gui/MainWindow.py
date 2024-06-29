@@ -5,7 +5,6 @@ import sys
 from PyQt6.QtGui import QPainter, QPixmap, QColor, QFont
 from PyQt6.QtWidgets import QApplication, QMainWindow
 
-import sys
 sys.path[0] =  r"C:\Users\Piotr Wajda\Desktop\384_wellplate\Dragonfly_package\348_wellplate_automation-main"
 
 from DragonFlyWellPlateAutomation.gui.FrameSwitcher import FrameManager

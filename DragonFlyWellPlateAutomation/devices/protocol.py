@@ -1,17 +1,17 @@
+import datetime
 import glob
 import json
 import logging
 import os
 import shutil
 import time
-import datetime
 
 from imaris_ims_file_reader.ims import ims
 
 from DragonFlyWellPlateAutomation.RestAPI import fusionrest
 from DragonFlyWellPlateAutomation.devices.image_based_autofocus import AutoFocus
 from DragonFlyWellPlateAutomation.devices.micrscope import Microscope
-from DragonFlyWellPlateAutomation.devices.xyzstage import FusionApi, get_output, update
+from DragonFlyWellPlateAutomation.devices.xyzstage import FusionApi, get_output
 
 logger = logging.getLogger("DragonFlyWellPlateAutomation.RestAPI.fusionrest")
 logger.info("This log message is from {}.py".format(__name__))
@@ -156,9 +156,16 @@ class Protocol(FusionApi):
         return z_heights, acquisition_n
 
     def load_ims_imgs(self, img_path):
-        img = ims(img_path, squeeze_output=True)
-        return img[0, :, 0].astype(float)  # time point, channel, z level
-
+        try:
+            img = ims(img_path, squeeze_output=True)
+            return img[0, :, 0].astype(float)  # time point, channel, z level
+        except Exception as e:
+            if os.path.exists(img_path) and ".ims" in img_path:
+                Exception ("The following error has nothing to do with the software "
+                 "but with the pip package {}."
+                 "The error that was produced: {}".format(ims.__module__, e))
+            else:
+                Exception ("Appears to be a problem with the image path: {}".format(img_path))
     def autofocusing(self, wellname, z_increment, n_acquisitions):
 
         start = time.time()  # Start time

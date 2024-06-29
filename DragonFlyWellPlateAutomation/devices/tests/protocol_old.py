@@ -10,7 +10,7 @@ from imaris_ims_file_reader.ims import ims
 from DragonFlyWellPlateAutomation.RestAPI import fusionrest
 from DragonFlyWellPlateAutomation.devices.image_based_autofocus import AutoFocus
 from DragonFlyWellPlateAutomation.devices.micrscope import Microscope
-from DragonFlyWellPlateAutomation.devices.xyzstage import FusionApi, get_output, update
+from DragonFlyWellPlateAutomation.devices.xyzstage import FusionApi, get_output
 
 logger = logging.getLogger("DragonFlyWellPlateAutomation.RestAPI.fusionrest")
 logger.info("This log message is from {}.py".format(__name__))

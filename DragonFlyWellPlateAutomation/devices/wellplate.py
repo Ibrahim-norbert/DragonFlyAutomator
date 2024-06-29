@@ -1,7 +1,6 @@
 import json
 import logging
 import os
-import sys
 from time import sleep
 
 import numpy as np
@@ -32,7 +31,7 @@ class WellPlate(XYZStage):
         self.r_n = None
         self.homography_matrix_algorithm = None
 
-        self.homography_matrix_algorithms = ["Levenberg-Marquardt", "SVD", "Eigen-decomposition"]
+        self.homography_matrix_algorithms = ["RANSAC", "SVD"]
         self.coordinate_frame_algorithm = None
         self.coordinate_frame_algorithms = ["Linear spacing", "Homography"]
         self.currentwellposition = None

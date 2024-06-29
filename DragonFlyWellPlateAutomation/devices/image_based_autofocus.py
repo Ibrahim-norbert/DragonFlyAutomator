@@ -1,9 +1,8 @@
 """ All methods gotten from:
 Koho, S., Fazeli, E., Eriksson, J. et al. Image Quality Ranking Method for Microscopy.
 Sci Rep 6, 28962 (2016). https://doi.org/10.1038/srep28962"""
-import glob
 import os
-from imaris_ims_file_reader.ims import ims
+
 import numpy as np
 import pandas as pd
 

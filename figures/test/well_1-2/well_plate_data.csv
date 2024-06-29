@@ -1,6 +1,0 @@
-,Img_ID,Z plane,Well coords,Acquisition number,Metrics,Value,Variables,Frequency,Total power,Estimated f,Elapsed time,x,y,Type prediction,Type homography prediction,Type grid prediction
-0,rawtake_n1_well1-2_zheigth489.ims,489,1-2,1,Brenner,72529092898.0,,,,1,70.12826609611511,-43.04347826086957,33.1,1,Levenberg-Marquardt,Linear spacing
-1,rawtake_n1_well1-2_zheigth485.ims,485,1-2,1,Brenner,72529092898.0,,,,0,70.12826609611511,-43.04347826086957,33.1,1,Levenberg-Marquardt,Linear spacing
-2,rawtake_n1_well1-2_zheigth493.ims,493,1-2,1,Brenner,72529092898.0,,,,0,70.12826609611511,-43.04347826086957,33.1,1,Levenberg-Marquardt,Linear spacing
-3,rawtake_n2_well1-2_zheigth483.ims,483,1-2,2,Brenner,72529092898.0,,,,0,70.12826609611511,-43.04347826086957,33.1,1,Levenberg-Marquardt,Linear spacing
-4,rawtake_n2_well1-2_zheigth495.ims,495,1-2,2,Brenner,72529092898.0,,,,0,70.12826609611511,-43.04347826086957,33.1,1,Levenberg-Marquardt,Linear spacing

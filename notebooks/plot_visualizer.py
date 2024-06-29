@@ -105,9 +105,6 @@ def initwellplate():
 
 
 def merge_complex_autofocusimgs():
-    import matplotlib.pyplot as plt
-    import numpy as np
-
     wellnames = sum([[str(r + 1) + "-" + str(c + 1) for c in range(c_n)] for r in range(r_n)], [])
 
     for vector, wellname in zip(mid_points, wellnames):

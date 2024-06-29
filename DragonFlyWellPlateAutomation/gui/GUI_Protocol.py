@@ -1,5 +1,6 @@
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QPushButton, QWidget, QLineEdit, QVBoxLayout, QComboBox, QHBoxLayout, QCheckBox
+from PyQt6.QtWidgets import QPushButton, QWidget, QLineEdit, QVBoxLayout, QComboBox, QHBoxLayout
+
 from DragonFlyWellPlateAutomation.devices.protocol import Protocol
 from DragonFlyWellPlateAutomation.gui.helperfunctions import create_colored_label
 

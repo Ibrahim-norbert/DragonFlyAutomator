@@ -1,28 +1,13 @@
 import glob
 import logging
 import os
-from time import sleep
-
-import numpy as np
-from PyQt6.QtCore import Qt, QTimer
-from PyQt6.QtGui import QPixmap, QColor, QPainter
-from PyQt6.QtWidgets import QGridLayout, QPushButton, QWidget, QLineEdit, QVBoxLayout, QComboBox, QHBoxLayout, \
-    QSplashScreen, QLabel, QMessageBox
-from matplotlib import pyplot as plt
-import logging
-import sys
-
-import matplotlib
-import numpy as np
 
 from PyQt6.QtCore import *
-from PyQt6.QtWidgets import QApplication, QVBoxLayout, QWidget, QSizePolicy, \
-    QPlainTextEdit
-from imaris_ims_file_reader.ims import ims
-from matplotlib import pyplot as plt
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QColor, QPainter
+from PyQt6.QtWidgets import QGridLayout, QPushButton, QLineEdit, QComboBox, QHBoxLayout
+from PyQt6.QtWidgets import QVBoxLayout, QWidget
 
-from DragonFlyWellPlateAutomation.devices.wellplate import WellPlate
 from DragonFlyWellPlateAutomation.gui.helperfunctions import create_colored_label
 
 wellplate_paths = [os.path.basename(x) for x in glob.glob(os.path.join(os.getcwd(), "models", "*WellPlate*"))]

@@ -94,11 +94,11 @@ def homography_matrix_estimation(method, vectors, wellcoords_key):
         pts_dst = np.hstack((np.array(vectors, dtype=np.float32), np.ones((len(vectors), 1))))
     logger.log(level=20, msg="The corresponding xyz coordinates {}".format(pts_dst))
 
-    if method == "Levenberg-Marquardt":
+    if method == "RANSAC":
         logger.log(level=20, msg="Homography estimation method: {}".format(method))
         H = cv.findHomography(pts_src, pts_dst)[0]
 
-    elif method == "SVD":
+    else:
         logger.log(level=20, msg="Homography estimation method: {}".format("SVD"))
         # Construct matrix A
         A = []
@@ -116,31 +116,6 @@ def homography_matrix_estimation(method, vectors, wellcoords_key):
 
         # Normalize the matrix (optional)
         H /= H[2, 2]
-
-    else:
-
-        logger.log(level=20, msg="Homography estimation method: {}".format("Eigenvectors"))
-        # Construct matrix A
-        A = []  # 3,9
-        for i in range(len(pts_src)):
-            x, y, z = pts_src[i]
-            u, v, z = pts_dst[i]
-            A.append([-x, -y, -1, 0, 0, 0, x * u, y * u, u])
-            A.append([0, 0, 0, -x, -y, -1, x * v, y * v, v])
-
-        A = np.array(A)
-
-        # 9,3 @ 3,9
-        eigenvalues, eigenvectors = np.linalg.eig(A.T @ A)
-        # Find the smallest eigenvalue and its index
-        smallest_eigenvalue_index = np.argmin(eigenvalues)
-
-        # Extract the eigenvector corresponding to the smallest eigenvalue
-        homography_candidate = eigenvectors[:, smallest_eigenvalue_index]
-
-        # Reshape and normalize the homography matrix
-        homography = homography_candidate.reshape((3, 3))
-        H = homography / homography[2, 2]
 
     return H
 
