@@ -3,11 +3,11 @@ import logging
 from PyQt6.QtWidgets import QStackedWidget
 
 import DragonFlyWellPlateAutomation.gui.GUI_Protocol as GUIP
+import DragonFlyWellPlateAutomation.gui.Visualisation as VIZ
 import DragonFlyWellPlateAutomation.gui.GUI_WellPlate as GUIWP
 import DragonFlyWellPlateAutomation.gui.SaveDirectory as SaveDirectory
-import DragonFlyWellPlateAutomation.gui.Visualisation as VIZ
 
-logger = logging.getLogger("DragonFlyWellPlateAutomation.RestAPI.fusionrest")
+logger = logging.getLogger("RestAPI.fusionrest")
 logger.info("This log message is from {}.py".format(__name__))
 
 

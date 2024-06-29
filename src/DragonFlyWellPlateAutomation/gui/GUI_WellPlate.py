@@ -9,9 +9,9 @@ from PyQt6.QtWidgets import QVBoxLayout, QWidget
 
 from DragonFlyWellPlateAutomation.gui.helperfunctions import create_colored_label
 
-wellplate_paths = [os.path.basename(x) for x in glob.glob(os.path.join(os.getcwd(), "models", "*WellPlate*"))]
+wellplate_paths = [os.path.basename(x) for x in glob.glob(os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "models", "*WellPlate*"))]
 
-logger = logging.getLogger("DragonFlyWellPlateAutomation.RestAPI.fusionrest")
+logger = logging.getLogger("RestAPI.fusionrest")
 logger.info("This log message is from {}.py".format(__name__))
 logger.debug("Directory: {}".format(os.getcwd()))
 

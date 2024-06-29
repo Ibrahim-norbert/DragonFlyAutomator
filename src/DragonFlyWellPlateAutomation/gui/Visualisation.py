@@ -9,7 +9,7 @@ from matplotlib import pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
 matplotlib.use("QtAgg")
-logger = logging.getLogger("DragonFlyWellPlateAutomation.RestAPI.fusionrest")
+logger = logging.getLogger("RestAPI.fusionrest")
 logger.info("This log message is from {}.py".format(__name__))
 
 

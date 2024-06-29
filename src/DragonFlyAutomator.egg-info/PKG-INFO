@@ -1,0 +1,16 @@
+Metadata-Version: 2.1
+Name: DragonFlyAutomator
+Version: 0.0.1
+Requires-Python: >=3.8.19
+License-File: LICENSE.md
+Requires-Dist: imaris_ims_file_reader==0.1.8
+Requires-Dist: matplotlib==3.7.2
+Requires-Dist: numpy==1.24.4
+Requires-Dist: opencv_python==4.9.0.80
+Requires-Dist: pandas==2.0.3
+Requires-Dist: ProjectRoot==0.0.6
+Requires-Dist: PyQt6==6.7.0
+Requires-Dist: PyQt6_sip==13.6.0
+Requires-Dist: Requests==2.32.3
+Provides-Extra: dev
+Requires-Dist: pytest>=6.2.2; extra == "dev"

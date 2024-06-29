@@ -5,7 +5,7 @@ from time import sleep
 
 from DragonFlyWellPlateAutomation.devices.xyzstage import get_output, update, FusionApi
 
-logger = logging.getLogger("DragonFlyWellPlateAutomation.RestAPI.fusionrest")
+logger = logging.getLogger("RestAPI.fusionrest")
 logger.info("This log message is from {}.py".format(__name__))
 
 
@@ -18,7 +18,7 @@ class Microscope(FusionApi):
         if self.test is False:
             self.current_output = get_output(self.endpoint)
         else:
-            f = open(os.path.join(os.getcwd(), "endpoint_outputs", os.path.basename(self.endpoint) + ".json"))
+            f = open(os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "endpoint_outputs", os.path.basename(self.endpoint) + ".json"))
             self.current_output = json.load(f)
 
         self.path_options = [x["Name"] for x in self.current_output if x is not None]

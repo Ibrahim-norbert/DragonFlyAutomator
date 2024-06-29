@@ -2,7 +2,7 @@ import logging
 
 from PyQt6.QtWidgets import QLabel
 
-logger = logging.getLogger("DragonFlyWellPlateAutomation.RestAPI.fusionrest")
+logger = logging.getLogger("RestAPI.fusionrest")
 logger.info("This log message is from {}.py".format(__name__))
 
 

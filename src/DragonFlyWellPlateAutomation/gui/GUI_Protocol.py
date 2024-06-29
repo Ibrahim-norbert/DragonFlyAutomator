@@ -104,7 +104,7 @@ class GUIProtocol(QWidget):
             self.protocol.autofocus_algorithm = self.dropdown.currentText()
 
             # # Assign image directory
-            # self.protocol.image_dir = self.stacked_widget.frame0.img_dir  # os.path.join(os.getcwd(), "test_rn") =
+            # self.protocol.image_dir = self.stacked_widget.frame0.img_dir  # os.path.join( "test_rn") =
             # # self.stacked_widget.frame0.img_dir
 
     def enteredvalues(self):

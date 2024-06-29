@@ -91,7 +91,7 @@ def create_plot(xmin=-50,
     return axis, tr, tl, bl, r_n, c_n, mid_point, vector_1, sum([[np.array([x, y]) for indx, x in enumerate(x_coords[:c_n])] for y in np.flip(y_coords[1:])], [])
 
 
-from DragonFlyWellPlateAutomation.devices.wellplate import WellPlate as wp
+from src.DragonFlyWellPlateAutomation.devices.wellplate import WellPlate as wp
 
 
 def initwellplate():

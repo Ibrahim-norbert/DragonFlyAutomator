@@ -8,11 +8,11 @@ from time import sleep
 import fusionrest
 
 # Example: Log a message from another module
-logger = logging.getLogger("DragonFlyWellPlateAutomation.RestAPI.fusionrest")
+logger = logging.getLogger("RestAPI.fusionrest")
 logger.info("This log message is from {}".format(__name__))
 
 
-# logging.basicConfig(filename=os.path.join(os.getcwd(), 'dragonfly_automator.log'), level=logging.DEBUG,
+# logging.basicConfig(filename=os.path.join(os.path.dirname(__file__), 'dragonfly_automator.log'), level=logging.DEBUG,
 #                   format='%(asctime)s - %(levelname)s - %(message)s')
 
 def wait_for_input_trigger():

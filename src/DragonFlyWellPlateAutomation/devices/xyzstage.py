@@ -6,7 +6,7 @@ import numpy as np
 
 from DragonFlyWellPlateAutomation.RestAPI import fusionrest
 
-logger = logging.getLogger("DragonFlyWellPlateAutomation.RestAPI.fusionrest")
+logger = logging.getLogger("RestAPI.fusionrest")
 logger.info("This log message is from {}.py".format(__name__))
 
 
@@ -114,11 +114,11 @@ class FusionApi:
         attributes = {key: attr.tolist() if isinstance(attr, np.ndarray) else attr for key,
         attr in attributes.items()}
 
-        with open(os.path.join(os.getcwd(), "models", '{}.json'.format(name)), 'w') as f:
+        with open(os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "models", '{}.json'.format(name)), 'w') as f:
             json.dump(attributes, f)
 
     def load_attributes(self, name):
-        f = open(os.path.join(os.getcwd(), "models", '{}'.format(name)))
+        f = open(os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "models", '{}'.format(name)))
         attributes = json.load(f)
         self.__dict__.update(attributes)
 
@@ -134,7 +134,7 @@ class XYZStage(FusionApi):
         if self.test is False:
             self.current_output = get_output(self.endpoint)
         else:
-            f = open(os.path.join(os.getcwd(), "endpoint_outputs", os.path.basename(self.endpoint) + ".json"))
+            f = open(os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "endpoint_outputs", os.path.basename(self.endpoint) + ".json"))
             self.current_output = json.load(f)
 
         self.path_options = [x["Name"] for x in self.current_output]
@@ -161,7 +161,7 @@ class XYZStage(FusionApi):
             return {x: get_output(endpoint=self.endpoint + "/{}".format(x)) for x in
                     self.path_options}
         else:
-            f = open(os.path.join(os.getcwd(), r"endpoint_outputs", "xyz-stage.json"))
+            f = open(os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", r"endpoint_outputs", "xyz-stage.json"))
             x = json.load(f)
 
             return {d: x[id_] for id_, d in enumerate(self.path_options)}

@@ -1,0 +1,67 @@
+LICENSE.md
+README.md
+pyproject.toml
+setup.cfg
+src/DragonFlyAutomator.egg-info/PKG-INFO
+src/DragonFlyAutomator.egg-info/SOURCES.txt
+src/DragonFlyAutomator.egg-info/dependency_links.txt
+src/DragonFlyAutomator.egg-info/entry_points.txt
+src/DragonFlyAutomator.egg-info/requires.txt
+src/DragonFlyAutomator.egg-info/top_level.txt
+src/DragonFlyWellPlateAutomation/__init__.py
+src/DragonFlyWellPlateAutomation/custom_logger.py
+src/DragonFlyWellPlateAutomation/RestAPI/__init__.py
+src/DragonFlyWellPlateAutomation/RestAPI/fusionrest.py
+src/DragonFlyWellPlateAutomation/RestAPI/mit-test.py
+src/DragonFlyWellPlateAutomation/data/dependencies/dependencies_linux_qt6
+src/DragonFlyWellPlateAutomation/data/dependencies/important_code_to_instantiate_python_environment.txt
+src/DragonFlyWellPlateAutomation/data/dependencies/notes
+src/DragonFlyWellPlateAutomation/data/endpoint_outputs/Bottom left_xposition.json
+src/DragonFlyWellPlateAutomation/data/endpoint_outputs/Bottom left_yposition.json
+src/DragonFlyWellPlateAutomation/data/endpoint_outputs/Bottom right_xposition.json
+src/DragonFlyWellPlateAutomation/data/endpoint_outputs/Bottom right_yposition.json
+src/DragonFlyWellPlateAutomation/data/endpoint_outputs/Devices.json
+src/DragonFlyWellPlateAutomation/data/endpoint_outputs/Middle_xposition.json
+src/DragonFlyWellPlateAutomation/data/endpoint_outputs/Middle_yposition.json
+src/DragonFlyWellPlateAutomation/data/endpoint_outputs/Top left_xposition.json
+src/DragonFlyWellPlateAutomation/data/endpoint_outputs/Top left_yposition.json
+src/DragonFlyWellPlateAutomation/data/endpoint_outputs/Top right_xposition.json
+src/DragonFlyWellPlateAutomation/data/endpoint_outputs/Top right_yposition.json
+src/DragonFlyWellPlateAutomation/data/endpoint_outputs/analoguecontrol.json
+src/DragonFlyWellPlateAutomation/data/endpoint_outputs/confocal-unit.json
+src/DragonFlyWellPlateAutomation/data/endpoint_outputs/datasets.json
+src/DragonFlyWellPlateAutomation/data/endpoint_outputs/ixon-emccd-2.json
+src/DragonFlyWellPlateAutomation/data/endpoint_outputs/light-source.json
+src/DragonFlyWellPlateAutomation/data/endpoint_outputs/microscope.json
+src/DragonFlyWellPlateAutomation/data/endpoint_outputs/protocol_current.json
+src/DragonFlyWellPlateAutomation/data/endpoint_outputs/triggermode.json
+src/DragonFlyWellPlateAutomation/data/endpoint_outputs/xyz-stage.json
+src/DragonFlyWellPlateAutomation/data/images/BioQuant_Logo_RGB_136.png
+src/DragonFlyWellPlateAutomation/data/images/dragonfly.jpg
+src/DragonFlyWellPlateAutomation/data/models/384_WellPlate_Falcon_4.json
+src/DragonFlyWellPlateAutomation/data/test/test_dir/rawtake_n1_well3-2_zheigth485.ims
+src/DragonFlyWellPlateAutomation/devices/CoordinateTransforms.py
+src/DragonFlyWellPlateAutomation/devices/__init__.py
+src/DragonFlyWellPlateAutomation/devices/camera.py
+src/DragonFlyWellPlateAutomation/devices/dataset.py
+src/DragonFlyWellPlateAutomation/devices/image_based_autofocus.py
+src/DragonFlyWellPlateAutomation/devices/microscope_test.py
+src/DragonFlyWellPlateAutomation/devices/micrscope.py
+src/DragonFlyWellPlateAutomation/devices/protocol.py
+src/DragonFlyWellPlateAutomation/devices/wellplate.py
+src/DragonFlyWellPlateAutomation/devices/xyzstage.py
+src/DragonFlyWellPlateAutomation/devices/online_tests/__init__.py
+src/DragonFlyWellPlateAutomation/devices/online_tests/microscope_test.py
+src/DragonFlyWellPlateAutomation/devices/online_tests/protocol_old.py
+src/DragonFlyWellPlateAutomation/devices/online_tests/protocol_test.py
+src/DragonFlyWellPlateAutomation/gui/CloseFrame.py
+src/DragonFlyWellPlateAutomation/gui/FrameSwitcher.py
+src/DragonFlyWellPlateAutomation/gui/GUI_Protocol.py
+src/DragonFlyWellPlateAutomation/gui/GUI_WellPlate.py
+src/DragonFlyWellPlateAutomation/gui/MainWindow.py
+src/DragonFlyWellPlateAutomation/gui/SaveDirectory.py
+src/DragonFlyWellPlateAutomation/gui/Visualisation.py
+src/DragonFlyWellPlateAutomation/gui/__init__.py
+src/DragonFlyWellPlateAutomation/gui/helperfunctions.py
+src/DragonFlyWellPlateAutomation/notebooks/__init__.py
+src/DragonFlyWellPlateAutomation/notebooks/plot_visualizer.py

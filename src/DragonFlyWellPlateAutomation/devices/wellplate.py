@@ -8,7 +8,7 @@ import numpy as np
 from DragonFlyWellPlateAutomation.devices import CoordinateTransforms as CT
 from DragonFlyWellPlateAutomation.devices.xyzstage import XYZStage, get_output
 
-logger = logging.getLogger("DragonFlyWellPlateAutomation.RestAPI.fusionrest")
+logger = logging.getLogger("RestAPI.fusionrest")
 logger.info("This log message is from {}.py".format(__name__))
 
 
@@ -46,12 +46,12 @@ class WellPlate(XYZStage):
                     self.path_options}
 
         else:
-            file = os.path.join(os.getcwd(), r"endpoint_outputs",
+            file = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", r"endpoint_outputs",
                                 "{}xposition.json".format(test_key.replace(" well", "_")))
             f = open(file)
             x_ = json.load(f)
             # Opening JSON file
-            file = os.path.join(os.getcwd(), r"endpoint_outputs",
+            file = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", r"endpoint_outputs",
                                 "{}yposition.json".format(test_key.replace(" well", "_")))
             f = open(file)
             y_ = json.load(f)
@@ -215,12 +215,12 @@ class WellPlate(XYZStage):
         attributes = {key: attr.tolist() if isinstance(attr, np.ndarray) else attr for key,
         attr in attributes.items()}
 
-        with open(os.path.join(os.getcwd(), "models", '{}_WellPlate_{}_{}.json'.format(self.c_n * self.r_n, partnumber,
+        with open(os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "models", '{}_WellPlate_{}_{}.json'.format(self.c_n * self.r_n, partnumber,
                                                                                        manufacturer)), 'w') as f:
             json.dump(attributes, f)
 
     def load_attributes(self, name):
-        f = open(os.path.join(os.getcwd(), "models", '{}'.format(name)))
+        f = open(os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "models", '{}'.format(name)))
         attributes = json.load(f)
 
         self.__dict__.update({key:value for key,value in attributes.items() if key != "test"})

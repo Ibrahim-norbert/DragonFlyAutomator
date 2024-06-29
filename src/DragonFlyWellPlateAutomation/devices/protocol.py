@@ -13,7 +13,7 @@ from DragonFlyWellPlateAutomation.devices.image_based_autofocus import AutoFocus
 from DragonFlyWellPlateAutomation.devices.micrscope import Microscope
 from DragonFlyWellPlateAutomation.devices.xyzstage import FusionApi, get_output
 
-logger = logging.getLogger("DragonFlyWellPlateAutomation.RestAPI.fusionrest")
+logger = logging.getLogger("RestAPI.fusionrest")
 logger.info("This log message is from {}.py".format(__name__))
 
 
@@ -35,7 +35,7 @@ class Protocol(FusionApi):
             self.current_output = self.get_state()
             self.protocol_name = fusionrest.get_protocol_name()
         else:
-            f = open(os.path.join(os.getcwd(), "endpoint_outputs", os.path.basename(self.endpoint) + "_current.json"))
+            f = open(os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "endpoint_outputs", os.path.basename(self.endpoint) + "_current.json"))
             self.current_output = json.load(f)
 
         # For z-stack algorithm
@@ -54,7 +54,7 @@ class Protocol(FusionApi):
         if self.test is False:
             return fusionrest.get_state()
         else:
-            f = open(os.path.join(os.getcwd(), "endpoint_outputs", os.path.basename(self.endpoint) + "_current.json"))
+            f = open(os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "endpoint_outputs", os.path.basename(self.endpoint) + "_current.json"))
             return json.load(f)
 
     def run_protocol(self, protocol_name):
@@ -71,7 +71,7 @@ class Protocol(FusionApi):
         if self.test is False:
             img_name_dict = get_output(os.path.dirname(self.endpoint) + "/{}".format("datasets/current"))
         else:
-            f = open(os.path.join(os.getcwd(), "endpoint_outputs", "datasets.json"))
+            f = open(os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "endpoint_outputs", "datasets.json"))
             img_name_dict = json.load(f)
 
         logger.log(level=20, msg="Image directory given as: {}".format(img_name_dict["Path"]))
@@ -243,7 +243,7 @@ class Protocol(FusionApi):
         else:
             timestemp = str(datetime.datetime.now().strftime(
                 "%Y-%m-%d_%H_%M"))
-            img_path_old = os.path.join(os.getcwd(), "test", "test_dir", "rawtake_n1_well3-2_zheigth485.ims")
+            img_path_old = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "test", "test_dir", "rawtake_n1_well3-2_zheigth485.ims")
             ### Apply root directory of img name dict only in test
             img_path = os.path.join(os.path.dirname(self.image_dir),
                                     "{}_{}.ims".format(protocol_name, timestemp))

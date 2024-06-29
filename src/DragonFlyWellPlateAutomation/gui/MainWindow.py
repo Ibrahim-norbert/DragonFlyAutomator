@@ -8,7 +8,7 @@ from DragonFlyWellPlateAutomation.gui.FrameSwitcher import FrameManager
 
 # Configure import logging
 
-logger = logging.getLogger("DragonFlyWellPlateAutomation.RestAPI.fusionrest")
+logger = logging.getLogger("RestAPI.fusionrest")
 logger.info("This log message is from {}.py".format(__name__))
 logger.info("Directory: {}".format(os.getcwd()))
 
@@ -18,10 +18,16 @@ logger.info("Directory: {}".format(os.getcwd()))
 class BackgroundMainWindow(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.background_image = QPixmap(os.path.join(os.getcwd(), "images", "dragonfly.jpg"))
-        self.overlay_image = QPixmap(os.path.join(os.getcwd(), "images", "BioQuant_Logo_RGB_136.png"))
-        self.text = "AG Erfle & Starkuvienė"
 
+        self.background_image = QPixmap(os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "images", "dragonfly.jpg"))
+        self.overlay_image = QPixmap(os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "images", "BioQuant_Logo_RGB_136.png"))
+        self.text = "AG Erfle & Starkuvienė"
+        if self.background_image.isNull():
+            print("Failed to load image")
+            if os.path.exists(os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "images", "dragonfly.jpg")):
+                print("But appears to exist")
+            else:
+                print("Does not exist")
     def paintEvent(self, event):
         painter = QPainter(self)
 

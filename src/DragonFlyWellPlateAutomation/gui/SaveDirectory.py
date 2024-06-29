@@ -7,10 +7,10 @@ from PyQt6.QtWidgets import QPushButton, QWidget, QLineEdit, QVBoxLayout, QHBoxL
 
 from DragonFlyWellPlateAutomation.devices.wellplate import WellPlate
 
-logger = logging.getLogger("DragonFlyWellPlateAutomation.RestAPI.fusionrest")
+logger = logging.getLogger("RestAPI.fusionrest")
 logger.info("This log message is from {}.py".format(__name__))
 
-wellplate_paths = [os.path.basename(x) for x in glob.glob(os.path.join(os.getcwd(), "models", "*WellPlate*"))]
+wellplate_paths = [os.path.basename(x) for x in glob.glob(os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "models", "*WellPlate*"))]
 
 
 # TODO Add another widget

@@ -1,4 +1,3 @@
-import sys
 from DragonFlyWellPlateAutomation.devices.micrscope import Microscope
 
 

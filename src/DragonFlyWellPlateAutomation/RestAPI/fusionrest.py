@@ -5,7 +5,7 @@ import time
 import requests
 
 
-logging.basicConfig(level=logging.INFO, filemode="w", filename=os.path.join(os.getcwd(), 'dragonfly_automator.log'),
+logging.basicConfig(level=logging.INFO, filemode="w", filename=os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", 'dragonfly_automator.log'),
                     format='%(filename)s - %(asctime)s - %(levelname)s - %(message)s')
 
 
