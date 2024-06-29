@@ -117,6 +117,34 @@ def homography_matrix_estimation(method, vectors, wellcoords_key):
         # Normalize the matrix (optional)
         H /= H[2, 2]
 
+<<<<<<< HEAD
+=======
+    else:
+
+        logger.log(level=20, msg="Homography estimation method: {}".format("Eigenvectors"))
+        # Construct matrix A
+        A = []  # pts_src*2,9
+        for i in range(len(pts_src)):
+            x, y, z = pts_src[i]
+            u, v, z = pts_dst[i]
+            A.append([-x, -y, -1, 0, 0, 0, x * u, y * u, u])
+            A.append([0, 0, 0, -x, -y, -1, x * v, y * v, v])
+
+        A = np.array(A)
+
+        # 9,pts_src*2 @ pts_src*2,9
+        eigenvalues, eigenvectors = np.linalg.eig(A.T @ A)
+        # Find the smallest eigenvalue and its index
+        smallest_eigenvalue_index = np.argmin(eigenvalues)
+
+        # Extract the eigenvector corresponding to the smallest eigenvalue
+        homography_candidate = eigenvectors[:, smallest_eigenvalue_index]
+
+        # Reshape and normalize the homography matrix
+        homography = homography_candidate.reshape((3, 3))
+        H = homography / homography[2, 2]
+
+>>>>>>> 290d67663131df3267b2331094efa033a4a7a685
     return H
 
 
