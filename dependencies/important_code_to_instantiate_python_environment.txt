@@ -1,8 +1,0 @@
-#Creat python envirnoment:
-python -m venv C:\Users\Piotr Wajda\Desktop\384_wellplate\DragonFlyAutomator
-
-#Activate python envrionment:
-DragonFlyAutomator\Scripts\activate.bat
-
-#Install packages from requirement files in activated python environement:
-pip install -r requirements.txt
