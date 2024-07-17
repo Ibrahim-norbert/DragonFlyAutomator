@@ -5,13 +5,21 @@ import numpy as np
 import json
 import os
 
+
+
+
+
 x_paths = ["/endpoint_outputs/Top right_xposition.json",
            "endpoint_outputs/Top left_xposition.json",
            "endpoint_outputs/Bottom left_xposition.json"]
 
 y_paths = ["endpoint_outputs/Top right_yposition.json", "endpoint_outputs/Top left_yposition.json",
            "endpoint_outputs/Bottom left_yposition.json"]
-data_path = os.getcwd()
+
+data_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
+
+os.chdir(os.path.dirname(os.path.dirname(data_path)))
+print("New working dir: {}".format(os.getcwd()))
 print(data_path)
 tr, tl, bl = [[eval(json.load(open(data_path + "/" + x))["Value"]), eval(json.load(open(data_path + "/" + y))["Value"])]
               for x, y in zip(x_paths, y_paths)]
@@ -19,9 +27,9 @@ r_n, c_n = 16, 24
 
 
 def create_plot(xmin=-50,
-                xmax=62,
-                ymin=-40,
-                ymax=35, title='Real-Time {} well plate positioning'.format(c_n * r_n)):
+                xmax=60,
+                ymin=-39,
+                ymax=34, title='Real-Time {} well plate positioning'.format(c_n * r_n)):
     # All values are in mm
 
     fig, axis = plt.subplots(figsize=(11, 7.2))
@@ -92,6 +100,7 @@ def create_plot(xmin=-50,
 
 
 from DragonFlyWellPlateAutomation.devices.wellplate import WellPlate as wp
+
 
 
 def initwellplate():

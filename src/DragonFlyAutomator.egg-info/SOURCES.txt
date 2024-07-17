@@ -13,6 +13,7 @@ src/DragonFlyWellPlateAutomation/custom_logger.py
 src/DragonFlyWellPlateAutomation/RestAPI/__init__.py
 src/DragonFlyWellPlateAutomation/RestAPI/fusionrest.py
 src/DragonFlyWellPlateAutomation/RestAPI/mit-test.py
+src/DragonFlyWellPlateAutomation/data/dragonfly_automator.log
 src/DragonFlyWellPlateAutomation/data/dependencies/dependencies_linux_qt6
 src/DragonFlyWellPlateAutomation/data/dependencies/important_code_to_instantiate_python_environment.txt
 src/DragonFlyWellPlateAutomation/data/dependencies/notes
