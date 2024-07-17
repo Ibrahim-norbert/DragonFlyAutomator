@@ -74,9 +74,9 @@ def cleanup():
 
 def main():
     app = QApplication(sys.argv)
+    app.aboutToQuit.connect(cleanup)
     window = DragonflyAutomator()
     window.show()
-    app.aboutToQuit.connect(cleanup)
     sys.exit(app.exec())
 
 
