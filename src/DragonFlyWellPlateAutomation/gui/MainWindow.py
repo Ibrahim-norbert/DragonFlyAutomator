@@ -1,5 +1,7 @@
+import glob
 import logging
 import os.path
+import shutil
 import sys
 from PyQt6.QtGui import QPainter, QPixmap, QColor, QFont
 from PyQt6.QtWidgets import QApplication, QMainWindow
@@ -19,15 +21,19 @@ class BackgroundMainWindow(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        self.background_image = QPixmap(os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "images", "dragonfly.jpg"))
-        self.overlay_image = QPixmap(os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "images", "BioQuant_Logo_RGB_136.png"))
+        self.background_image = QPixmap(
+            os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "images", "dragonfly.jpg"))
+        self.overlay_image = QPixmap(
+            os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "images", "BioQuant_Logo_RGB_136.png"))
         self.text = "AG Erfle & Starkuvienė"
         if self.background_image.isNull():
             print("Failed to load image")
-            if os.path.exists(os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "images", "dragonfly.jpg")):
+            if os.path.exists(
+                    os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "images", "dragonfly.jpg")):
                 print("But appears to exist")
             else:
                 print("Does not exist")
+
     def paintEvent(self, event):
         painter = QPainter(self)
 
@@ -59,12 +65,20 @@ class DragonflyAutomator(BackgroundMainWindow):
         self.setCentralWidget(FrameManager(parent=self, test=True))
 
 
+def cleanup():
+    paths = glob.glob(os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "test", "*"))
+    [os.remove(path) for path in paths if ".ims" in path]
+    [shutil.rmtree(path) for path in paths if "well_" in path]
+    logger.log(level=20, msg=f"Files cleaned up")
+
+
 def main():
     app = QApplication(sys.argv)
     window = DragonflyAutomator()
     window.show()
+    app.aboutToQuit.connect(cleanup)
     sys.exit(app.exec())
+
 
 if __name__ == '__main__':
     main()
-

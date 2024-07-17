@@ -309,9 +309,3 @@ class Protocol(FusionApi):
         # Save data
         self.savedatafromexecution(vector, coordinate_frame_algorithm, homography_matrix_algorithm, wellname)
 
-        if self.test is True:
-            files = glob.glob(os.path.join(os.path.dirname(self.image_dir), "*.ims"))
-            [os.remove(file) for file in files]
-            folders = glob.glob(os.path.join(os.path.dirname(self.image_dir), "*wellname*"))
-            [shutil.rmtree(folder) for folder in folders]
-            logger.log(level=20, msg=f"Testing of {wellname} was successful")
