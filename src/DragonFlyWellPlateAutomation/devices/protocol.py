@@ -35,7 +35,8 @@ class Protocol(FusionApi):
             self.current_output = self.get_state()
             self.protocol_name = fusionrest.get_protocol_name()
         else:
-            f = open(os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "endpoint_outputs", os.path.basename(self.endpoint) + "_current.json"))
+            f = open(os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "endpoint_outputs",
+                                  os.path.basename(self.endpoint) + "_current.json"))
             self.current_output = json.load(f)
 
         # For z-stack algorithm
@@ -43,7 +44,6 @@ class Protocol(FusionApi):
         self.n_acquisitions = None
         self.img_name_dict = self.get_image_dir()
         self.image_dir = os.path.dirname(self.img_name_dict["Path"])
-
 
         # Only for live image acquisition method
         self.image_name = None  # "Phalloidin_Hoechst_GfP_HeLa"
@@ -54,7 +54,8 @@ class Protocol(FusionApi):
         if self.test is False:
             return fusionrest.get_state()
         else:
-            f = open(os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "endpoint_outputs", os.path.basename(self.endpoint) + "_current.json"))
+            f = open(os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "endpoint_outputs",
+                                  os.path.basename(self.endpoint) + "_current.json"))
             return json.load(f)
 
     def run_protocol(self, protocol_name):
@@ -71,8 +72,10 @@ class Protocol(FusionApi):
         if self.test is False:
             img_name_dict = get_output(os.path.dirname(self.endpoint) + "/{}".format("datasets/current"))
         else:
-            f = open(os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "endpoint_outputs", "datasets.json"))
+            f = open(
+                os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "endpoint_outputs", "datasets.json"))
             img_name_dict = json.load(f)
+            img_name_dict["Path"] = os.path.join(os.path.dirname(os.path.dirname(__file__)), img_name_dict["Path"])
 
         logger.log(level=20, msg="Image directory given as: {}".format(img_name_dict["Path"]))
         return img_name_dict
@@ -161,11 +164,12 @@ class Protocol(FusionApi):
             return img[0, :, 0].astype(float)  # time point, channel, z level
         except Exception as e:
             if os.path.exists(img_path) and ".ims" in img_path:
-                Exception ("The following error has nothing to do with the software "
-                 "but with the pip package {}."
-                 "The error that was produced: {}".format(ims.__module__, e))
+                Exception("The following error has nothing to do with the software "
+                          "but with the pip package {}."
+                          "The error that was produced: {}".format(ims.__module__, e))
             else:
-                Exception ("Appears to be a problem with the image path: {}".format(img_path))
+                Exception("Appears to be a problem with the image path: {}".format(img_path))
+
     def autofocusing(self, wellname, z_increment, n_acquisitions):
 
         start = time.time()  # Start time
@@ -243,7 +247,8 @@ class Protocol(FusionApi):
         else:
             timestemp = str(datetime.datetime.now().strftime(
                 "%Y-%m-%d_%H_%M"))
-            img_path_old = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "test", "test_dir", "rawtake_n1_well3-2_zheigth485.ims")
+            img_path_old = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "test", "test_dir",
+                                        "rawtake_n1_well3-2_zheigth485.ims")
             ### Apply root directory of img name dict only in test
             img_path = os.path.join(os.path.dirname(self.image_dir),
                                     "{}_{}.ims".format(protocol_name, timestemp))
@@ -261,9 +266,6 @@ class Protocol(FusionApi):
         self.variables.loc[:,
         "Type homography prediction"] = homography_matrix_algorithm
         self.variables.loc[:, "Type grid prediction"] = coordinate_frame_algorithm
-
-
-
 
         # Save dataframe in well directory
         self.autofocus.save2DT_excel(self.well_folder(wellname=wellname), self.variables)
