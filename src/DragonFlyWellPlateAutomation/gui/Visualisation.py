@@ -223,7 +223,7 @@ class CoordinatePlotAndImgDisplay(QWidget):
 
     @pyqtSlot()
     def close_updater(self):
-        self.text_display.appendPlainText("We are done")
+        self.text_display.appendPlainText("We are done. Please close the application.")
 
     def initprocess(self, parent, well_plate, protocol):
         self.thread = Automation(parent, well_plate, protocol)

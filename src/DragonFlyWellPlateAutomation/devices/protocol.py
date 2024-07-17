@@ -181,12 +181,8 @@ class Protocol(FusionApi):
         logger.log(level=20, msg="Obtaining images from the following directory: {}".format(
             self.image_dir))
 
-        if self.test is True:
-            img_paths = glob.glob(
-                os.path.join(os.path.dirname(self.image_dir), "*Protocol 59*.ims"))
-        else:
-            img_paths = glob.glob(
-                os.path.join(self.image_dir, "*Protocol 59*.ims"))
+        img_paths = glob.glob(
+            os.path.join(os.path.dirname(self.image_dir), "*Protocol 59*.ims"))
 
         n_imgs = 2 * n_acquisitions
         if len(img_paths) > n_imgs:
@@ -203,9 +199,16 @@ class Protocol(FusionApi):
 
         # Populate autofocus variable
         if func is not None and callable(func):
-            [func(self.load_ims_imgs(img_path), (z_heights[indx], acquisition_n[indx],
-                                                 wellname, os.path.basename(img_path))) for indx, img_path in
-             enumerate(img_paths)]  # Time point 0, Channel 0, z-layer 5
+            if self.test is True:
+                [func(self.load_ims_imgs(img_path), (z_heights[indx], acquisition_n[indx],
+                                                     wellname, os.path.basename(img_path))) for indx, img_path in
+                 enumerate(img_paths)]  # Time point 0, Channel 0, z-layer 5
+            else:
+                [func(self.load_ims_imgs(img_path), (z_heights[indx], acquisition_n[indx],
+                                                     wellname, os.path.basename(img_path))) and os.remove(img_path) for
+                 indx, img_path in
+                 enumerate(img_paths)]  # Time point 0, Channel 0, z-layer 5
+
             logger.log(level=20, msg="Image quality metric applied to all z-stack images")
         else:
             logger.log(level=20, msg="Image quality metric cannot be found.")
@@ -214,7 +217,7 @@ class Protocol(FusionApi):
         self.variables = self.autofocus.turn2dt()
 
         # Get focal plane
-        self.variables, well_f = self.determinefocalplane(func, self.variables)  ## Added this function 02.04
+        self.variables, well_f = self.determinefocalplane(func, self.variables, wellname)  ## Added this function 02.04
 
         # Request update to focal z position
         self.microscope.move_z_axis(new_z_height=well_f)  ## Made this function more compact 02.04
@@ -224,7 +227,7 @@ class Protocol(FusionApi):
 
         logger.log(level=20, msg="Autofocus ended for well {} with elapsed time: {}".format(wellname, timer))
 
-    def determinefocalplane(self, func, dt):
+    def determinefocalplane(self, func, dt, wellname):
 
         # Index the best image
         subdt = dt[dt["Metrics"] == func.__name__]
@@ -235,7 +238,20 @@ class Protocol(FusionApi):
         dt.at[best_score, "Estimated f"] = 1
 
         # Index the z height of the best image
-        well_f = dt.loc[best_score, "Z plane"].tolist()
+        logger.log(level=20, msg="Estimated focal plane: {}".format(dt.loc[best_score, "Z plane"]))
+        well_f = dt.loc[best_score, "Z plane"]
+        if isinstance(well_f, float):
+            well_f = [well_f]
+        elif isinstance(well_f, tuple):
+            well_f = list(well_f)
+        else:
+            well_f = well_f.tolist()
+
+        if len(well_f) > 1:
+            exception = "Multiple focal planes detected for {}. Well might be empty. For now we choose acquisition at z plane {}".format(wellname, well_f[0])
+            logger.log(level=20, msg=exception)
+
+        well_f = well_f[0]
 
         return dt, well_f
 
@@ -249,6 +265,14 @@ class Protocol(FusionApi):
                 "%Y-%m-%d_%H_%M"))
             img_path_old = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "test", "test_dir",
                                         "rawtake_n1_well3-2_zheigth485.ims")
+            if not os.path.exists(img_path_old):
+                img_path_old_new = input(
+                    "If you would like to test the autofocus methods, please provide an ims image path")
+                if os.path.exists(img_path_old_new):
+                    shutil.copy2(img_path_old_new, img_path_old)
+                else:
+                    raise Exception("The path provided does not exist. Please provide a valid path")
+
             ### Apply root directory of img name dict only in test
             img_path = os.path.join(os.path.dirname(self.image_dir),
                                     "{}_{}.ims".format(protocol_name, timestemp))
@@ -284,3 +308,10 @@ class Protocol(FusionApi):
 
         # Save data
         self.savedatafromexecution(vector, coordinate_frame_algorithm, homography_matrix_algorithm, wellname)
+
+        if self.test is True:
+            files = glob.glob(os.path.join(os.path.dirname(self.image_dir), "*.ims"))
+            [os.remove(file) for file in files]
+            folders = glob.glob(os.path.join(os.path.dirname(self.image_dir), "*wellname*"))
+            [shutil.rmtree(folder) for folder in folders]
+            logger.log(level=20, msg=f"Testing of {wellname} was successful")
