@@ -2,10 +2,10 @@
 
 ## Description
 DragonFlyAutomator is a software that automates the process of image acquisition of a multiwell plate for the Dragonfly Andor 505 microscope.
-The single channel image acquisition is performed using Protocol 59, so please ensure that the protocol is present in the Fusion software.
-Protocol 59 must have the following settings: Dapi channel and single burst mode. The protocol is used in the autofocus step and is executed 
-at each z-plane position. The positioning to the wells is performed either by linear spacing or homography transformation.
-Both methods will require the sampling of well corners as illustrated in the following image:
+Single channel image acquisition is performed using Protocol 59, so please ensure this protocol is present in the Fusion software.
+Protocol 59 must have the following settings: Dapi channel and single burst mode. The protocol is required for autofocusing and executed 
+at each z-plane position. Well positioning is performed either by linear spacing or homography transformation.
+Both methods require sampling of well corners as illustrated in the following images:
 
 ![Alt text](demo_positioning.png)
 
