@@ -8,7 +8,7 @@ DragonFlyAutomator is a software that automates the process of image acquisition
 Single channel image acquisition is performed using Protocol 59, so please ensure this protocol is present in the Fusion software.
 Protocol 59 must have the following settings: Dapi channel and single burst mode. The protocol is required for autofocusing and executed 
 at each z-plane position. Well positioning is performed either by linear spacing or homography transformation.
-Both methods require sampling of well corners as illustrated in the following images:
+Both methods require recording of well corner stage coordinates as illustrated in the following images:
 
 ![Alt text](demo_positioning.png)
 
